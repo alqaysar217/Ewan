@@ -41,7 +41,7 @@ export default async function Home() {
     });
     aiSuggestions = result.suggestedVersions;
   } catch (error) {
-    console.error("AI suggestion failed:", error);
+    console.error("AI suggestion failed:", error instanceof Error ? error.message : String(error));
     aiSuggestions = "Could not retrieve AI suggestions at this time.";
   }
 
