@@ -24,7 +24,10 @@ import {
   Quote,
   CheckCircle,
   Hammer,
-  Palette
+  Palette,
+  MapPin,
+  HelpCircle,
+  CheckCircle2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from '@/firebase';
@@ -38,6 +41,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Footer from '@/components/Footer';
 
 export default function HomePage() {
@@ -73,7 +82,6 @@ export default function HomePage() {
         <div className="container flex h-20 items-center justify-between px-4 md:px-8">
           
           <div className="flex items-center gap-6 lg:gap-10">
-            {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <div className="relative w-10 h-10 overflow-hidden rounded-lg shadow-lg shadow-secondary/20 bg-white">
                 <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
@@ -81,7 +89,6 @@ export default function HomePage() {
               <span className="text-2xl font-extrabold tracking-tight text-secondary hidden sm:block">إيوان</span>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-muted-foreground">
               {navLinks.map((link) => (
                 <Link 
@@ -101,7 +108,6 @@ export default function HomePage() {
             </nav>
           </div>
 
-          {/* Action Icons */}
           <div className="flex items-center gap-2 md:gap-4">
             <div className={cn(
               "flex items-center bg-gray-50 rounded-lg border border-border/60 transition-all duration-300",
@@ -226,7 +232,7 @@ export default function HomePage() {
           
           <div className="container relative z-20 px-4 md:px-8">
             <div className="max-w-2xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-20">
-              <div className="relative inline-flex items-center px-6 py-2 bg-secondary/20 border-r-4 border-primary text-primary overflow-hidden">
+              <div className="relative inline-flex items-center px-6 py-2 bg-secondary/30 backdrop-blur-xl border-r-4 border-primary text-primary overflow-hidden">
                 <span className="text-xs font-black tracking-[0.2em] uppercase">المساحات الذكية • إيوان</span>
               </div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
@@ -293,7 +299,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Vendors & Carpenters Section */}
+        {/* Featured Vendors Section */}
         <section className="py-24 bg-gray-50">
           <div className="container px-4 md:px-8">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -311,28 +317,43 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: 'ورشة إتقان للنجارة', type: 'نجارة يدوية', rating: 4.9, icon: Hammer, img: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=600' },
-                { name: 'تصاميم رؤية', type: 'تصميم داخلي', rating: 4.8, icon: Palette, img: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=600' },
-                { name: 'الخشب الفاخر', type: 'أثاث مخصص', rating: 5.0, icon: Hammer, img: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=600' }
+                { name: 'ورشة إتقان للنجارة', type: 'نجارة يدوية', rating: 4.9, icon: Hammer, location: 'صنعاء، التحرير', img: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=600', description: 'متخصصون في صناعة غرف النوم والدواوين الخشبية الفاخرة بجودة يمنية أصيلة.' },
+                { name: 'تصاميم رؤية', type: 'تصميم داخلي', rating: 4.8, icon: Palette, location: 'عدن، المنصورة', img: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=600', description: 'نحول مساحات منزلك إلى لوحات فنية بلمسات عصرية وأسعار تنافسية.' },
+                { name: 'الخشب الفاخر', type: 'أثاث مخصص', rating: 5.0, icon: Hammer, location: 'حضرموت، المكلا', img: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=600', description: 'أثاث منزلي ومكتبي مخصص حسب الطلب من أفضل أنواع الأخشاب الطبيعية.' }
               ].map((vendor, idx) => (
-                <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-border/50 group hover:shadow-xl transition-all">
-                  <div className="relative h-48 w-full mb-6 rounded-lg overflow-hidden">
+                <div key={idx} className="bg-white rounded-lg shadow-sm border border-border/50 group hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                  <div className="relative h-56 w-full">
                     <Image src={vendor.img} alt={vendor.name} fill className="object-cover group-hover:scale-105 transition-transform" data-ai-hint="carpentry workshop" />
+                    <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button className="bg-white text-secondary hover:bg-white/90 font-bold rounded-lg shadow-xl">عرض المعرض</Button>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="text-xl font-black text-secondary mb-1">{vendor.name}</h4>
-                      <div className="flex items-center gap-2 text-primary">
-                        <vendor.icon className="w-4 h-4" />
-                        <span className="text-sm font-bold">{vendor.type}</span>
+                  <div className="p-6 flex-1 flex flex-col space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <h4 className="text-xl font-black text-secondary">{vendor.name}</h4>
+                          <CheckCircle2 className="w-4 h-4 text-primary fill-primary/10" />
+                        </div>
+                        <div className="flex items-center gap-2 text-primary">
+                          <vendor.icon className="w-4 h-4" />
+                          <span className="text-sm font-bold">{vendor.type}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-lg">
+                        <Star className="w-4 h-4 fill-current" />
+                        <span className="text-sm font-black">{vendor.rating}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-lg">
-                      <Star className="w-4 h-4 fill-current" />
-                      <span className="text-sm font-black">{vendor.rating}</span>
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{vendor.description}</p>
+                    <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-bold pt-2">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {vendor.location}
+                    </div>
+                    <div className="pt-4 mt-auto">
+                      <Button variant="outline" className="w-full rounded-lg border-secondary/20 hover:bg-secondary hover:text-white font-bold transition-all h-12">عرض كافة المنتجات</Button>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full rounded-lg border-secondary/20 hover:bg-secondary hover:text-white font-bold transition-all">عرض الملف الشخصي</Button>
                 </div>
               ))}
             </div>
@@ -371,8 +392,37 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section className="py-24 bg-gray-50">
+          <div className="container px-4 md:px-8 max-w-4xl mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <div className="inline-flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest">
+                <HelpCircle className="w-5 h-5" /> مركز المساعدة
+              </div>
+              <h2 className="text-4xl font-black text-secondary">الأسئلة الشائعة</h2>
+              <p className="text-muted-foreground text-lg">كل ما تحتاج معرفته حول رحلتك مع إيوان.</p>
+            </div>
+
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {[
+                { q: "كيف يعمل التصميم بالذكاء الاصطناعي؟", a: "ببساطة، ترفع صورة لغرفتك الحالية، تختار الطراز المفضل (مودرن، كلاسيك..)، وتحدد ميزانيتك. سيقوم نظامنا بتحليل المساحة واقتراح قطع أثاث حقيقية متوفرة في متجرنا تناسب مساحتك." },
+                { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
+                { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." },
+                { q: "كيف يمكنني الانضمام كتاجر أو نجار؟", a: "يمكنك التسجيل كتاجر من صفحة التسجيل، وبعد مراجعة الإدارة لبياناتك وتوثيق ورشتك أو متجرك، ستتمكن من رفع منتجاتك وبدء استقبال الطلبات." }
+              ].map((item, i) => (
+                <AccordionItem key={i} value={`item-${i}`} className="bg-white border rounded-lg px-6">
+                  <AccordionTrigger className="text-lg font-bold text-secondary hover:no-underline">{item.q}</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed text-[15px] pb-6">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+
         {/* Testimonials Section */}
-        <section className="py-24 bg-gray-50 overflow-hidden">
+        <section className="py-24 bg-white overflow-hidden border-t">
           <div className="container px-4 md:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
               <h2 className="text-4xl font-black text-secondary">ماذا يقول عملاؤنا</h2>
@@ -440,7 +490,6 @@ export default function HomePage() {
           
           <div className="relative">
             <div className="absolute inset-0 bg-primary/30 rounded-full blur-lg group-hover:bg-primary/50 transition-all duration-500 animate-pulse scale-125" />
-            
             <Button 
               size="icon" 
               className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-all hover:scale-110 duration-300 overflow-hidden border-2 border-white/20"
