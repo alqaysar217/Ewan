@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Cairo } from 'next/font/google';
+import { FirebaseClientProvider } from '@/firebase';
 
 const cairo = Cairo({ 
   subsets: ['arabic', 'latin'],
@@ -23,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable}`}>
       <body className="antialiased font-sans selection:bg-primary/20">
-        {children}
-        <Toaster />
+        <FirebaseClientProvider>
+          {children}
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

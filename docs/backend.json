@@ -3,7 +3,7 @@
   "entities": {
     "User": {
       "title": "مستخدم",
-      "description": "بيانات المستخدمين (عملاء، تجار، مسؤولين)",
+      "description": "بيانات المستخدمين الأساسية",
       "type": "object",
       "properties": {
         "full_name": { "type": "string" },
@@ -17,8 +17,8 @@
       "required": ["full_name", "email", "role"]
     },
     "Vendor": {
-      "title": "تاجر / مقدم خدمة",
-      "description": "بيانات المتاجر والنجارين ومصممي الديكور",
+      "title": "متجر / مزود خدمة",
+      "description": "بيانات التجار والنجارين ومصممي الديكور",
       "type": "object",
       "properties": {
         "user_id": { "type": "string" },
@@ -36,7 +36,7 @@
     },
     "Product": {
       "title": "منتج",
-      "description": "الأثاث والديكورات المعروضة في المتجر",
+      "description": "قطع الأثاث والديكور المتاحة في المتجر",
       "type": "object",
       "properties": {
         "vendor_id": { "type": "string" },
@@ -57,7 +57,7 @@
     },
     "AIDesignRequest": {
       "title": "طلب تصميم ذكاء اصطناعي",
-      "description": "طلبات إعادة تصميم الغرف باستخدام الذكاء الاصطناعي",
+      "description": "طلبات إعادة تصميم الغرف",
       "type": "object",
       "properties": {
         "user_id": { "type": "string" },
@@ -70,26 +70,25 @@
         "status": { "type": "string", "enum": ["queued", "processing", "completed", "failed"] }
       }
     },
-    "Order": {
-      "title": "طلب شراء",
-      "description": "طلبات شراء الأثاث من المتجر",
-      "type": "object",
-      "properties": {
-        "user_id": { "type": "string" },
-        "total": { "type": "number" },
-        "order_status": { "type": "string", "enum": ["pending", "confirmed", "preparing", "shipped", "delivered", "cancelled"] },
-        "payment_status": { "type": "string", "enum": ["pending", "paid", "failed"] },
-        "shipping_address": { "type": "object" }
-      }
-    },
     "Conversation": {
       "title": "محادثة",
-      "description": "المحادثات بين العملاء والتجار",
+      "description": "المحادثات الفورية بين العملاء والتجار",
       "type": "object",
       "properties": {
         "customer_id": { "type": "string" },
         "vendor_id": { "type": "string" },
         "last_message_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Order": {
+      "title": "طلب شراء",
+      "description": "طلبات شراء الأثاث من المتاجر",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "total": { "type": "number" },
+        "order_status": { "type": "string", "enum": ["pending", "confirmed", "preparing", "shipped", "delivered", "cancelled"] },
+        "payment_status": { "type": "string", "enum": ["pending", "paid", "failed"] }
       }
     }
   },
@@ -98,10 +97,10 @@
   },
   "firestore": {
     "/users/{userId}": { "schema": "User", "description": "ملفات المستخدمين" },
-    "/vendors/{vendorId}": { "schema": "Vendor", "description": "بيانات التجار" },
+    "/vendors/{vendorId}": { "schema": "Vendor", "description": "بيانات المتاجر والنجارين" },
     "/products/{productId}": { "schema": "Product", "description": "كتالوج المنتجات" },
-    "/orders/{orderId}": { "schema": "Order", "description": "طلبات الشراء" },
-    "/ai_design_requests/{requestId}": { "schema": "AIDesignRequest", "description": "طلبات تصميم الذكاء الاصطناعي" },
-    "/conversations/{convId}": { "schema": "Conversation", "description": "غرف المحادثة" }
+    "/ai_design_requests/{requestId}": { "schema": "AIDesignRequest", "description": "طلبات التصميم الذكي" },
+    "/conversations/{convId}": { "schema": "Conversation", "description": "غرف المحادثة" },
+    "/orders/{orderId}": { "schema": "Order", "description": "طلبات الشراء" }
   }
 }
