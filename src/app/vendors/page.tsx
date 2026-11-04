@@ -16,10 +16,8 @@ import {
   ChevronLeft,
   Award,
   Layers,
-  CircleDollarSign,
-  Palette,
   Sparkles,
-  Maximize2
+  Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +31,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const MOCK_STORES = [
@@ -42,7 +39,7 @@ const MOCK_STORES = [
     business_name: 'المعرض الملكي للأثاث',
     business_type: 'furniture_store',
     description: 'أفخم تشكيلة من غرف النوم الإيطالية والأطقم التركية الجاهزة مع ضمان حقيقي لمدة 5 سنوات.',
-    city: 'صنعاء، شارع حدة',
+    city: 'صنعاء',
     average_rating: 4.9,
     service_areas: ['صنعاء', 'عمران', 'ذمار'],
     cover_url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
@@ -54,7 +51,7 @@ const MOCK_STORES = [
     business_name: 'أثاث الخليج الحديث',
     business_type: 'furniture_store',
     description: 'نقدم حلولاً عصرية للمكاتب والمنازل بأسعار تنافسية. تشكيلة واسعة من المكاتب والكراسي الطبية.',
-    city: 'عدن، المنصورة',
+    city: 'عدن',
     average_rating: 4.7,
     service_areas: ['عدن', 'لحج', 'أبين'],
     cover_url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1200',
@@ -66,7 +63,7 @@ const MOCK_STORES = [
     business_name: 'مفروشات السعيد',
     business_type: 'furniture_store',
     description: 'الرائدون في عالم المفروشات منذ عام 1990. نجمع بين الجودة العالية والذوق الرفيع.',
-    city: 'تعز، شارع جمال',
+    city: 'تعز',
     average_rating: 4.8,
     service_areas: ['تعز', 'إب'],
     cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
@@ -78,7 +75,7 @@ const MOCK_STORES = [
     business_name: 'مركز المهرة للمفروشات',
     business_type: 'furniture_store',
     description: 'أحدث الموديلات العالمية المستوردة حصرياً لعملائنا في المهرة والمناطق الشرقية.',
-    city: 'المهرة، الغيضة',
+    city: 'المهرة',
     average_rating: 4.5,
     service_areas: ['الغيضة', 'سقطرى'],
     cover_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1200',
@@ -90,7 +87,7 @@ const MOCK_STORES = [
     business_name: 'عالم الديكور للأثاث',
     business_type: 'furniture_store',
     description: 'تخصصنا في الأثاث المودرن والستائر الذكية. اجعل منزلك مواكباً للعصر مع منتجاتنا.',
-    city: 'إب، الدائري',
+    city: 'إب',
     average_rating: 4.6,
     service_areas: ['إب', 'تعز'],
     cover_url: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=1200',
@@ -101,7 +98,6 @@ const MOCK_STORES = [
 
 export default function StoresPage() {
   const db = useFirestore();
-  const [maxPrice, setMaxPrice] = useState([500000]);
   
   const vendorsQuery = query(
     collection(db, 'vendors'), 
@@ -116,37 +112,20 @@ export default function StoresPage() {
 
   const categories = [
     { id: 'living', name: 'غرف المعيشة' },
-    { id: 'bedroom', name: 'النوم' },
-    { id: 'dining', name: 'الطعام' },
-    { id: 'majlis', name: 'المجالس' },
-    { id: 'lighting', name: 'الإضاءة' },
-    { id: 'rugs', name: 'السجاد' },
-    { id: 'antiques', name: 'التحف' }
+    { id: 'bedroom', name: 'غرف النوم' },
+    { id: 'dining', name: 'طاولات الطعام' },
+    { id: 'majlis', name: 'المجالس العربية' },
+    { id: 'office', name: 'الأثاث المكتبي' },
+    { id: 'decor', name: 'إكسسوارات وديكور' }
   ];
 
-  const styles = [
-    { id: 'modern', name: 'حديث' },
-    { id: 'minimalist', name: 'مينمليست' },
-    { id: 'traditional', name: 'طابع تراثي' },
-    { id: 'contemporary', name: 'كونتمبوراري' },
-    { id: 'scandinavian', name: 'اسكندنافي' }
-  ];
-
-  const colors = [
-    { id: 'creamy', name: 'كريمي', hex: '#F5F5DC' },
-    { id: 'beige', name: 'بيج', hex: '#F5F5DC' },
-    { id: 'walnut', name: 'جوز داكن', hex: '#3B2F2F' },
-    { id: 'oak', name: 'بلوط', hex: '#9E7E53' }
-  ];
-
-  const materials = [
-    { id: 'wood', name: 'خشب' },
-    { id: 'fabric', name: 'قماش' },
-    { id: 'linen', name: 'كتان' },
-    { id: 'metal', name: 'معدن' },
-    { id: 'copper', name: 'نحاس' },
-    { id: 'bamboo', name: 'خيزران' },
-    { id: 'woven', name: 'منسوج' }
+  const cities = [
+    { id: 'sanaa', name: 'صنعاء' },
+    { id: 'aden', name: 'عدن' },
+    { id: 'taiz', name: 'تعز' },
+    { id: 'mukalla', name: 'حضرموت / المكلا' },
+    { id: 'ibb', name: 'إب' },
+    { id: 'mahrah', name: 'المهرة' }
   ];
 
   return (
@@ -161,7 +140,7 @@ export default function StoresPage() {
               نخبة المتاجر المعتمدة في اليمن
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
-              اكتشف <span className="text-primary">أرقى</span> قطع الأثاث
+              اكتشف <span className="text-primary">أرقى</span> معارض الأثاث
             </h1>
             <p className="text-lg text-gray-300 font-medium max-w-xl">
               تصفح معارض الأثاث الكبرى التي توفر لك الجودة والضمان في مكان واحد.
@@ -173,6 +152,7 @@ export default function StoresPage() {
       <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-12">
           
+          {/* Sidebar Filters */}
           <aside className="w-full lg:w-80 space-y-8">
             <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-[15px]">
               <div className="space-y-4">
@@ -191,12 +171,33 @@ export default function StoresPage() {
                 </div>
               </div>
 
-              <Accordion type="multiple" defaultValue={["categories"]} className="w-full">
-                {/* Categories */}
+              <Accordion type="multiple" defaultValue={["cities", "categories"]} className="w-full">
+                {/* Cities Filter */}
+                <AccordionItem value="cities" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <Map className="w-4 h-4 text-primary" /> المدينة
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pt-1">
+                      {cities.map((city) => (
+                        <div key={city.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
+                          <Checkbox id={`city-${city.id}`} className="rounded-sm" />
+                          <label htmlFor={`city-${city.id}`} className="text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
+                            {city.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Categories / Specialties Filter */}
                 <AccordionItem value="categories" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <Layers className="w-4 h-4 text-primary" /> القسم الرئيسي
+                      <Layers className="w-4 h-4 text-primary" /> نوع الأثاث المتوفر
                     </span>
                   </AccordionTrigger>
                   <AccordionContent>
@@ -208,99 +209,6 @@ export default function StoresPage() {
                             {cat.name}
                           </label>
                         </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Styles */}
-                <AccordionItem value="styles" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <Maximize2 className="w-4 h-4 text-primary" /> الأنماط والتصاميم
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-1">
-                      {styles.map((style) => (
-                        <div key={style.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
-                          <Checkbox id={`style-${style.id}`} className="rounded-sm" />
-                          <label htmlFor={`style-${style.id}`} className="text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
-                            {style.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Price */}
-                <AccordionItem value="price" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <CircleDollarSign className="w-4 h-4 text-primary" /> الميزانية (ر.ي)
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="pt-4 px-2 space-y-4">
-                      <Slider 
-                        defaultValue={[500000]} 
-                        max={1000000} 
-                        step={1000} 
-                        value={maxPrice}
-                        onValueChange={setMaxPrice}
-                        className="cursor-pointer"
-                      />
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-muted-foreground">0</span>
-                        <span className="text-xs font-black text-primary">حتى {maxPrice[0].toLocaleString('en-US')}</span>
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Colors */}
-                <AccordionItem value="colors" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <Palette className="w-4 h-4 text-primary" /> اللون السائد
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      {colors.map((color) => (
-                        <button 
-                          key={color.id}
-                          className="flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-50 border border-transparent hover:border-border transition-all text-right"
-                        >
-                          <div 
-                            className="w-3 h-3 rounded-full border border-border" 
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <span className="text-[10px] font-bold text-muted-foreground">{color.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Materials */}
-                <AccordionItem value="materials" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <Sparkles className="w-4 h-4 text-primary" /> المادة والخامة
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {materials.map((mat) => (
-                        <Badge 
-                          key={mat.id} 
-                          variant="outline" 
-                          className="cursor-pointer hover:bg-primary hover:text-white hover:border-primary transition-all rounded-md px-2 py-0.5 font-bold text-[10px]"
-                        >
-                          {mat.name}
-                        </Badge>
                       ))}
                     </div>
                   </AccordionContent>
@@ -324,10 +232,11 @@ export default function StoresPage() {
             </div>
           </aside>
 
+          {/* Stores Listing */}
           <div className="flex-1 space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black text-secondary">
-                جميع المتاجر المتاحة
+                المعارض المتاحة
                 <span className="text-sm font-bold text-muted-foreground mr-3">({displayedStores.length.toLocaleString('en-US')})</span>
               </h2>
             </div>
@@ -370,7 +279,7 @@ export default function StoresPage() {
                             <CheckCircle2 className="w-4 h-4 text-primary fill-white" />
                           </div>
                           <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[10px] uppercase">
-                            معرض أثاث
+                            معرض أثاث معتمد
                           </Badge>
                         </div>
                       </div>
