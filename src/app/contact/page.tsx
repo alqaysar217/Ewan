@@ -46,7 +46,7 @@ export default function ContactPage() {
       desc: 'نتشرف بزيارتكم لمقرنا',
       icon: MapPin,
       color: 'text-amber-600',
-      bg: 'bg-amber-50'
+      bg: 'bg-emerald-50'
     }
   ];
 
@@ -189,7 +189,7 @@ export default function ContactPage() {
                    <h4 className="text-xl font-black text-secondary">تفضل بزيارة مكتبنا</h4>
                    <p className="text-sm text-muted-foreground font-bold leading-relaxed">الجمهورية اليمنية، صنعاء، حي حدة، الطابق الثالث - مبنى إيوان.</p>
                    <Button asChild variant="outline" className="w-full rounded-xl border-primary text-primary font-black mt-4 hover:bg-primary hover:text-white h-12 transition-all">
-                      <a href="https://maps.app.goo.gl/YourMapLink" target="_blank" rel="noopener noreferrer">
+                      <a href="https://www.google.com/maps/search/?api=1&query=15.352011,44.204689" target="_blank" rel="noopener noreferrer">
                          فتح في خرائط جوجل <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
                       </a>
                    </Button>
