@@ -81,9 +81,33 @@ export default function HomePage() {
   ];
 
   const featuredStores = [
-    { name: 'المعرض الملكي', city: 'صنعاء', rating: 4.9, img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=600' },
-    { name: 'أثاث الخليج', city: 'عدن', rating: 4.8, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
-    { name: 'مودرن هوم', city: 'تعز', rating: 4.7, img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600' }
+    { 
+      id: 's1', 
+      business_name: 'المعرض الملكي', 
+      city: 'صنعاء', 
+      average_rating: 4.9, 
+      cover_url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=600',
+      logo_url: 'https://picsum.photos/seed/s1/200/200',
+      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
+    },
+    { 
+      id: 's2', 
+      business_name: 'أثاث الخليج', 
+      city: 'عدن', 
+      average_rating: 4.8, 
+      cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600',
+      logo_url: 'https://picsum.photos/seed/s2/200/200',
+      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
+    },
+    { 
+      id: 's3', 
+      business_name: 'مودرن هوم', 
+      city: 'تعز', 
+      average_rating: 4.7, 
+      cover_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600',
+      logo_url: 'https://picsum.photos/seed/s3/200/200',
+      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
+    }
   ];
 
   return (
@@ -217,7 +241,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Stores Section (Replacing AI Studio CTA) */}
+        {/* Featured Stores Section */}
         <section className="py-24 bg-secondary relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
@@ -228,32 +252,65 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredStores.map((store, i) => (
-                <div key={i} className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 transition-all duration-500 shadow-2xl">
-                  <div className="relative h-56 overflow-hidden">
-                    <Image src={store.img} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                <Link 
+                  href={`/vendors/${store.id}`}
+                  key={i} 
+                  className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
+                >
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image 
+                      src={store.cover_url || `https://picsum.photos/seed/${store.id}/800/400`} 
+                      alt={store.business_name} 
+                      fill 
+                      className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />
-                    <Badge className="absolute top-4 right-4 bg-primary text-white border-none font-bold px-4 py-1.5 shadow-lg">
-                      {store.city}
-                    </Badge>
-                  </div>
-                  <div className="p-8 space-y-6">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-2xl font-black text-white group-hover:text-primary transition-colors">{store.name}</h3>
-                      <div className="flex items-center gap-1.5 text-amber-500">
-                        <Star className="w-5 h-5 fill-current" />
-                        <span className="text-base font-black text-white">{store.rating.toLocaleString('en-US')}</span>
+                    
+                    <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                      <div className="w-14 h-14 bg-white p-1 shadow-xl relative overflow-hidden rounded-md">
+                        <Image 
+                          src={store.logo_url || `https://picsum.photos/seed/${store.id}-logo/200/200`}
+                          alt="Logo"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="text-white">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-black text-lg">{store.business_name}</h4>
+                          <CheckCircle2 className="w-4 h-4 text-primary fill-white" />
+                        </div>
+                        <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[10px] uppercase">
+                          معرض أثاث
+                        </Badge>
                       </div>
                     </div>
-                    <p className="text-gray-400 font-medium leading-relaxed line-clamp-2">
-                      تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.
-                    </p>
-                    <Link href="/vendors" className="block">
-                      <Button variant="outline" className="w-full h-12 border-white/20 text-white hover:bg-primary hover:border-primary font-bold rounded-xl transition-all">
-                        تصفح المنتجات
-                      </Button>
-                    </Link>
+                    
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-white/90 backdrop-blur-sm text-secondary font-black border-none px-2 py-1 flex items-center gap-1 shadow-lg rounded-md">
+                        <Star className="w-3 h-3 text-amber-500 fill-current" />
+                        {store.average_rating ? store.average_rating.toLocaleString('en-US') : '5.0'}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
+
+                  <div className="p-6 flex-1 flex flex-col space-y-4">
+                    <p className="text-sm text-muted-foreground leading-relaxed font-medium line-clamp-2">
+                      {store.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
+                        <MapPin className="w-3.5 h-3.5 text-primary" />
+                        {store.city}
+                      </div>
+                      <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                        تصفح المنتجات 
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                      </Button>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
             
