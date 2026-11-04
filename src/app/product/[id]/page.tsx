@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Footer from '@/components/Footer';
+import { cn } from '@/lib/utils';
 
 type ProductPageProps = {
   params: Promise<{ id: string }>;
@@ -278,8 +279,4 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       <Footer />
     </div>
   );
-}
-
-function cn(...classes: any[]) {
-  return classes.filter(Boolean).join(' ');
 }
