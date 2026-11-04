@@ -80,6 +80,12 @@ export default function HomePage() {
     }
   ];
 
+  const featuredStores = [
+    { name: 'المعرض الملكي', city: 'صنعاء', rating: 4.9, img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=600' },
+    { name: 'أثاث الخليج', city: 'عدن', rating: 4.8, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
+    { name: 'مودرن هوم', city: 'تعز', rating: 4.7, img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600' }
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background" dir="rtl">
       <Header />
@@ -101,24 +107,24 @@ export default function HomePage() {
           
           <div className="container relative z-20 px-4 md:px-8 mx-auto">
             <div className="max-w-3xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-16">
-              <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/20 backdrop-blur-xl rounded-[15px] text-primary border-r-4 border-secondary shadow-xl shadow-primary/5">
+              <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/20 backdrop-blur-xl rounded-[15px] text-primary border-r-4 border-secondary shadow-xl shadow-primary/5 mx-auto lg:mx-0">
                 <Sparkles className="w-4 h-4" />
                 <span className="text-xs font-black tracking-widest uppercase">ابتكار ذكي لمساحتك الخاصة</span>
               </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight text-center lg:text-right">
                 اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium max-w-xl text-right">
+              <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium max-w-xl text-center lg:text-right mx-auto lg:mx-0">
                 أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
               </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-6">
                 <Link href="/ai-design" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full h-14 px-10 rounded-[15px] bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
+                  <Button size="lg" className="w-full sm:w-64 h-14 px-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
                     صمم غرفتك <Zap className="w-5 h-5 mr-2" />
                   </Button>
                 </Link>
                 <Link href="/shop" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full h-14 px-10 rounded-[15px] border-white/20 bg-white/5 text-white hover:bg-white/10 font-black text-lg transition-all">
+                  <Button size="lg" variant="outline" className="w-full sm:w-64 h-14 px-10 rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-black text-lg transition-all">
                     اكتشف المجموعات
                   </Button>
                 </Link>
@@ -147,8 +153,8 @@ export default function HomePage() {
         {/* Featured Products Section */}
         <section className="py-24 bg-white">
           <div className="container px-4 md:px-8 mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-              <div className="space-y-4 text-right">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6 text-center md:text-right">
+              <div className="space-y-4">
                 <div className="h-8 w-1 bg-primary inline-block align-middle ml-4 rounded-full"></div>
                 <h2 className="text-4xl font-black text-secondary inline-block align-middle">قطع مختارة لك</h2>
                 <p className="text-muted-foreground text-lg max-w-xl">أحدث ما تم إنتاجه في ورش النجارين اليمنيين والمتاجر الكبرى.</p>
@@ -211,40 +217,52 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CTA AI Studio Section */}
+        {/* Featured Stores Section (Replacing AI Studio CTA) */}
         <section className="py-24 bg-secondary relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
-            <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-10 md:p-20 text-center space-y-8">
-              <Zap className="w-16 h-16 text-primary mx-auto animate-pulse" />
-              <h2 className="text-3xl md:text-5xl font-black text-white">حول خيالك إلى حقيقة في ثوانٍ</h2>
-              <p className="text-xl text-gray-300 font-medium leading-relaxed">
-                استوديو إيوان الذكي يتيح لك تجربة الأثاث في مساحتك الحقيقية باستخدام الذكاء الاصطناعي. ارفع صورة غرفتك الآن وابدأ التغيير.
-              </p>
-              <Button size="lg" className="h-16 px-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/40">
-                جرب المصمم الذكي مجاناً
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Stores Showcase Section */}
-        <section className="py-24 bg-white">
-          <div className="container px-4 md:px-8 mx-auto">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl font-black text-secondary">أبرز المتاجر والورش</h2>
-              <p className="text-muted-foreground text-lg">نخبة المبدعين الذين يثق بهم عملاء إيوان.</p>
+              <h2 className="text-4xl md:text-5xl font-black text-white">أبرز المتاجر المعتمدة</h2>
+              <p className="text-gray-300 text-lg max-w-2xl mx-auto font-medium">نخبة من أفضل معارض الأثاث التي تقدم أرقى المجموعات الجاهزة والمصنعة.</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Link href="/vendors" key={i} className="group p-6 bg-gray-50 rounded-2xl border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all text-center space-y-4">
-                  <div className="w-24 h-24 bg-white rounded-full mx-auto relative overflow-hidden border shadow-sm group-hover:scale-110 transition-transform">
-                    <Image src={`https://picsum.photos/seed/store-${i}/200/200`} alt="Store" fill className="object-cover" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredStores.map((store, i) => (
+                <div key={i} className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 transition-all duration-500 shadow-2xl">
+                  <div className="relative h-56 overflow-hidden">
+                    <Image src={store.img} alt={store.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />
+                    <Badge className="absolute top-4 right-4 bg-primary text-white border-none font-bold px-4 py-1.5 shadow-lg">
+                      {store.city}
+                    </Badge>
                   </div>
-                  <h4 className="font-black text-secondary group-hover:text-primary transition-colors">متجر التميز {i.toLocaleString('en-US')}</h4>
-                  <Badge variant="outline" className="text-[10px] bg-white">صنعاء</Badge>
-                </Link>
+                  <div className="p-8 space-y-6">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-2xl font-black text-white group-hover:text-primary transition-colors">{store.name}</h3>
+                      <div className="flex items-center gap-1.5 text-amber-500">
+                        <Star className="w-5 h-5 fill-current" />
+                        <span className="text-base font-black text-white">{store.rating.toLocaleString('en-US')}</span>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 font-medium leading-relaxed line-clamp-2">
+                      تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.
+                    </p>
+                    <Link href="/vendors" className="block">
+                      <Button variant="outline" className="w-full h-12 border-white/20 text-white hover:bg-primary hover:border-primary font-bold rounded-xl transition-all">
+                        تصفح المنتجات
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               ))}
+            </div>
+            
+            <div className="mt-16 text-center">
+               <Link href="/vendors">
+                 <Button size="lg" className="h-16 px-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/40 transition-all hover:-translate-y-1">
+                   شاهد كافة المتاجر <ChevronRight className="w-6 h-6 mr-2 rotate-180" />
+                 </Button>
+               </Link>
             </div>
           </div>
         </section>
@@ -257,8 +275,8 @@ export default function HomePage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 items-center opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                 {partners.map((partner, i) => (
                   <div key={i} className="flex justify-center">
-                    <div className="relative w-24 h-24 overflow-hidden">
-                      <Image src={partner.logo} alt={partner.name} fill className="object-contain" />
+                    <div className="relative w-24 h-24 overflow-hidden rounded-xl border border-border/50 bg-white p-2">
+                      <Image src={partner.logo} alt={partner.name} fill className="object-contain p-2" />
                     </div>
                   </div>
                 ))}
@@ -269,7 +287,6 @@ export default function HomePage() {
 
         {/* Testimonials Section */}
         <section className="py-24 bg-secondary text-white relative overflow-hidden">
-          {/* Decorative quotes in background */}
           <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
           <Quote className="absolute -bottom-10 -left-10 w-64 h-64 text-white/5 -rotate-12" />
           
@@ -285,14 +302,12 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((t, i) => (
                 <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full">
-                  {/* Rating Stars */}
                   <div className="flex gap-1 text-amber-500">
                     {Array.from({ length: 5 }).map((_, starIdx) => (
                       <Star key={starIdx} className={cn("w-4 h-4", starIdx >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
                     ))}
                   </div>
                   
-                  {/* Testimonial Text */}
                   <div className="relative flex-1">
                     <Quote className="absolute -top-4 -right-4 w-10 h-10 text-primary opacity-20" />
                     <p className="text-lg font-medium leading-relaxed text-right relative z-10 italic">
@@ -300,7 +315,6 @@ export default function HomePage() {
                     </p>
                   </div>
                   
-                  {/* User Profile */}
                   <div className="flex items-center gap-4 pt-6 border-t border-white/10">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-primary/20 shrink-0">
                       <Image 
