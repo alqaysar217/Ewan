@@ -52,7 +52,7 @@ export default function Header() {
     { href: "/", label: "الرئيسية", icon: Home },
     { href: "/vendors", label: "المتاجر", icon: Store },
     { href: "/shop", label: "التصنيفات", icon: LayoutGrid },
-    { href: "/vendors?type=carpenter", label: "النجارين والتجار", icon: Users },
+    { href: "/professionals", label: "النجارين والتجار", icon: Users },
     { href: "/about", label: "حول المنصة", icon: Info },
     { href: "/contact", label: "التواصل", icon: Phone },
   ];
@@ -115,7 +115,7 @@ export default function Header() {
           
           <Button variant="ghost" size="icon" className="rounded-md hover:bg-primary/10 hover:text-primary relative">
             <ShoppingBag className="w-5 h-5" />
-            <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">٠</span>
+            <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">0</span>
           </Button>
 
           {!loading && (

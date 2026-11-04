@@ -22,7 +22,7 @@ export default function Footer() {
       { label: "الرئيسية", href: "/" },
       { label: "المتاجر", href: "/vendors" },
       { label: "التصنيفات", href: "/shop" },
-      { label: "النجارين والتجار", href: "/vendors?type=carpenter" },
+      { label: "النجارين والتجار", href: "/professionals" },
       { label: "صمم غرفتك", href: "/ai-design" },
     ],
     support: [
