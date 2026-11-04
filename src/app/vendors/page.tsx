@@ -21,10 +21,11 @@ import {
   Award
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 // البيانات الافتراضية للمتاجر والورش
 const MOCK_VENDORS = [
@@ -64,42 +65,6 @@ const MOCK_VENDORS = [
     logo_url: 'https://picsum.photos/seed/v3/200/200',
     approval_status: 'approved'
   },
-  {
-    id: 'v4',
-    business_name: 'مودرن هوم للأثاث',
-    business_type: 'furniture_store',
-    description: 'نقدم حلول أثاث مبتكرة تناسب المساحات الصغيرة وتجمع بين الأناقة والعملية بأسعار مدروسة.',
-    city: 'تعز، الحوبان',
-    average_rating: 4.7,
-    service_areas: ['تعز', 'إب'],
-    cover_url: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v4/200/200',
-    approval_status: 'approved'
-  },
-  {
-    id: 'v5',
-    business_name: 'أثاث الخليج المتميز',
-    business_type: 'furniture_store',
-    description: 'استيراد وتصنيع أرقى أطقم الكنب والمجالس العربية بأحدث التصاميم العالمية وأقمشة فاخرة.',
-    city: 'صنعاء، حدة',
-    average_rating: 4.9,
-    service_areas: ['صنعاء', 'عدن'],
-    cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v5/200/200',
-    approval_status: 'approved'
-  },
-  {
-    id: 'v6',
-    business_name: 'نجارة السعادة',
-    business_type: 'carpenter',
-    description: 'خبرة أكثر من 20 عاماً في صناعة غرف النوم والأسرة الخشبية المتينة بتصاميم كلاسيكية ومودرن.',
-    city: 'إب، الظهار',
-    average_rating: 4.6,
-    service_areas: ['إب', 'تعز'],
-    cover_url: 'https://images.unsplash.com/photo-1544450610-ad597ea31c9d?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v6/200/200',
-    approval_status: 'approved'
-  }
 ];
 
 export default function VendorsPage() {
@@ -112,7 +77,6 @@ export default function VendorsPage() {
     
   const { data: firestoreVendors, loading } = useCollection(vendorsQuery);
 
-  // دمج البيانات الحقيقية مع الافتراضية إذا كانت قاعدة البيانات فارغة
   const displayedVendors = (firestoreVendors && firestoreVendors.length > 0) 
     ? firestoreVendors 
     : MOCK_VENDORS.filter(v => activeType === 'all' || v.business_type === activeType);
@@ -126,30 +90,32 @@ export default function VendorsPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+      <Header />
+
       {/* Header Section */}
-      <section className="relative pt-32 pb-20 bg-secondary overflow-hidden">
+      <section className="relative py-16 bg-secondary overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 -skew-x-12 translate-x-1/4" />
-        <div className="container relative z-10 px-4">
+        <div className="container relative z-10 px-4 md:px-8 mx-auto">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border-r-4 border-primary text-primary text-xs font-black uppercase tracking-widest">
               نخبة المبدعين في اليمن
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight">
+            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
               تعرف على صُنّاع <span className="text-primary">الجمال</span>
             </h1>
             <p className="text-lg text-gray-300 font-medium max-w-xl">
-              نجمع لك أمهر الحرفيين ومصممي الديكور والمتاجر الكبرى في منصة واحدة، لنضمن لك جودة التنفيذ وروعة التصميم.
+              نجمع لك أمهر الحرفيين ومصممي الديكور والمتاجر الكبرى في منصة واحدة.
             </p>
           </div>
         </div>
       </section>
 
-      <main className="container mx-auto py-12 px-4 flex-1">
+      <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-12">
           
           {/* Sidebar / Filters */}
           <aside className="w-full lg:w-80 space-y-8">
-            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-lg">
+            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-md">
               <div className="space-y-4">
                 <h3 className="text-lg font-black text-secondary flex items-center gap-2">
                   <Filter className="w-4 h-4 text-primary" /> تصفية النتائج
@@ -158,7 +124,7 @@ export default function VendorsPage() {
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input 
                     placeholder="ابحث عن اسم..." 
-                    className="pr-10 h-12 bg-gray-50 border-none focus-visible:ring-1 focus-visible:ring-primary" 
+                    className="pr-10 h-12 bg-gray-50 border-none focus-visible:ring-1 focus-visible:ring-primary rounded-md" 
                   />
                 </div>
               </div>
@@ -187,26 +153,14 @@ export default function VendorsPage() {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-gray-100">
-                <h4 className="text-sm font-black text-muted-foreground uppercase tracking-widest">المدينة</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['صنعاء', 'عدن', 'تعز', 'المكلا'].map((city) => (
-                    <Button key={city} variant="outline" size="sm" className="h-10 text-xs font-bold border-gray-200">
-                      {city}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
               <div className="pt-6">
-                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-lg">
+                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-md">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45" />
                   <div className="relative z-10 space-y-4">
                     <Award className="w-8 h-8 text-primary" />
                     <h4 className="font-black text-lg leading-tight">هل أنت نجار أو مصمم؟</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed font-medium">انضم إلى أكبر منصة أثاث في اليمن وابدأ بعرض إبداعاتك لآلاف العملاء.</p>
                     <Link href="/register" className="block">
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11">
+                      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 rounded-md">
                         سجل متجرك الآن
                       </Button>
                     </Link>
@@ -228,21 +182,16 @@ export default function VendorsPage() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-lg" />
+                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-md" />
                 ))}
-              </div>
-            ) : displayedVendors.length === 0 ? (
-              <div className="py-24 text-center space-y-4 bg-white border border-dashed border-gray-200 rounded-lg">
-                <Users className="w-16 h-16 text-gray-200 mx-auto" />
-                <h3 className="text-xl font-bold text-secondary">لا يوجد مبدعون في هذا القسم حالياً</h3>
-                <p className="text-muted-foreground">كن أول من ينضم إلينا في هذا التصنيف!</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {displayedVendors.map((vendor: any) => (
-                  <div 
+                  <Link 
+                    href={`/vendors/${vendor.id}`}
                     key={vendor.id} 
-                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-lg"
+                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-md"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image 
@@ -268,10 +217,8 @@ export default function VendorsPage() {
                             <h4 className="font-black text-lg">{vendor.business_name}</h4>
                             <CheckCircle2 className="w-4 h-4 text-primary fill-white" />
                           </div>
-                          <p className="text-[10px] font-bold opacity-80">
-                            {vendor.business_type === 'carpenter' ? 'ورشة نجارة' : 
-                             vendor.business_type === 'furniture_store' ? 'معرض أثاث' : 
-                             'مصمم ديكور'}
+                          <p className="text-[10px] font-bold opacity-80 uppercase">
+                            {vendor.business_type}
                           </p>
                         </div>
                       </div>
@@ -286,55 +233,27 @@ export default function VendorsPage() {
 
                     <div className="p-6 flex-1 flex flex-col space-y-4">
                       <p className="text-sm text-muted-foreground leading-relaxed font-medium line-clamp-2">
-                        {vendor.description || 'نحن نقدم أفضل خدمات التصميم والتنفيذ بجودة عالية وأسعار تنافسية تناسب الجميع، مع ضمان حقيقي على كافة المنتجات.'}
+                        {vendor.description}
                       </p>
                       
                       <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
                         <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
                           <MapPin className="w-3.5 h-3.5 text-primary" />
-                          {vendor.city || 'اليمن'}
+                          {vendor.city}
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] font-bold text-primary">
-                          {vendor.service_areas?.length || 0} مناطق خدمة
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <Link href={`/vendors/${vendor.id}`}>
-                          <Button variant="outline" className="w-full h-12 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all group rounded-md">
-                            زيارة المتجر 
-                            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                          </Button>
-                        </Link>
+                        <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                          زيارة المتجر 
+                          <ArrowLeft className="w-4 h-4 mr-2" />
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
           </div>
         </div>
       </main>
-
-      {/* Partners/Success Stories CTA */}
-      <section className="py-24 bg-gray-50 border-t border-border/50">
-        <div className="container px-4 text-center space-y-8">
-          <h2 className="text-3xl font-black text-secondary">هل تبحث عن تصميم مخصص؟</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto font-medium">
-            تواصل مع خبرائنا مباشرة لمناقشة مشروعك الخاص والحصول على عروض أسعار تنافسية من أفضل النجارين في منطقتك.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-             <Button size="lg" className="h-14 px-10 bg-secondary hover:bg-secondary/90 text-white font-bold rounded-md">
-               تحدث مع مستشار تصميم
-             </Button>
-             <Link href="/ai-design">
-               <Button size="lg" variant="outline" className="h-14 px-10 border-primary text-primary hover:bg-primary/5 font-bold rounded-md">
-                 جرب الذكاء الاصطناعي
-               </Button>
-             </Link>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
