@@ -6,13 +6,13 @@ import {
   Heart, 
   Zap, 
   ShoppingBag, 
-  Bot,
-  ArrowLeft,
   Star,
+  ArrowLeft,
+  Store,
+  Layout,
   CheckCircle2,
   MapPin,
-  Store,
-  Layout
+  MessageSquare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
@@ -28,10 +28,10 @@ import Footer from '@/components/Footer';
 
 export default function HomePage() {
   const featuredProducts = [
-    { id: 1, name: 'طقم ديوان حضرمي مطور', category: 'غرف معيشة', price: 450000, oldPrice: 540000, discount: 15, store: 'ورشة المكلا', img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
-    { id: 2, name: 'سرير خشبي ملكي منحوت', category: 'غرف نوم', price: 280000, oldPrice: 310000, discount: 10, store: 'أثاث الخليج', img: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=600' },
-    { id: 3, name: 'طاولة طعام دائرية مودرن', category: 'مطابخ', price: 120000, oldPrice: 150000, discount: 20, store: 'مودرن هوم', img: 'https://images.unsplash.com/photo-1577145000247-a737ad733c99?auto=format&fit=crop&q=80&w=600' },
-    { id: 4, name: 'كرسي مكتب مريح', category: 'مكاتب', price: 45000, oldPrice: 60000, discount: 25, store: 'الرويشان للأثاث', img: 'https://images.unsplash.com/photo-1505797149-43b0ad766a0e?auto=format&fit=crop&q=80&w=600' }
+    { id: 1, name: 'طقم ديوان حضرمي مطور', category: 'غرف معيشة', price: 450000, oldPrice: 540000, discount: 15, store: 'ورشة المكلا', rating: 4.9, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
+    { id: 2, name: 'سرير خشبي ملكي منحوت', category: 'غرف نوم', price: 280000, oldPrice: 310000, discount: 10, store: 'أثاث الخليج', rating: 4.8, img: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=600' },
+    { id: 3, name: 'طاولة طعام دائرية مودرن', category: 'مطابخ', price: 120000, oldPrice: 150000, discount: 20, store: 'مودرن هوم', rating: 4.7, img: 'https://images.unsplash.com/photo-1577145000247-a737ad733c99?auto=format&fit=crop&q=80&w=600' },
+    { id: 4, name: 'كرسي مكتب مريح', category: 'مكاتب', price: 45000, oldPrice: 60000, discount: 25, store: 'الرويشان للأثاث', rating: 4.5, img: 'https://images.unsplash.com/photo-1505797149-43b0ad766a0e?auto=format&fit=crop&q=80&w=600' }
   ];
 
   return (
@@ -100,7 +100,7 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300">
                   <div className="relative aspect-square overflow-hidden bg-gray-50">
                     <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" data-ai-hint="furniture product" />
                     
@@ -120,12 +120,13 @@ export default function HomePage() {
                     
                     <div className="absolute top-3 right-3 z-20">
                       <Badge className="bg-secondary text-white font-bold rounded-md px-2 py-1 flex items-center gap-1 shadow-sm border-none">
-                         {product.discount}% خصم
+                         {product.discount.toLocaleString('en-US')}% خصم
                       </Badge>
                     </div>
                   </div>
 
                   <div className="p-5 flex flex-col flex-1 gap-4">
+                    {/* Row 1: Name & Rating */}
                     <div className="flex justify-between items-start gap-2">
                       <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{product.name}</h4>
                       <div className="flex items-center gap-1 text-amber-500 shrink-0">
@@ -134,11 +135,13 @@ export default function HomePage() {
                       </div>
                     </div>
                     
+                    {/* Row 2: Store */}
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Store className="w-4 h-4 text-primary" />
                       <span className="text-xs font-bold">{product.store}</span>
                     </div>
 
+                    {/* Row 3: Category */}
                     <div className="flex items-center gap-2">
                       <Layout className="w-4 h-4 text-primary" />
                       <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0">
@@ -146,6 +149,7 @@ export default function HomePage() {
                       </Badge>
                     </div>
 
+                    {/* Row 4: Prices & Action */}
                     <div className="mt-auto pt-2 space-y-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-baseline gap-2">

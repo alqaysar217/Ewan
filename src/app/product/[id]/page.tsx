@@ -14,7 +14,6 @@ import {
   Info, 
   Truck, 
   Hammer, 
-  ArrowRight,
   Zap,
   MessageSquare,
   MapPin
@@ -119,11 +118,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               <div className="flex flex-wrap items-center gap-4 md:gap-6">
                 <div className="flex items-center gap-1.5 text-amber-500">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={cn("w-4 h-4 fill-current", i >= 4.5 && "fill-none")} />
+                    <Star key={i} className={cn("w-4 h-4 fill-current", i >= Math.floor(product.rating) && "fill-none")} />
                   ))}
-                  <span className="text-secondary font-black mr-1">{product.rating}</span>
+                  <span className="text-secondary font-black mr-1">{product.rating.toLocaleString('en-US')}</span>
                 </div>
-                <span className="text-xs md:text-sm font-bold text-muted-foreground">({product.reviewsCount} مراجعة)</span>
+                <span className="text-xs md:text-sm font-bold text-muted-foreground">({product.reviewsCount.toLocaleString('en-US')} مراجعة)</span>
                 <Separator orientation="vertical" className="hidden md:block h-4" />
                 <Button variant="ghost" className="text-primary font-bold gap-2 p-0 h-auto hover:bg-transparent text-xs md:text-sm">
                   <Share2 className="w-4 h-4" /> مشاركة
@@ -149,7 +148,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   <label className="text-sm font-bold text-secondary">الكمية</label>
                   <div className="flex items-center gap-4 bg-white border rounded-[10px] p-1 w-fit">
                     <Button variant="ghost" size="icon" className="w-8 h-8 rounded-sm" onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</Button>
-                    <span className="w-8 text-center font-black">{quantity}</span>
+                    <span className="w-8 text-center font-black">{quantity.toLocaleString('en-US')}</span>
                     <Button variant="ghost" size="icon" className="w-8 h-8 rounded-sm" onClick={() => setQuantity(quantity + 1)}>+</Button>
                   </div>
                 </div>
@@ -226,11 +225,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                <div className="space-y-8 md:space-y-10">
                   <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-6 md:p-8 bg-gray-50 rounded-[15px]">
                     <div className="text-center md:text-right space-y-2">
-                      <h3 className="text-4xl md:text-5xl font-black text-secondary">{product.rating}</h3>
+                      <h3 className="text-4xl md:text-5xl font-black text-secondary">{product.rating.toLocaleString('en-US')}</h3>
                       <div className="flex gap-1 justify-center md:justify-start text-amber-500">
                         {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current w-5 h-5" />)}
                       </div>
-                      <p className="text-xs md:text-sm font-bold text-muted-foreground">بناءً على {product.reviewsCount} تقييم</p>
+                      <p className="text-xs md:text-sm font-bold text-muted-foreground">بناءً على {product.reviewsCount.toLocaleString('en-US')} تقييم</p>
                     </div>
                     <Button className="w-full md:w-auto rounded-[10px] font-bold px-8 h-12 bg-secondary text-white">أضف مراجعتك الآن</Button>
                   </div>
