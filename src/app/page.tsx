@@ -65,14 +65,14 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium">
                 أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
               </p>
-              <div className="flex flex-col sm:flex-row gap-5 pt-4">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pt-4">
                 <Link href="/ai-design">
-                  <Button size="lg" className="h-16 px-10 rounded-md bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
-                    ابدأ التصميم بالذكاء الاصطناعي <Zap className="w-5 h-5 mr-2" />
+                  <Button size="lg" className="h-14 px-10 rounded-md bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
+                    صمم غرفتك <Zap className="w-5 h-5 mr-2" />
                   </Button>
                 </Link>
                 <Link href="/shop">
-                  <Button size="lg" variant="outline" className="h-16 px-10 rounded-md border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
+                  <Button size="lg" variant="outline" className="h-14 px-10 rounded-md border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
                     اكتشف المجموعات
                   </Button>
                 </Link>
@@ -120,7 +120,7 @@ export default function HomePage() {
                     
                     <div className="absolute top-3 right-3 z-20">
                       <Badge className="bg-secondary text-white font-bold rounded-md px-2 py-1 flex items-center gap-1 shadow-sm border-none">
-                         {product.discount.toLocaleString('en-US')}% خصم
+                         {(product.discount || 0).toLocaleString('en-US')}% خصم
                       </Badge>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ export default function HomePage() {
                       <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{product.name}</h4>
                       <div className="flex items-center gap-1 text-amber-500 shrink-0">
                         <Star className="w-3.5 h-3.5 fill-current" />
-                        <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
+                        <span className="text-xs font-black">{(product.rating || 0).toLocaleString('en-US')}</span>
                       </div>
                     </div>
                     
@@ -154,10 +154,10 @@ export default function HomePage() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-baseline gap-2">
                           <span className="text-lg font-black text-secondary leading-none">
-                            {product.price.toLocaleString('en-US')} <span className="text-xs font-bold">ر.ي</span>
+                            {(product.price || 0).toLocaleString('en-US')} <span className="text-xs font-bold">ر.ي</span>
                           </span>
                           <span className="text-xs font-bold text-muted-foreground line-through">
-                            {product.oldPrice.toLocaleString('en-US')}
+                            {(product.oldPrice || 0).toLocaleString('en-US')}
                           </span>
                         </div>
                       </div>
