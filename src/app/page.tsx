@@ -18,7 +18,8 @@ import {
   Info, 
   Phone,
   X,
-  ChevronLeft
+  ChevronLeft,
+  Bot
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from '@/firebase';
@@ -56,7 +57,6 @@ export default function HomePage() {
     { href: "/vendors", label: "المتاجر", icon: Store },
     { href: "/categories", label: "التصنيفات", icon: LayoutGrid },
     { href: "/vendors?type=carpenter", label: "النجارين والتجار", icon: Users },
-    { href: "/ai-design", label: "صمم غرفتك", icon: Sparkles, highlight: true },
     { href: "/about", label: "حول المنصة", icon: Info },
     { href: "/contact", label: "التواصل", icon: Phone },
   ];
@@ -83,13 +83,12 @@ export default function HomePage() {
                   key={link.href} 
                   href={link.href} 
                   className={cn(
-                    "transition-all hover:text-primary relative py-1 flex items-center gap-2 group",
-                    link.highlight && "text-primary"
+                    "transition-all hover:text-primary relative py-1 flex items-center gap-2 group"
                   )}
                 >
                   <link.icon className={cn(
                     "w-4 h-4 transition-colors", 
-                    link.highlight ? "text-primary" : "text-muted-foreground/60 group-hover:text-primary"
+                    "text-muted-foreground/60 group-hover:text-primary"
                   )} />
                   <span>{link.label}</span>
                 </Link>
@@ -171,11 +170,11 @@ export default function HomePage() {
                         href={link.href} 
                         className={cn(
                           "flex items-center justify-between p-4 rounded-2xl transition-all mb-2 group",
-                          link.highlight ? "bg-primary/5 text-primary" : "hover:bg-gray-50 text-secondary"
+                          "hover:bg-gray-50 text-secondary"
                         )}
                       >
                         <div className="flex items-center gap-4">
-                          <link.icon className={cn("w-5 h-5", link.highlight ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
+                          <link.icon className={cn("w-5 h-5", "text-muted-foreground group-hover:text-primary")} />
                           <span className="font-bold text-[15px]">{link.label}</span>
                         </div>
                         <ChevronLeft className="w-4 h-4 text-muted-foreground/50" />
@@ -293,6 +292,22 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+
+      {/* Floating AI Assistant Button */}
+      <Link href="/ai-design" className="fixed bottom-8 left-8 z-50 group">
+        <div className="relative">
+          <div className="absolute -inset-2 bg-primary/40 rounded-full blur-2xl group-hover:bg-primary/60 transition-all duration-500 animate-pulse" />
+          <Button 
+            size="icon" 
+            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-transform hover:-translate-y-2 duration-300"
+          >
+            <Bot className="w-8 h-8" />
+            <span className="absolute -top-12 left-0 bg-secondary text-white text-[13px] font-black px-4 py-2 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-2xl border border-white/10">
+              صمم غرفتك بذكاء ✨
+            </span>
+          </Button>
+        </div>
+      </Link>
 
       <Footer />
     </div>
