@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -32,9 +33,8 @@ export default function AIDesignStudio() {
         
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-primary/20 backdrop-blur-xl rounded-2xl text-primary border border-primary/30 shadow-xl shadow-primary/5 mx-auto">
-            <Zap className="w-4 h-4 fill-primary" />
-            <span className="text-sm font-black tracking-wide">استوديو إيوان الذكي</span>
+          <div className="relative inline-flex items-center px-6 py-2 bg-primary/10 border-r-4 border-secondary text-primary overflow-hidden mx-auto">
+            <span className="text-xs font-black tracking-[0.2em] uppercase">استوديو إيوان الذكي</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-secondary">صمم غرفتك بذكاء</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

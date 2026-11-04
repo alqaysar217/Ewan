@@ -223,9 +223,8 @@ export default function HomePage() {
           
           <div className="container relative z-20 px-4 md:px-8">
             <div className="max-w-2xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-20">
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-primary/20 backdrop-blur-xl rounded-2xl text-primary border border-primary/30 shadow-xl shadow-primary/5">
-                <Zap className="w-4 h-4 fill-primary" />
-                <span className="text-sm font-black tracking-wide">ابتكار ذكي لمساحتك الخاصة</span>
+              <div className="relative inline-flex items-center px-6 py-2 bg-secondary/20 border-r-4 border-primary text-primary overflow-hidden">
+                <span className="text-xs font-black tracking-[0.2em] uppercase">المساحات الذكية • إيوان</span>
               </div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
                 اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
