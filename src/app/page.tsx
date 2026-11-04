@@ -76,18 +76,21 @@ export default function HomePage() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-6 text-[15px] font-bold text-muted-foreground">
+            <nav className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-muted-foreground">
               {navLinks.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href} 
                   className={cn(
-                    "transition-all hover:text-primary relative py-1",
-                    link.highlight && "text-primary flex items-center gap-1.5"
+                    "transition-all hover:text-primary relative py-1 flex items-center gap-2 group",
+                    link.highlight && "text-primary"
                   )}
                 >
-                  {link.highlight && <Sparkles className="w-3.5 h-3.5" />}
-                  {link.label}
+                  <link.icon className={cn(
+                    "w-4 h-4 transition-colors", 
+                    link.highlight ? "text-primary" : "text-muted-foreground/60 group-hover:text-primary"
+                  )} />
+                  <span>{link.label}</span>
                 </Link>
               ))}
             </nav>
