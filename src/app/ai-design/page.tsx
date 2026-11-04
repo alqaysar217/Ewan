@@ -113,43 +113,10 @@ export default function AIDesignStudio() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-        <div className="container mx-auto px-4 py-12 md:py-20 relative z-10">
+        <div className="container mx-auto px-4 py-8 md:py-12 relative z-10">
           
-          <div className="max-w-4xl mx-auto space-y-12">
+          <div className="max-w-4xl mx-auto space-y-8">
             
-            {/* Elegant Header */}
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-primary/20 text-primary rounded-full shadow-sm">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Next-Gen AI Interior Studio</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl font-black text-secondary tracking-tight">
-                حوّل خيالك إلى <span className="text-primary">واقع</span>
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-                استخدم قوة الذكاء الاصطناعي لتصميم مساحتك الخاصة باستخدام منتجات حقيقية وحرفية يمنية أصيلة.
-              </p>
-            </div>
-
-            {/* Premium Stepper */}
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div className="flex justify-between items-end px-2">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-primary uppercase tracking-widest">Progress Stage</p>
-                  <h4 className="text-xl font-black text-secondary">المرحلة {step} <span className="text-muted-foreground/30 mx-2">/</span> {totalSteps}</h4>
-                </div>
-                <div className="text-left">
-                  <span className="text-3xl font-black text-primary">{Math.round((step / totalSteps) * 100)}%</span>
-                </div>
-              </div>
-              <div className="h-2 w-full bg-white rounded-full overflow-hidden shadow-inner border border-white">
-                <div 
-                  className="h-full bg-gradient-to-l from-primary to-secondary transition-all duration-700 ease-out"
-                  style={{ width: `${(step / totalSteps) * 100}%` }}
-                />
-              </div>
-            </div>
-
             {/* Main Content Area */}
             <Card className="border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] rounded-[24px] overflow-hidden bg-white/80 backdrop-blur-xl relative">
               <div className="absolute inset-0 border border-white/40 rounded-[24px] pointer-events-none" />
