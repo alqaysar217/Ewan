@@ -15,7 +15,8 @@ import {
   ChevronRight,
   ShoppingBag,
   ArrowLeft,
-  Heart
+  Heart,
+  Store
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
