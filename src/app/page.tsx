@@ -65,14 +65,14 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium">
                 أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
               </p>
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pt-4">
-                <Link href="/ai-design">
-                  <Button size="lg" className="h-14 px-10 rounded-md bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-4 w-full sm:w-auto max-w-md sm:max-w-none mx-auto sm:mx-0">
+                <Link href="/ai-design" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full h-14 px-10 rounded-md bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
                     صمم غرفتك <Zap className="w-5 h-5 mr-2" />
                   </Button>
                 </Link>
-                <Link href="/shop">
-                  <Button size="lg" variant="outline" className="h-14 px-10 rounded-md border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
+                <Link href="/shop" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full h-14 px-10 rounded-md border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
                     اكتشف المجموعات
                   </Button>
                 </Link>
