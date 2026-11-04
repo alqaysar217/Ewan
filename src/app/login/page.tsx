@@ -30,10 +30,20 @@ export default function LoginPage() {
       });
       router.push('/');
     } catch (error: any) {
+      let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = "هذا الحساب غير موجود. يرجى التأكد من البريد الإلكتروني.";
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "البريد الإلكتروني المدخل غير صالح.";
+      }
+
       toast({
         variant: "destructive",
         title: "خطأ في تسجيل الدخول",
-        description: "يرجى التأكد من البريد الإلكتروني وكلمة المرور",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -42,7 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4" dir="rtl">
-      <Card className="w-full max-w-md border-border/50 shadow-xl rounded-[2rem] overflow-hidden">
+      <Card className="w-full max-w-md border-border/50 shadow-xl rounded-[2rem] overflow-hidden bg-white">
         <CardHeader className="space-y-4 text-center pt-10">
           <div className="mx-auto relative w-16 h-16 overflow-hidden rounded-2xl shadow-lg shadow-primary/20 bg-white">
             <Image 
