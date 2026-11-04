@@ -19,7 +19,12 @@ import {
   Phone,
   ChevronLeft,
   Bot,
-  ArrowLeft
+  ArrowLeft,
+  Star,
+  Quote,
+  CheckCircle,
+  Hammer,
+  Palette
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from '@/firebase';
@@ -70,7 +75,7 @@ export default function HomePage() {
           <div className="flex items-center gap-6 lg:gap-10">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-lg shadow-secondary/20 bg-white">
+              <div className="relative w-10 h-10 overflow-hidden rounded-lg shadow-lg shadow-secondary/20 bg-white">
                 <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
               </div>
               <span className="text-2xl font-extrabold tracking-tight text-secondary hidden sm:block">إيوان</span>
@@ -99,7 +104,7 @@ export default function HomePage() {
           {/* Action Icons */}
           <div className="flex items-center gap-2 md:gap-4">
             <div className={cn(
-              "flex items-center bg-gray-50 rounded-2xl border border-border/60 transition-all duration-300",
+              "flex items-center bg-gray-50 rounded-lg border border-border/60 transition-all duration-300",
               isSearchExpanded ? "w-48 md:w-64 px-3" : "w-10 h-10 justify-center border-none bg-transparent hover:bg-primary/5"
             )}>
               <button 
@@ -130,14 +135,14 @@ export default function HomePage() {
             {!loading && (
               user ? (
                 <Link href="/vendor/dashboard">
-                  <Button variant="outline" className="hidden md:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                  <Button variant="outline" className="hidden md:flex gap-2 rounded-lg border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
                     <User className="w-4 h-4" />
                     حسابي
                   </Button>
                 </Link>
               ) : (
                 <Link href="/login">
-                  <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                  <Button variant="outline" className="hidden sm:flex gap-2 rounded-lg border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
                     <User className="w-4 h-4" />
                     دخول
                   </Button>
@@ -148,14 +153,14 @@ export default function HomePage() {
             <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-xl">
+                  <Button variant="ghost" size="icon" className="rounded-lg">
                     <Menu className="w-6 h-6 text-secondary" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
                   <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
                     <SheetTitle className="text-right text-white flex items-center gap-3">
-                      <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white">
+                      <div className="relative w-8 h-8 overflow-hidden rounded-md bg-white">
                         <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
                       </div>
                       <span className="font-bold text-xl">قائمة إيوان</span>
@@ -167,7 +172,7 @@ export default function HomePage() {
                         key={link.href} 
                         href={link.href} 
                         className={cn(
-                          "flex items-center justify-between p-4 rounded-2xl transition-all mb-2 group",
+                          "flex items-center justify-between p-4 rounded-lg transition-all mb-2 group",
                           "hover:bg-gray-50 text-secondary"
                         )}
                       >
@@ -181,7 +186,7 @@ export default function HomePage() {
                     <div className="mt-8 pt-8 border-t border-border/50 space-y-4">
                       {!user ? (
                         <Link href="/login" className="block">
-                          <Button className="w-full h-14 rounded-2xl bg-secondary text-white font-bold gap-2">
+                          <Button className="w-full h-14 rounded-lg bg-secondary text-white font-bold gap-2">
                             <User className="w-5 h-5" /> تسجيل الدخول
                           </Button>
                         </Link>
@@ -189,7 +194,7 @@ export default function HomePage() {
                         <Button 
                           variant="ghost" 
                           onClick={handleLogout}
-                          className="w-full h-14 rounded-2xl text-destructive hover:bg-destructive/5 font-bold gap-2"
+                          className="w-full h-14 rounded-lg text-destructive hover:bg-destructive/5 font-bold gap-2"
                         >
                           <LogOut className="w-5 h-5" /> تسجيل الخروج
                         </Button>
@@ -204,9 +209,8 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1">
-        {/* Hero Section - Premium Blended Design */}
+        {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-secondary">
-          {/* Background Image that covers the section */}
           <div className="absolute inset-0 z-0">
             <Image 
               src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
@@ -218,7 +222,6 @@ export default function HomePage() {
             />
           </div>
           
-          {/* Gradient Blur Overlay - Fixed for RTL */}
           <div className="absolute inset-0 z-10 bg-gradient-to-l from-secondary via-secondary/85 to-transparent backdrop-blur-[1px]" />
           
           <div className="container relative z-20 px-4 md:px-8">
@@ -234,12 +237,12 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-5 pt-4">
                 <Link href="/ai-design">
-                  <Button size="lg" className="h-16 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
+                  <Button size="lg" className="h-16 px-10 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
                     ابدأ التصميم بالذكاء الاصطناعي <Zap className="w-5 h-5 mr-2" />
                   </Button>
                 </Link>
                 <Link href="/shop">
-                  <Button size="lg" variant="outline" className="h-16 px-10 rounded-2xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
+                  <Button size="lg" variant="outline" className="h-16 px-10 rounded-lg border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
                     اكتشف المجموعات
                   </Button>
                 </Link>
@@ -271,7 +274,7 @@ export default function HomePage() {
                 { id: 'kitchen', name: 'المطبخ', hint: 'contemporary kitchen', img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=crop&q=80&w=600' },
                 { id: 'office', name: 'المكتب المنزلي', hint: 'modern home office', img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=600' }
               ].map((cat, idx) => (
-                <Link key={idx} href={`/shop?category=${cat.id}`} className="group relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700">
+                <Link key={idx} href={`/shop?category=${cat.id}`} className="group relative h-[450px] rounded-lg overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700">
                   <Image 
                     src={cat.img} 
                     alt={cat.name}
@@ -290,10 +293,56 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* AI Showcase Section */}
+        {/* Featured Vendors & Carpenters Section */}
         <section className="py-24 bg-gray-50">
           <div className="container px-4 md:px-8">
-            <div className="bg-secondary rounded-[3rem] p-8 md:p-20 relative overflow-hidden flex flex-col lg:flex-row items-center gap-16">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+              <div className="space-y-4">
+                <h2 className="text-4xl font-black text-secondary">نخبة النجارين والمصممين</h2>
+                <p className="text-muted-foreground text-lg max-w-xl">تعرف على أمهر الحرفيين الذين يحولون الخشب إلى قطع فنية تدوم للأبد.</p>
+              </div>
+              <Link href="/vendors?type=carpenter">
+                <Button variant="ghost" className="text-primary font-bold text-lg p-0 flex gap-2 group hover:bg-transparent">
+                  استكشف كل المبدعين
+                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { name: 'ورشة إتقان للنجارة', type: 'نجارة يدوية', rating: 4.9, icon: Hammer, img: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=600' },
+                { name: 'تصاميم رؤية', type: 'تصميم داخلي', rating: 4.8, icon: Palette, img: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=600' },
+                { name: 'الخشب الفاخر', type: 'أثاث مخصص', rating: 5.0, icon: Hammer, img: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=600' }
+              ].map((vendor, idx) => (
+                <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-border/50 group hover:shadow-xl transition-all">
+                  <div className="relative h-48 w-full mb-6 rounded-lg overflow-hidden">
+                    <Image src={vendor.img} alt={vendor.name} fill className="object-cover group-hover:scale-105 transition-transform" data-ai-hint="carpentry workshop" />
+                  </div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-xl font-black text-secondary mb-1">{vendor.name}</h4>
+                      <div className="flex items-center gap-2 text-primary">
+                        <vendor.icon className="w-4 h-4" />
+                        <span className="text-sm font-bold">{vendor.type}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-lg">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-sm font-black">{vendor.rating}</span>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full rounded-lg border-secondary/20 hover:bg-secondary hover:text-white font-bold transition-all">عرض الملف الشخصي</Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* AI Showcase Section */}
+        <section className="py-24 bg-white">
+          <div className="container px-4 md:px-8">
+            <div className="bg-secondary rounded-lg p-8 md:p-20 relative overflow-hidden flex flex-col lg:flex-row items-center gap-16">
               <div className="absolute top-0 left-0 w-full h-full bg-primary/5 pointer-events-none" />
               <div className="relative z-10 lg:w-1/2 space-y-8 text-white">
                 <h2 className="text-4xl md:text-5xl font-black leading-tight">شاهد خيالك يصبح واقعاً</h2>
@@ -301,12 +350,12 @@ export default function HomePage() {
                   باستخدام تقنياتنا المتقدمة، يمكنك رؤية كيف سيبدو منزلك قبل شراء أي قطعة. ذكاء اصطناعي يفهم ذوقك وميزانيتك ومساحة غرفتك.
                 </p>
                 <Link href="/ai-design" className="block w-fit">
-                  <Button size="lg" className="h-16 px-12 rounded-2xl bg-white text-secondary hover:bg-primary hover:text-white font-black text-lg transition-all shadow-xl shadow-white/5">
+                  <Button size="lg" className="h-16 px-12 rounded-lg bg-white text-secondary hover:bg-primary hover:text-white font-black text-lg transition-all shadow-xl shadow-white/5">
                     جرب الاستوديو الذكي الآن
                   </Button>
                 </Link>
               </div>
-              <div className="lg:w-1/2 relative h-[400px] w-full rounded-[2rem] overflow-hidden shadow-2xl">
+              <div className="lg:w-1/2 relative h-[400px] w-full rounded-lg overflow-hidden shadow-2xl">
                 <Image 
                   src="https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&q=80&w=800" 
                   alt="AI Design Preview"
@@ -314,25 +363,82 @@ export default function HomePage() {
                   className="object-cover"
                   data-ai-hint="interior design before and after"
                 />
-                <div className="absolute top-6 right-6 bg-primary text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg">
+                <div className="absolute top-6 right-6 bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg">
                   معاينة التصميم الذكي
                 </div>
               </div>
             </div>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <section className="py-24 bg-gray-50 overflow-hidden">
+          <div className="container px-4 md:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+              <h2 className="text-4xl font-black text-secondary">ماذا يقول عملاؤنا</h2>
+              <p className="text-muted-foreground text-lg">قصص نجاح من أشخاص حولوا منازلهم إلى واحات إبداع باستخدام إيوان.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { name: 'أحمد السعدني', role: 'صاحب منزل', comment: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة! استطعت رؤية الكنب في غرفتي قبل الطلب، والجودة فاقت التوقعات.', rating: 5 },
+                { name: 'سارة المطيري', role: 'مصممة مستقلة', comment: 'إيوان سهل علي التواصل مع أفضل النجارين في الرياض. القطع المخصصة التي طلبتها كانت تحفة فنية حقيقية.', rating: 5 },
+                { name: 'خالد عبد الله', role: 'عميل جديد', comment: 'سرعة في التوصيل واحترافية في التعامل. المتجر يضم تشكيلة واسعة تناسب كل الأذواق والميزانيات.', rating: 4 }
+              ].map((testimonial, idx) => (
+                <div key={idx} className="bg-white p-8 rounded-lg shadow-sm border border-border/50 relative group hover:-translate-y-2 transition-all duration-300">
+                  <div className="text-primary/10 absolute top-6 left-6">
+                    <Quote className="w-12 h-12 fill-current" />
+                  </div>
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className={cn("w-4 h-4", i < testimonial.rating ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                    ))}
+                  </div>
+                  <p className="text-secondary font-medium leading-relaxed mb-6 italic">"{testimonial.comment}"</p>
+                  <div className="flex items-center gap-4 border-t pt-6">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center font-black text-primary">
+                      {testimonial.name[0]}
+                    </div>
+                    <div>
+                      <h5 className="font-black text-secondary">{testimonial.name}</h5>
+                      <p className="text-xs text-muted-foreground font-bold">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-24 bg-primary text-white">
+          <div className="container px-4 md:px-8 text-center space-y-10">
+            <h2 className="text-4xl md:text-5xl font-black">جاهز لتغيير مساحتك؟</h2>
+            <p className="text-xl opacity-80 max-w-2xl mx-auto font-medium">انضم إلى آلاف المستخدمين الذين بدأوا رحلة تصميم منازلهم بذكاء وسهولة.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/register">
+                <Button size="lg" className="h-16 px-12 rounded-lg bg-white text-primary hover:bg-secondary hover:text-white font-black text-lg transition-all shadow-xl">
+                  سجل حسابك الآن
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="h-16 px-12 rounded-lg border-white/40 text-white hover:bg-white/10 font-black text-lg transition-all">
+                  تواصل مع خبير
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Floating AI Assistant Button - Refined Circular Design */}
+      {/* Floating AI Assistant Button */}
       <Link href="/ai-design" className="fixed bottom-10 left-10 z-[100] group">
         <div className="relative flex items-center gap-4">
-          {/* Label Tooltip */}
-          <div className="bg-secondary text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-2xl border border-white/10 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block whitespace-nowrap">
+          <div className="bg-secondary text-white px-5 py-2.5 rounded-lg text-xs font-black shadow-2xl border border-white/10 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block whitespace-nowrap">
             صمم غرفتك بذكاء ✨
           </div>
           
           <div className="relative">
-            {/* Pulsing Effect - Matching Primary Color */}
             <div className="absolute inset-0 bg-primary/30 rounded-full blur-lg group-hover:bg-primary/50 transition-all duration-500 animate-pulse scale-125" />
             
             <Button 

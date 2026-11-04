@@ -70,7 +70,7 @@ export default function ShopPage() {
                   <Button 
                     key={cat.id} 
                     variant="ghost" 
-                    className="w-full justify-start text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl h-12 font-bold"
+                    className="w-full justify-start text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg h-12 font-bold"
                   >
                     {cat.name}
                   </Button>
@@ -89,12 +89,12 @@ export default function ShopPage() {
               </div>
             </div>
 
-            <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/10 space-y-4">
+            <div className="p-6 bg-primary/5 rounded-lg border border-primary/10 space-y-4">
               <Sparkles className="w-8 h-8 text-primary" />
               <h4 className="font-black text-secondary">تحتاج مساعدة في الاختيار؟</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">استخدم استوديو التصميم الذكي لترى كيف تبدو هذه القطع في غرفتك قبل الشراء.</p>
               <Link href="/ai-design" className="block">
-                <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-bold">ابدأ التصميم</Button>
+                <Button className="w-full rounded-lg bg-primary hover:bg-primary/90 text-white font-bold">ابدأ التصميم</Button>
               </Link>
             </div>
           </aside>
@@ -102,13 +102,13 @@ export default function ShopPage() {
           {/* Product Grid */}
           <div className="flex-1 space-y-8">
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-2xl shadow-sm border border-border/50">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-border/50">
               <div className="flex items-center gap-4">
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setViewType('grid')}
-                  className={`rounded-xl ${viewType === 'grid' ? 'text-primary bg-primary/10' : ''}`}
+                  className={`rounded-lg ${viewType === 'grid' ? 'text-primary bg-primary/10' : ''}`}
                 >
                   <LayoutGrid className="w-5 h-5" />
                 </Button>
@@ -125,7 +125,7 @@ export default function ShopPage() {
 
               <div className="flex items-center gap-4">
                 <Select defaultValue="newest">
-                  <SelectTrigger className="w-[180px] rounded-xl border-border/60">
+                  <SelectTrigger className="w-[180px] rounded-lg border-border/60">
                     <SelectValue placeholder="ترتيب حسب" />
                   </SelectTrigger>
                   <SelectContent>
@@ -140,13 +140,13 @@ export default function ShopPage() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="h-96 bg-gray-100 animate-pulse rounded-[2rem]" />
+                  <div key={i} className="h-96 bg-gray-100 animate-pulse rounded-lg" />
                 ))}
               </div>
             ) : (
               <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-8`}>
                 {products?.map((product: any) => (
-                  <Card key={product.id} className="group overflow-hidden rounded-[2rem] border-none shadow-sm hover:shadow-xl transition-all duration-500">
+                  <Card key={product.id} className="group overflow-hidden rounded-lg border-none shadow-sm hover:shadow-xl transition-all duration-500">
                     <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
                       <Image 
                         src={`https://picsum.photos/seed/${product.id}/600/800`} 
@@ -170,7 +170,7 @@ export default function ShopPage() {
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t border-gray-50">
                         <p className="text-xs text-muted-foreground font-medium">بواسطة: <span className="text-secondary font-bold">متجر إيوان</span></p>
-                        <Button size="sm" className="rounded-xl bg-secondary hover:bg-primary text-white font-bold gap-2">
+                        <Button size="sm" className="rounded-lg bg-secondary hover:bg-primary text-white font-bold gap-2">
                           <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                         </Button>
                       </div>
