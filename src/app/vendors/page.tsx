@@ -25,17 +25,65 @@ import { Badge } from '@/components/ui/badge';
 
 const MOCK_STORES = [
   {
-    id: 'v3',
-    business_name: 'معرض الخشب الفاخر',
+    id: 's1',
+    business_name: 'المعرض الملكي للأثاث',
     business_type: 'furniture_store',
-    description: 'أكبر تشكيلة من الأثاث المنزلي والمكتبي الجاهز والمصنع حسب الطلب من أفضل أنواع الأخشاب.',
-    city: 'حضرموت، المكلا',
-    average_rating: 5.0,
-    service_areas: ['المكلا', 'الشحر', 'سيئون'],
-    cover_url: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v3/200/200',
+    description: 'أفخم تشكيلة من غرف النوم الإيطالية والأطقم التركية الجاهزة مع ضمان حقيقي لمدة 5 سنوات.',
+    city: 'صنعاء، شارع حدة',
+    average_rating: 4.9,
+    service_areas: ['صنعاء', 'عمران', 'ذمار'],
+    cover_url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+    logo_url: 'https://picsum.photos/seed/s1/200/200',
     approval_status: 'approved'
   },
+  {
+    id: 's2',
+    business_name: 'أثاث الخليج الحديث',
+    business_type: 'furniture_store',
+    description: 'نقدم حلولاً عصرية للمكاتب والمنازل بأسعار تنافسية. تشكيلة واسعة من المكاتب والكراسي الطبية.',
+    city: 'عدن، المنصورة',
+    average_rating: 4.7,
+    service_areas: ['عدن', 'لحج', 'أبين'],
+    cover_url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1200',
+    logo_url: 'https://picsum.photos/seed/s2/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 's3',
+    business_name: 'مفروشات السعيد',
+    business_type: 'furniture_store',
+    description: 'الرائدون في عالم المفروشات منذ عام 1990. نجمع بين الجودة العالية والذوق الرفيع.',
+    city: 'تعز، شارع جمال',
+    average_rating: 4.8,
+    service_areas: ['تعز', 'إب'],
+    cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
+    logo_url: 'https://picsum.photos/seed/s3/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 's4',
+    business_name: 'مركز المهرة للمفروشات',
+    business_type: 'furniture_store',
+    description: 'أحدث الموديلات العالمية المستوردة حصرياً لعملائنا في المهرة والمناطق الشرقية.',
+    city: 'المهرة، الغيضة',
+    average_rating: 4.5,
+    service_areas: ['الغيضة', 'سقطرى'],
+    cover_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=1200',
+    logo_url: 'https://picsum.photos/seed/s4/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 's5',
+    business_name: 'عالم الديكور للأثاث',
+    business_type: 'furniture_store',
+    description: 'تخصصنا في الأثاث المودرن والستائر الذكية. اجعل منزلك مواكباً للعصر مع منتجاتنا.',
+    city: 'إب، الدائري',
+    average_rating: 4.6,
+    service_areas: ['إب', 'تعز'],
+    cover_url: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=1200',
+    logo_url: 'https://picsum.photos/seed/s5/200/200',
+    approval_status: 'approved'
+  }
 ];
 
 export default function StoresPage() {
@@ -77,7 +125,7 @@ export default function StoresPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           
           <aside className="w-full lg:w-80 space-y-8">
-            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-md">
+            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-[15px]">
               <div className="space-y-4">
                 <h3 className="text-lg font-black text-secondary flex items-center gap-2">
                   <Filter className="w-4 h-4 text-primary" /> تصفية المتاجر
@@ -92,7 +140,7 @@ export default function StoresPage() {
               </div>
 
               <div className="pt-6">
-                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-md">
+                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-[15px]">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45" />
                   <div className="relative z-10 space-y-4">
                     <Award className="w-8 h-8 text-primary" />
@@ -118,8 +166,8 @@ export default function StoresPage() {
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[1, 2].map(i => (
-                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-md" />
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-[15px]" />
                 ))}
               </div>
             ) : (
@@ -128,7 +176,7 @@ export default function StoresPage() {
                   <Link 
                     href={`/vendors/${store.id}`}
                     key={store.id} 
-                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-md"
+                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image 

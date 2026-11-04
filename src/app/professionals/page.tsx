@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge';
 
 const MOCK_PROFESSIONALS = [
   {
-    id: 'v1',
+    id: 'p1',
     business_name: 'ورشة إتقان للنجارة',
     business_type: 'carpenter',
     description: 'متخصصون في صناعة غرف النوم والدواوين الخشبية الفاخرة بجودة يمنية أصيلة وأخشاب زان طبيعية.',
@@ -37,11 +37,11 @@ const MOCK_PROFESSIONALS = [
     average_rating: 4.9,
     service_areas: ['صنعاء', 'ذمار', 'إب'],
     cover_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v1/200/200',
+    logo_url: 'https://picsum.photos/seed/p1/200/200',
     approval_status: 'approved'
   },
   {
-    id: 'v2',
+    id: 'p2',
     business_name: 'تصاميم رؤية للديكور',
     business_type: 'interior_designer',
     description: 'نحول مساحات منزلك إلى لوحات فنية بلمسات عصرية وأسعار تنافسية. متخصصون في الديكورات المودرن.',
@@ -49,9 +49,57 @@ const MOCK_PROFESSIONALS = [
     average_rating: 4.8,
     service_areas: ['عدن', 'لحج', 'أبين'],
     cover_url: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/v2/200/200',
+    logo_url: 'https://picsum.photos/seed/p2/200/200',
     approval_status: 'approved'
   },
+  {
+    id: 'p3',
+    business_name: 'نجار اليمن الحديث',
+    business_type: 'carpenter',
+    description: 'خبرة 15 عاماً في تفصيل المطابخ الخشبية والخزائن الحائطية بأحدث التصاميم العالمية.',
+    city: 'تعز، بئر باشا',
+    average_rating: 4.6,
+    service_areas: ['تعز', 'إب'],
+    cover_url: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
+    logo_url: 'https://picsum.photos/seed/p3/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 'p4',
+    business_name: 'إبداع للتصميم الداخلي',
+    business_type: 'interior_designer',
+    description: 'متخصصون في التصميم ثلاثي الأبعاد وتوزيع الإضاءة والأثاث لخلق بيئة مريحة وجذابة.',
+    city: 'حضرموت، المكلا',
+    average_rating: 5.0,
+    service_areas: ['المكلا', 'سيئون'],
+    cover_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800',
+    logo_url: 'https://picsum.photos/seed/p4/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 'p5',
+    business_name: 'ورشة النجارة المتميزة',
+    business_type: 'carpenter',
+    description: 'نصنع أثاثك بمواصفاتك الخاصة. نستخدم أجود أنواع الأخشاب المحلية والمستوردة.',
+    city: 'إب، المحمول',
+    average_rating: 4.7,
+    service_areas: ['إب', 'تعز'],
+    cover_url: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&q=80&w=800',
+    logo_url: 'https://picsum.photos/seed/p5/200/200',
+    approval_status: 'approved'
+  },
+  {
+    id: 'p6',
+    business_name: 'فنون الديكور الحضرمي',
+    business_type: 'interior_designer',
+    description: 'دمج التراث الحضرمي الأصيل مع الحداثة في ديكورات المنازل والمجالس العربية.',
+    city: 'حضرموت، سيئون',
+    average_rating: 4.9,
+    service_areas: ['سيئون', 'تريم'],
+    cover_url: 'https://images.unsplash.com/photo-1513519247388-193ad5139b36?auto=format&fit=crop&q=80&w=800',
+    logo_url: 'https://picsum.photos/seed/p6/200/200',
+    approval_status: 'approved'
+  }
 ];
 
 export default function ProfessionalsPage() {
@@ -99,7 +147,7 @@ export default function ProfessionalsPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           
           <aside className="w-full lg:w-80 space-y-8">
-            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-md">
+            <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-[15px]">
               <div className="space-y-4">
                 <h3 className="text-lg font-black text-secondary flex items-center gap-2">
                   <Filter className="w-4 h-4 text-primary" /> تصفية المتخصصين
@@ -138,7 +186,7 @@ export default function ProfessionalsPage() {
               </div>
 
               <div className="pt-6">
-                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-md">
+                <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-[15px]">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45" />
                   <div className="relative z-10 space-y-4">
                     <Award className="w-8 h-8 text-primary" />
@@ -164,8 +212,8 @@ export default function ProfessionalsPage() {
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[1, 2].map(i => (
-                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-md" />
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-[15px]" />
                 ))}
               </div>
             ) : (
@@ -174,7 +222,7 @@ export default function ProfessionalsPage() {
                   <Link 
                     href={`/vendors/${prof.id}`}
                     key={prof.id} 
-                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-md"
+                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image 
