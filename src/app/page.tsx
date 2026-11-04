@@ -159,15 +159,15 @@ export default function HomePage() {
 
         {/* Features Section */}
         <section className="py-24 bg-gray-50">
-          <div className="container px-4 md:px-8 mx-auto">
-            <div className="text-center mb-16 space-y-4">
+          <div className="container px-4 md:px-8 mx-auto text-center">
+            <div className="mb-16 space-y-4">
               <div className="h-8 w-1 bg-primary inline-block align-middle ml-4 rounded-full"></div>
               <h2 className="text-3xl md:text-4xl font-black text-secondary inline-block align-middle">لماذا تختار إيوان؟</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نقدم لك تجربة فريدة تجمع بين التكنولوجيا المتطورة والحرفية التقليدية.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, i) => (
-                <div key={i} className="group p-8 bg-gray-50 border border-border/50 rounded-[15px] shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
+                <div key={i} className="group p-8 bg-gray-50 border border-border/50 rounded-[15px] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center">
                   <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110", feature.bg, feature.color)}>
                     <feature.icon className="w-8 h-8" />
                   </div>
@@ -396,7 +396,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-16 text-center">
-               <Link href="/faq">
+               <Link href="/reviews">
                  <Button variant="outline" size="lg" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-black px-12 h-14 transition-all">
                    عرض كافة الآراء <ArrowLeft className="w-5 h-5 mr-2" />
                  </Button>
@@ -408,7 +408,7 @@ export default function HomePage() {
         {/* FAQ Section */}
         <section className="py-20 md:py-24 bg-white">
           <div className="container px-4 md:px-8 max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 md:mb-16 gap-6 text-center md:text-right">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 mb-16 gap-6 text-center md:text-right">
               <div className="space-y-3 md:space-y-4">
                 <div className="h-6 md:h-8 w-1 bg-primary inline-block align-middle ml-3 md:ml-4 rounded-full"></div>
                 <h2 className="text-2xl md:text-4xl font-black text-secondary inline-block align-middle">الأسئلة الشائعة</h2>

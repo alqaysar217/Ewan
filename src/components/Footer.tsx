@@ -10,7 +10,6 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  ExternalLink,
   ChevronLeft
 } from 'lucide-react';
 
@@ -27,10 +26,10 @@ export default function Footer() {
     ],
     support: [
       { label: "حول المنصة", href: "/about" },
+      { label: "آراء العملاء", href: "/reviews" },
       { label: "تواصل معنا", href: "/contact" },
       { label: "الأسئلة الشائعة", href: "/faq" },
       { label: "سياسة الخصوصية", href: "/privacy" },
-      { label: "شروط الاستخدام", href: "/terms" },
     ],
     categories: [
       { label: "غرف المعيشة", href: "/shop?category=living" },
@@ -91,14 +90,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Rooms */}
+          {/* Support */}
           <div className="space-y-8">
             <h4 className="text-xl font-black relative inline-block">
-              تصفح الغرف
+              الدعم والمساعدة
               <span className="absolute -bottom-2 right-0 w-8 h-1 bg-primary rounded-full"></span>
             </h4>
             <ul className="space-y-4">
-              {footerLinks.categories.map((link) => (
+              {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-gray-400 hover:text-primary transition-colors flex items-center gap-2 group">
                     <ChevronLeft className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
@@ -122,7 +121,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">اتصل بنا</p>
-                  <p className="font-black dir-ltr text-left">+966 500 000 000</p>
+                  <p className="font-black dir-ltr text-left">+967 770 000 000</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -131,7 +130,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">البريد الإلكتروني</p>
-                  <p className="font-black">info@ewan-design.com</p>
+                  <p className="font-black">info@ewan.ye</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -140,7 +139,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">المقر الرئيسي</p>
-                  <p className="font-black text-sm">المملكة العربية السعودية، الرياض</p>
+                  <p className="font-black text-sm">اليمن، صنعاء، حي حدة</p>
                 </div>
               </div>
             </div>
@@ -150,17 +149,13 @@ export default function Footer() {
 
         {/* Support Links & Copyright */}
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex flex-wrap justify-center gap-8">
-            {footerLinks.support.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm font-bold text-gray-500 hover:text-white transition-colors">
-                {link.label}
-              </Link>
-            ))}
+          <div className="flex flex-wrap justify-center gap-8 text-sm font-bold text-gray-500">
+             تم التطوير بكل ❤️ في اليمن.
           </div>
           
           <div className="text-center md:text-left">
             <p className="text-sm text-gray-500 font-bold">
-              © {currentYear} إيوان. جميع الحقوق محفوظة. تم التطوير بكل ❤️ في المملكة.
+              © {currentYear} إيوان. جميع الحقوق محفوظة.
             </p>
           </div>
         </div>
