@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { auth } = useAuth();
+  const auth = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,7 +32,6 @@ export default function LoginPage() {
     } catch (error: any) {
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
       
-      // تفصيل الأخطاء بناءً على رمز الخطأ من Firebase
       if (error.code === 'auth/user-not-found') {
         errorMessage = "هذا الحساب غير موجود. يرجى التأكد من البريد الإلكتروني.";
       } else if (error.code === 'auth/wrong-password') {
@@ -42,7 +41,6 @@ export default function LoginPage() {
       } else if (error.code === 'auth/invalid-credential') {
         errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
       } else if (error.message) {
-        // إذا كان هناك رسالة خطأ أخرى غير معروفة الرمز، نعرضها لمساعدة المستخدم
         errorMessage = `فشل تسجيل الدخول: ${error.message}`;
       }
 

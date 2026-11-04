@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 
 export default function HomePage() {
   const { user, loading } = useUser();
-  const { auth } = useAuth();
+  const auth = useAuth();
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-interior');
 
   const handleLogout = async () => {

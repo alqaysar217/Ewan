@@ -21,7 +21,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'customer' | 'vendor'>('customer');
   const [loading, setLoading] = useState(false);
-  const { auth } = useAuth();
+  const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
 
@@ -34,7 +34,6 @@ export default function RegisterPage() {
 
       await updateProfile(user, { displayName: fullName });
 
-      // إضافة بيانات المستخدم لقاعدة البيانات
       await setDoc(doc(db, 'users', user.uid), {
         full_name: fullName,
         email: email,
