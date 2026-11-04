@@ -117,9 +117,53 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
         <section className="container mx-auto px-4 md:px-8 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             
-            {/* Main Content Areas - Now on the right/first in RTL DOM order for swapping */}
+            {/* Sidebar Info - Moved to the right (first in DOM for RTL) */}
+            <div className="lg:col-span-1 space-y-8">
+              <div className="bg-white p-8 border border-border/50 rounded-md shadow-sm space-y-8">
+                <div className="space-y-4">
+                  <h3 className="font-black text-secondary flex items-center gap-2">
+                    <Info className="w-4 h-4 text-primary" /> نبذة عن المتجر
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                    {vendor.description}
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-6">
+                  <h3 className="font-black text-secondary">إحصائيات سريعة</h3>
+                  <div className="space-y-4">
+                    {vendor.stats.map((stat, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
+                        <div className="flex items-center gap-3">
+                          <stat.icon className="w-5 h-5 text-primary" />
+                          <span className="text-xs font-bold text-muted-foreground">{stat.label}</span>
+                        </div>
+                        <span className="font-black text-secondary">{stat.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h3 className="font-black text-secondary">مناطق الخدمة</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {vendor.service_areas.map((area) => (
+                      <Badge key={area} variant="secondary" className="bg-primary/5 text-primary border-none rounded-md px-3">
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content Areas - Moved to the left (second in DOM for RTL) */}
             <div className="lg:col-span-3 space-y-12">
-              <Tabs defaultValue="products" className="w-full">
+              <Tabs defaultValue="products" className="w-full" dir="rtl">
                 <TabsList className="w-full justify-start h-14 bg-transparent border-b rounded-none p-0 gap-8">
                   <TabsTrigger value="products" className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-6">منتجات المتجر</TabsTrigger>
                   <TabsTrigger value="reviews" className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-6">تقييمات العملاء</TabsTrigger>
@@ -191,50 +235,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               </Tabs>
             </div>
 
-            {/* Sidebar Info - Now on the left/second in RTL DOM order for swapping */}
-            <div className="lg:col-span-1 space-y-8">
-              <div className="bg-white p-8 border border-border/50 rounded-md shadow-sm space-y-8">
-                <div className="space-y-4">
-                  <h3 className="font-black text-secondary flex items-center gap-2">
-                    <Info className="w-4 h-4 text-primary" /> نبذة عن المتجر
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-                    {vendor.description}
-                  </p>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-6">
-                  <h3 className="font-black text-secondary">إحصائيات سريعة</h3>
-                  <div className="space-y-4">
-                    {vendor.stats.map((stat, i) => (
-                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
-                        <div className="flex items-center gap-3">
-                          <stat.icon className="w-5 h-5 text-primary" />
-                          <span className="text-xs font-bold text-muted-foreground">{stat.label}</span>
-                        </div>
-                        <span className="font-black text-secondary">{stat.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h3 className="font-black text-secondary">مناطق الخدمة</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {vendor.service_areas.map((area) => (
-                      <Badge key={area} variant="secondary" className="bg-primary/5 text-primary border-none rounded-md px-3">
-                        {area}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </section>
       </main>
@@ -242,4 +242,8 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
       <Footer />
     </div>
   );
+}
+
+function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(' ');
 }
