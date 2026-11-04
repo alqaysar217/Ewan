@@ -14,15 +14,27 @@ import {
   ArrowLeft,
   Store,
   ChevronLeft,
-  Award
+  Award,
+  Layers,
+  CircleDollarSign,
+  Palette,
+  Sparkles,
+  Maximize2
 } from 'lucide-react';
-import { Button } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { Button as ShButton } from '@/components/ui/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const MOCK_STORES = [
   {
@@ -89,6 +101,7 @@ const MOCK_STORES = [
 
 export default function StoresPage() {
   const db = useFirestore();
+  const [maxPrice, setMaxPrice] = useState([500000]);
   
   const vendorsQuery = query(
     collection(db, 'vendors'), 
@@ -100,6 +113,41 @@ export default function StoresPage() {
   const displayedStores = (firestoreVendors && firestoreVendors.length > 0) 
     ? firestoreVendors 
     : MOCK_STORES;
+
+  const categories = [
+    { id: 'living', name: 'غرف المعيشة' },
+    { id: 'bedroom', name: 'النوم' },
+    { id: 'dining', name: 'الطعام' },
+    { id: 'majlis', name: 'المجالس' },
+    { id: 'lighting', name: 'الإضاءة' },
+    { id: 'rugs', name: 'السجاد' },
+    { id: 'antiques', name: 'التحف' }
+  ];
+
+  const styles = [
+    { id: 'modern', name: 'حديث' },
+    { id: 'minimalist', name: 'مينمليست' },
+    { id: 'traditional', name: 'طابع تراثي' },
+    { id: 'contemporary', name: 'كونتمبوراري' },
+    { id: 'scandinavian', name: 'اسكندنافي' }
+  ];
+
+  const colors = [
+    { id: 'creamy', name: 'كريمي', hex: '#F5F5DC' },
+    { id: 'beige', name: 'بيج', hex: '#F5F5DC' },
+    { id: 'walnut', name: 'جوز داكن', hex: '#3B2F2F' },
+    { id: 'oak', name: 'بلوط', hex: '#9E7E53' }
+  ];
+
+  const materials = [
+    { id: 'wood', name: 'خشب' },
+    { id: 'fabric', name: 'قماش' },
+    { id: 'linen', name: 'كتان' },
+    { id: 'metal', name: 'معدن' },
+    { id: 'copper', name: 'نحاس' },
+    { id: 'bamboo', name: 'خيزران' },
+    { id: 'woven', name: 'منسوج' }
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
@@ -128,9 +176,12 @@ export default function StoresPage() {
           <aside className="w-full lg:w-80 space-y-8">
             <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-[15px]">
               <div className="space-y-4">
-                <h3 className="text-lg font-black text-secondary flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-primary" /> تصفية المتاجر
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-black text-secondary flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-primary" /> تصفية المتاجر
+                  </h3>
+                  <button className="text-xs font-bold text-primary hover:underline">إعادة تعيين</button>
+                </div>
                 <div className="relative">
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input 
@@ -140,6 +191,122 @@ export default function StoresPage() {
                 </div>
               </div>
 
+              <Accordion type="multiple" defaultValue={["categories"]} className="w-full">
+                {/* Categories */}
+                <AccordionItem value="categories" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <Layers className="w-4 h-4 text-primary" /> القسم الرئيسي
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pt-1">
+                      {categories.map((cat) => (
+                        <div key={cat.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
+                          <Checkbox id={`cat-${cat.id}`} className="rounded-sm" />
+                          <label htmlFor={`cat-${cat.id}`} className="text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
+                            {cat.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Styles */}
+                <AccordionItem value="styles" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <Maximize2 className="w-4 h-4 text-primary" /> الأنماط والتصاميم
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pt-1">
+                      {styles.map((style) => (
+                        <div key={style.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
+                          <Checkbox id={`style-${style.id}`} className="rounded-sm" />
+                          <label htmlFor={`style-${style.id}`} className="text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
+                            {style.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Price */}
+                <AccordionItem value="price" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <CircleDollarSign className="w-4 h-4 text-primary" /> الميزانية (ر.ي)
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="pt-4 px-2 space-y-4">
+                      <Slider 
+                        defaultValue={[500000]} 
+                        max={1000000} 
+                        step={1000} 
+                        value={maxPrice}
+                        onValueChange={setMaxPrice}
+                        className="cursor-pointer"
+                      />
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-muted-foreground">0</span>
+                        <span className="text-xs font-black text-primary">حتى {maxPrice[0].toLocaleString('en-US')}</span>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Colors */}
+                <AccordionItem value="colors" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <Palette className="w-4 h-4 text-primary" /> اللون السائد
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      {colors.map((color) => (
+                        <button 
+                          key={color.id}
+                          className="flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-50 border border-transparent hover:border-border transition-all text-right"
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-full border border-border" 
+                            style={{ backgroundColor: color.hex }}
+                          />
+                          <span className="text-[10px] font-bold text-muted-foreground">{color.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Materials */}
+                <AccordionItem value="materials" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-3">
+                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
+                      <Sparkles className="w-4 h-4 text-primary" /> المادة والخامة
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {materials.map((mat) => (
+                        <Badge 
+                          key={mat.id} 
+                          variant="outline" 
+                          className="cursor-pointer hover:bg-primary hover:text-white hover:border-primary transition-all rounded-md px-2 py-0.5 font-bold text-[10px]"
+                        >
+                          {mat.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
               <div className="pt-6">
                 <div className="p-6 bg-secondary text-white relative overflow-hidden group rounded-[15px]">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45" />
@@ -147,9 +314,9 @@ export default function StoresPage() {
                     <Award className="w-8 h-8 text-primary" />
                     <h4 className="font-black text-lg leading-tight">هل لديك معرض أثاث؟</h4>
                     <Link href="/register" className="block">
-                      <ShButton className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 rounded-md">
+                      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 rounded-md">
                         سجل معرضك الآن
-                      </ShButton>
+                      </Button>
                     </Link>
                   </div>
                 </div>
@@ -226,10 +393,10 @@ export default function StoresPage() {
                           <MapPin className="w-3.5 h-3.5 text-primary" />
                           {store.city}
                         </div>
-                        <ShButton variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                        <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
                           تصفح المنتجات 
                           <ArrowLeft className="w-4 h-4 mr-2" />
-                        </ShButton>
+                        </Button>
                       </div>
                     </div>
                   </Link>
