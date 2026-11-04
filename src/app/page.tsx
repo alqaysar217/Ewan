@@ -58,9 +58,27 @@ export default function HomePage() {
   ];
 
   const testimonials = [
-    { name: 'محمد القاضي', role: 'عميل من صنعاء', text: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة، ساعدتني كثيراً في اختيار اللون المناسب لمجلسي الجديد وبكل سهولة.', rating: 5 },
-    { name: 'سارة باوزير', role: 'عميلة من المكلا', text: 'جودة الخشب في الطقم الحضرمي الذي طلبته تفوقت على توقعاتي، والتوصيل كان في الموعد تماماً وبكل احترافية.', rating: 5 },
-    { name: 'أحمد علي', role: 'عميل من عدن', text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة جداً.', rating: 4.8 }
+    { 
+      name: 'محمد القاضي', 
+      role: 'عميل من صنعاء', 
+      text: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة، ساعدتني كثيراً في اختيار اللون المناسب لمجلسي الجديد وبكل سهولة.', 
+      rating: 4.9,
+      avatar: 'https://picsum.photos/seed/user1/100/100'
+    },
+    { 
+      name: 'سارة باوزير', 
+      role: 'عميلة من المكلا', 
+      text: 'جودة الخشب في الطقم الحضرمي الذي طلبته تفوقت على توقعاتي، والتوصيل كان في الموعد تماماً وبكل احترافية.', 
+      rating: 5.0,
+      avatar: 'https://picsum.photos/seed/user2/100/100'
+    },
+    { 
+      name: 'أحمد علي', 
+      role: 'عميل من عدن', 
+      text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة جداً.', 
+      rating: 4.8,
+      avatar: 'https://picsum.photos/seed/user3/100/100'
+    }
   ];
 
   return (
@@ -115,7 +133,7 @@ export default function HomePage() {
           <div className="container px-4 md:px-8 mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, i) => (
-                <div key={i} className="group p-8 bg-white border border-border/50 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300">
+                <div key={i} className="group p-8 bg-white border border-border/50 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300">
                   <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110", feature.bg, feature.color)}>
                     <feature.icon className="w-7 h-7" />
                   </div>
@@ -146,7 +164,7 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
                   <div className="relative aspect-square overflow-hidden bg-gray-50">
                     <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" data-ai-hint="furniture product" />
                     <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
@@ -198,13 +216,13 @@ export default function HomePage() {
         <section className="py-24 bg-secondary relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
-            <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md border border-white/10 rounded-[3rem] p-10 md:p-20 text-center space-y-8">
+            <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-10 md:p-20 text-center space-y-8">
               <Zap className="w-16 h-16 text-primary mx-auto animate-pulse" />
               <h2 className="text-3xl md:text-5xl font-black text-white">حول خيالك إلى حقيقة في ثوانٍ</h2>
               <p className="text-xl text-gray-300 font-medium leading-relaxed">
                 استوديو إيوان الذكي يتيح لك تجربة الأثاث في مساحتك الحقيقية باستخدام الذكاء الاصطناعي. ارفع صورة غرفتك الآن وابدأ التغيير.
               </p>
-              <Button size="lg" className="h-16 px-12 rounded-[15px] bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/40">
+              <Button size="lg" className="h-16 px-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/40">
                 جرب المصمم الذكي مجاناً
               </Button>
             </div>
@@ -220,7 +238,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Link href="/vendors" key={i} className="group p-6 bg-gray-50 rounded-[2rem] border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all text-center space-y-4">
+                <Link href="/vendors" key={i} className="group p-6 bg-gray-50 rounded-2xl border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all text-center space-y-4">
                   <div className="w-24 h-24 bg-white rounded-full mx-auto relative overflow-hidden border shadow-sm group-hover:scale-110 transition-transform">
                     <Image src={`https://picsum.photos/seed/store-${i}/200/200`} alt="Store" fill className="object-cover" />
                   </div>
@@ -256,38 +274,43 @@ export default function HomePage() {
           
           <div className="container px-4 md:px-8 mx-auto relative z-10">
             <div className="text-center mb-20 space-y-6">
-              <div className="w-20 h-20 bg-primary/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mx-auto mb-4 border border-white/10">
+              <div className="w-20 h-20 bg-primary/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
                 <Quote className="w-10 h-10 text-primary" />
               </div>
               <h2 className="text-4xl md:text-5xl font-black">ماذا يقول عملاؤنا؟</h2>
               <p className="text-gray-400 text-lg max-w-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((t, i) => (
-                <div key={i} className="group relative p-10 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] space-y-8 hover:bg-white/10 transition-all duration-500 shadow-2xl">
+                <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full">
                   {/* Rating Stars */}
                   <div className="flex gap-1 text-amber-500">
-                    {Array.from({ length: 5 }).map((_, star) => (
-                      <Star key={star} className={cn("w-4 h-4", star >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
+                    {Array.from({ length: 5 }).map((_, starIdx) => (
+                      <Star key={starIdx} className={cn("w-4 h-4", starIdx >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
                     ))}
                   </div>
                   
-                  {/* Testimonial Text with large quotes */}
-                  <div className="relative">
-                    <Quote className="absolute -top-6 -right-6 w-12 h-12 text-primary opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <p className="text-lg md:text-xl italic font-medium leading-relaxed text-right relative z-10">
-                      {t.text}
+                  {/* Testimonial Text */}
+                  <div className="relative flex-1">
+                    <Quote className="absolute -top-4 -right-4 w-10 h-10 text-primary opacity-20" />
+                    <p className="text-lg font-medium leading-relaxed text-right relative z-10 italic">
+                      "{t.text}"
                     </p>
                   </div>
                   
                   {/* User Profile */}
-                  <div className="flex items-center gap-4 pt-6 border-t border-white/10 flex-row-reverse">
-                    <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-black/20 shrink-0 transform group-hover:scale-110 transition-transform">
-                      {t.name[0]}
+                  <div className="flex items-center gap-4 pt-6 border-t border-white/10">
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-primary/20 shrink-0">
+                      <Image 
+                        src={t.avatar} 
+                        alt={t.name} 
+                        fill 
+                        className="object-cover" 
+                      />
                     </div>
                     <div className="text-right">
-                      <h4 className="font-black text-white text-lg">{t.name}</h4>
+                      <h4 className="font-black text-white text-base">{t.name}</h4>
                       <p className="text-xs text-primary font-bold mt-0.5">{t.role}</p>
                     </div>
                   </div>
@@ -320,7 +343,7 @@ export default function HomePage() {
                 { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
                 { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." }
               ].map((item, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
+                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-2xl px-4 md:px-6 overflow-hidden">
                   <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
                     {item.q}
                   </AccordionTrigger>
