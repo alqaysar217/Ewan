@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from '@/hooks/use-toast';
-import { Sparkles, User, Store } from 'lucide-react';
+import { User, Store } from 'lucide-react';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -63,8 +64,13 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4" dir="rtl">
       <Card className="w-full max-w-lg border-border/50 shadow-xl rounded-[2rem] overflow-hidden">
         <CardHeader className="space-y-4 text-center pt-10">
-          <div className="mx-auto w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
-            <Sparkles className="text-white w-6 h-6" />
+          <div className="mx-auto relative w-16 h-16 overflow-hidden rounded-2xl shadow-lg shadow-primary/20 bg-white">
+            <Image 
+              src="/logo.png" 
+              alt="إيوان" 
+              fill 
+              className="object-contain p-2"
+            />
           </div>
           <CardTitle className="text-3xl font-extrabold text-secondary">إنشاء حساب جديد</CardTitle>
           <CardDescription className="text-muted-foreground font-medium">

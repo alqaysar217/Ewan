@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { 
@@ -72,8 +72,13 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className="w-72 bg-secondary text-white hidden lg:flex flex-col border-l border-white/5">
         <div className="p-8 flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-            <span className="font-bold text-xl">إ</span>
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-lg shadow-primary/20 bg-white">
+            <Image 
+              src="/logo.png" 
+              alt="إيوان" 
+              fill 
+              className="object-contain p-1"
+            />
           </div>
           <span className="text-2xl font-extrabold tracking-tight">إيوان للإدارة</span>
         </div>

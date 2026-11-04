@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '@/firebase';
@@ -10,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -44,8 +44,13 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4" dir="rtl">
       <Card className="w-full max-w-md border-border/50 shadow-xl rounded-[2rem] overflow-hidden">
         <CardHeader className="space-y-4 text-center pt-10">
-          <div className="mx-auto w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
-            <Sparkles className="text-white w-6 h-6" />
+          <div className="mx-auto relative w-16 h-16 overflow-hidden rounded-2xl shadow-lg shadow-primary/20 bg-white">
+            <Image 
+              src="/logo.png" 
+              alt="إيوان" 
+              fill 
+              className="object-contain p-2"
+            />
           </div>
           <CardTitle className="text-3xl font-extrabold text-secondary">تسجيل الدخول</CardTitle>
           <CardDescription className="text-muted-foreground font-medium">

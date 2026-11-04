@@ -33,8 +33,13 @@ export default function HomePage() {
         <div className="container flex h-20 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20">
-                <span className="text-white font-bold text-xl">إ</span>
+              <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-lg shadow-secondary/20 bg-white">
+                <Image 
+                  src="/logo.png" 
+                  alt="إيوان" 
+                  fill 
+                  className="object-contain p-1"
+                />
               </div>
               <span className="text-2xl font-extrabold tracking-tight text-secondary">إيوان</span>
             </Link>
@@ -244,8 +249,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-16 pb-16 border-b border-white/10 mb-16">
             <div className="space-y-8">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">إ</span>
+                <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white">
+                  <Image 
+                    src="/logo.png" 
+                    alt="إيوان" 
+                    fill 
+                    className="object-contain p-1"
+                  />
                 </div>
                 <span className="text-2xl font-bold tracking-tight">إيوان</span>
               </Link>
