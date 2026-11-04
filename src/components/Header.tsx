@@ -17,9 +17,11 @@ import {
   Info, 
   Phone,
   ChevronLeft,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -32,9 +34,14 @@ import {
 } from "@/components/ui/sheet";
 
 export default function Header() {
-  const { user, loading } = useUser();
+  const { user, loading: userLoading } = useUser();
+  const db = useFirestore();
   const auth = useAuth();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+
+  // جلب بيانات المستخدم لمعرفة الدور (Role)
+  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
   const handleLogout = async () => {
     try {
@@ -118,15 +125,24 @@ export default function Header() {
             <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">0</span>
           </Button>
 
-          {!loading && (
+          {!userLoading && (
             user ? (
               <div className="flex items-center gap-2">
-                <Link href="/vendor/dashboard">
-                  <Button variant="outline" className="hidden md:flex gap-2 rounded-md border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
-                    <User className="w-4 h-4" />
-                    حسابي
-                  </Button>
-                </Link>
+                {userData?.role === 'admin' ? (
+                  <Link href="/admin">
+                    <Button className="hidden md:flex gap-2 rounded-md bg-secondary text-white hover:bg-secondary/90 transition-all px-6 font-bold shadow-lg shadow-secondary/10">
+                      <ShieldCheck className="w-4 h-4 text-primary" />
+                      لوحة الإدارة
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/vendor/dashboard">
+                    <Button variant="outline" className="hidden md:flex gap-2 rounded-md border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                      <User className="w-4 h-4" />
+                      حسابي
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="ghost" size="icon" onClick={handleLogout} className="text-destructive hover:bg-destructive/10">
                   <LogOut className="w-5 h-5" />
                 </Button>
@@ -182,13 +198,28 @@ export default function Header() {
                         </Button>
                       </Link>
                     ) : (
-                      <Button 
-                        variant="ghost" 
-                        onClick={handleLogout}
-                        className="w-full h-14 rounded-md text-destructive hover:bg-destructive/5 font-bold gap-2"
-                      >
-                        <LogOut className="w-5 h-5" /> تسجيل الخروج
-                      </Button>
+                      <div className="space-y-4">
+                         {userData?.role === 'admin' ? (
+                            <Link href="/admin" className="block">
+                              <Button className="w-full h-14 rounded-md bg-secondary text-white font-bold gap-2">
+                                <ShieldCheck className="w-5 h-5 text-primary" /> لوحة الإدارة
+                              </Button>
+                            </Link>
+                         ) : (
+                            <Link href="/vendor/dashboard" className="block">
+                              <Button className="w-full h-14 rounded-md bg-primary text-white font-bold gap-2">
+                                <User className="w-5 h-5" /> حسابي
+                              </Button>
+                            </Link>
+                         )}
+                        <Button 
+                          variant="ghost" 
+                          onClick={handleLogout}
+                          className="w-full h-14 rounded-md text-destructive hover:bg-destructive/5 font-bold gap-2"
+                        >
+                          <LogOut className="w-5 h-5" /> تسجيل الخروج
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </nav>
