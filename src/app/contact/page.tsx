@@ -11,7 +11,8 @@ import {
   Facebook,
   Instagram,
   Twitter,
-  Linkedin
+  Linkedin,
+  ArrowRight
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -40,9 +41,9 @@ export default function ContactPage() {
       bg: 'bg-emerald-50'
     },
     { 
-      title: 'مقرنا', 
-      value: 'صنعاء - شارع حدة', 
-      desc: 'تفضل بزيارة مكتبنا الرئيسي',
+      title: 'مقرنا الرئيسي', 
+      value: 'صنعاء - حي حدة', 
+      desc: 'نتشرف بزيارتكم لمقرنا',
       icon: MapPin,
       color: 'text-amber-600',
       bg: 'bg-amber-50'
@@ -54,15 +55,20 @@ export default function ContactPage() {
       <Header />
 
       <main className="flex-1">
-        {/* Header Hero */}
+        {/* Header Hero Section */}
         <section className="bg-secondary text-white py-24 md:py-32 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <Globe className="w-full h-full scale-125" />
+          <div className="absolute inset-0 opacity-10">
+            <Globe className="w-full h-full scale-150 rotate-12" />
           </div>
-          <div className="container relative z-10 px-4 md:px-8 mx-auto text-center space-y-6">
-            <h1 className="text-4xl md:text-6xl font-black">تواصل معنا</h1>
-            <p className="text-gray-300 max-w-2xl mx-auto text-lg font-medium">
-              نحن هنا لمساعدتك في كل خطوة. سواء كان لديك استفسار عن منتج، أو ترغب في الانضمام كتاجر، أو تحتاج لمساعدة تقنية.
+          <div className="container relative z-10 px-4 md:px-8 mx-auto text-center space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/20 backdrop-blur-xl border-r-4 border-primary text-primary text-xs font-black uppercase tracking-[0.2em] mx-auto">
+              تواصل مع إيوان
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black leading-tight">
+              نحن هنا <span className="text-primary">لنسمع</span> منك
+            </h1>
+            <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
+              سواء كنت عميلاً يبحث عن التميز، أو تاجراً يرغب في الانضمام، فريقنا جاهز للإجابة على جميع استفساراتك.
             </p>
           </div>
         </section>
@@ -70,11 +76,11 @@ export default function ContactPage() {
         <section className="container mx-auto py-24 px-4 md:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             
-            {/* Contact Cards */}
+            {/* Sidebar Contact Cards */}
             <div className="lg:col-span-1 space-y-6">
               {contactInfo.map((info, i) => (
-                <div key={i} className="bg-white p-8 rounded-[15px] border border-border/50 shadow-sm hover:shadow-md transition-all flex items-start gap-6 group">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 ${info.bg} ${info.color}`}>
+                <div key={i} className="bg-white p-8 rounded-[15px] border border-border/50 shadow-sm hover:shadow-xl transition-all flex items-start gap-6 group">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all group-hover:scale-110 group-hover:rotate-6 ${info.bg} ${info.color}`}>
                     <info.icon className="w-6 h-6" />
                   </div>
                   <div>
@@ -85,61 +91,71 @@ export default function ContactPage() {
                 </div>
               ))}
 
-              <div className="p-8 bg-secondary text-white rounded-[15px] space-y-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rotate-45 -translate-y-12 translate-x-12" />
-                <h4 className="text-xl font-black">تابعنا على التواصل</h4>
+              <div className="p-10 bg-secondary text-white rounded-[15px] space-y-8 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16" />
+                <div className="space-y-4">
+                  <h4 className="text-2xl font-black">مجتمع إيوان</h4>
+                  <p className="text-sm text-white/70 font-medium leading-relaxed">
+                    تابعنا على منصات التواصل الاجتماعي لتبقى على اطلاع بآخر الصيحات والعروض.
+                  </p>
+                </div>
                 <div className="flex gap-4">
                   {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
-                    <a key={i} href="#" className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-colors">
-                      <Icon className="w-5 h-5" />
+                    <a key={i} href="#" className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-all group shadow-inner">
+                      <Icon className="w-5 h-5 group-hover:scale-110" />
                     </a>
                   ))}
                 </div>
-                <div className="flex items-center gap-2 pt-4 border-t border-white/10">
-                  <Clock className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold opacity-80">ساعات العمل: السبت - الخميس</span>
+                <div className="flex items-center gap-3 pt-6 border-t border-white/10">
+                  <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-primary">ساعات العمل</p>
+                    <p className="text-xs font-bold text-white/80 mt-0.5">السبت - الخميس (9ص - 9م)</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Contact Form */}
+            {/* Main Contact Form */}
             <div className="lg:col-span-2">
-              <Card className="rounded-[15px] border border-border/50 shadow-sm overflow-hidden bg-white">
-                <CardContent className="p-8 md:p-12">
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <MessageSquare className="w-5 h-5 text-primary" />
+              <Card className="rounded-[15px] border border-border/50 shadow-2xl overflow-hidden bg-white">
+                <CardContent className="p-8 md:p-16">
+                  <div className="flex items-center gap-5 mb-12">
+                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shadow-inner">
+                      <MessageSquare className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black text-secondary">أرسل لنا رسالة</h2>
-                      <p className="text-muted-foreground font-medium">املأ النموذج أدناه وسنتواصل معك بأسرع وقت.</p>
+                      <h2 className="text-3xl font-black text-secondary">أرسل لنا رسالة</h2>
+                      <p className="text-muted-foreground font-medium mt-1">نسعد باستقبال رسائلك وسيقوم فريقنا بالرد خلال 24 ساعة.</p>
                     </div>
                   </div>
 
-                  <form className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <form className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-3">
-                        <Label htmlFor="name" className="font-bold text-secondary">الاسم الكامل</Label>
-                        <Input id="name" placeholder="أدخل اسمك هنا" className="h-12 rounded-md border-gray-100 bg-gray-50 focus:ring-primary" />
+                        <Label htmlFor="name" className="font-black text-secondary text-base">الاسم الكامل</Label>
+                        <Input id="name" placeholder="أدخل اسمك هنا" className="h-14 rounded-[10px] border-gray-100 bg-gray-50 focus:ring-primary font-bold text-secondary" />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="email" className="font-bold text-secondary">البريد الإلكتروني</Label>
-                        <Input id="email" type="email" placeholder="example@mail.com" className="h-12 rounded-md border-gray-100 bg-gray-50 focus:ring-primary" />
+                        <Label htmlFor="email" className="font-black text-secondary text-base">البريد الإلكتروني</Label>
+                        <Input id="email" type="email" placeholder="example@mail.com" className="h-14 rounded-[10px] border-gray-100 bg-gray-50 focus:ring-primary font-bold text-secondary" />
                       </div>
                     </div>
                     
                     <div className="space-y-3">
-                      <Label htmlFor="subject" className="font-bold text-secondary">الموضوع</Label>
-                      <Input id="subject" placeholder="كيف يمكننا مساعدتك؟" className="h-12 rounded-md border-gray-100 bg-gray-50 focus:ring-primary" />
+                      <Label htmlFor="subject" className="font-black text-secondary text-base">الموضوع</Label>
+                      <Input id="subject" placeholder="كيف يمكننا مساعدتك؟" className="h-14 rounded-[10px] border-gray-100 bg-gray-50 focus:ring-primary font-bold text-secondary" />
                     </div>
                     
                     <div className="space-y-3">
-                      <Label htmlFor="message" className="font-bold text-secondary">رسالتك</Label>
-                      <Textarea id="message" placeholder="اكتب تفاصيل استفسارك هنا..." className="min-h-[150px] rounded-md border-gray-100 bg-gray-50 focus:ring-primary py-4" />
+                      <Label htmlFor="message" className="font-black text-secondary text-base">تفاصيل الرسالة</Label>
+                      <Textarea id="message" placeholder="اكتب تفاصيل استفسارك هنا بوضوح..." className="min-h-[180px] rounded-[10px] border-gray-100 bg-gray-50 focus:ring-primary py-5 px-6 font-medium text-secondary" />
                     </div>
 
-                    <Button className="w-full md:w-64 h-14 rounded-md bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-xl shadow-primary/20 gap-3">
-                      إرسال الرسالة <Send className="w-5 h-5" />
+                    <Button className="w-full md:w-64 h-16 rounded-[12px] bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-2xl shadow-primary/30 gap-3 group transition-all">
+                      إرسال الرسالة الآن <Send className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
                     </Button>
                   </form>
                 </CardContent>
@@ -148,20 +164,23 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Map Placeholder */}
-        <section className="h-[450px] relative bg-gray-200 w-full overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center grayscale opacity-50 bg-[url('https://picsum.photos/seed/map/1920/600')] bg-cover bg-center">
-            {/* Overlay for Map Look */}
-            <div className="absolute inset-0 bg-secondary/10" />
-            <div className="relative z-10 p-6 bg-white rounded-[15px] shadow-2xl border flex items-center gap-4">
-               <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                  <MapPin className="text-primary w-6 h-6 animate-bounce" />
-               </div>
-               <div>
-                  <p className="font-black text-secondary">مكتب إيوان الرئيسي</p>
-                  <p className="text-xs text-muted-foreground font-bold">صنعاء، حي حدة السكني</p>
-               </div>
-            </div>
+        {/* Dynamic Location Map Placeholder */}
+        <section className="h-[500px] relative w-full overflow-hidden bg-gray-100">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=1920')] bg-cover bg-center grayscale opacity-40" />
+          <div className="absolute inset-0 bg-secondary/20" />
+          <div className="container relative h-full mx-auto px-4 flex items-center justify-center">
+             <div className="p-8 md:p-12 bg-white/95 backdrop-blur-md rounded-[15px] shadow-2xl border-4 border-primary/20 flex flex-col md:flex-row items-center gap-8 max-w-2xl transform hover:scale-105 transition-transform duration-500">
+                <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center shrink-0 shadow-inner">
+                   <MapPin className="text-primary w-10 h-10 animate-bounce" />
+                </div>
+                <div className="text-center md:text-right space-y-3">
+                   <h4 className="text-2xl font-black text-secondary">زورونا في مكتبنا الرئيسي</h4>
+                   <p className="text-base text-muted-foreground font-bold">الجمهورية اليمنية، صنعاء، حي حدة، الطابق الثالث - مبنى إيوان.</p>
+                   <Button variant="outline" className="rounded-md border-primary text-primary font-black mt-2 hover:bg-primary hover:text-white">
+                      فتح في خرائط جوجل <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                   </Button>
+                </div>
+             </div>
           </div>
         </section>
       </main>
