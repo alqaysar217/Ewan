@@ -1,0 +1,29 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-interior",
+      "description": "صورة داخلية لغرفة معيشة مودرن وأنيقة",
+      "imageUrl": "https://picsum.photos/seed/ewan1/1200/800",
+      "imageHint": "modern interior living room"
+    },
+    {
+      "id": "living-room",
+      "description": "غرفة معيشة دافئة",
+      "imageUrl": "https://picsum.photos/seed/ewan2/600/400",
+      "imageHint": "cozy living room"
+    },
+    {
+      "id": "bedroom",
+      "description": "غرفة نوم هادئة",
+      "imageUrl": "https://picsum.photos/seed/ewan3/600/400",
+      "imageHint": "peaceful bedroom"
+    },
+    {
+      "id": "sofa-product",
+      "description": "أريكة فخمة بلون ترابي",
+      "imageUrl": "https://picsum.photos/seed/ewan4/500/500",
+      "imageHint": "luxury terracotta sofa"
+    }
+  ]
+}
