@@ -164,20 +164,34 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Dynamic Location Map Placeholder */}
-        <section className="h-[500px] relative w-full overflow-hidden bg-gray-100">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=1920')] bg-cover bg-center grayscale opacity-40" />
-          <div className="absolute inset-0 bg-secondary/20" />
-          <div className="container relative h-full mx-auto px-4 flex items-center justify-center">
-             <div className="p-8 md:p-12 bg-white/95 backdrop-blur-md rounded-[15px] shadow-2xl border-4 border-primary/20 flex flex-col md:flex-row items-center gap-8 max-w-2xl transform hover:scale-105 transition-transform duration-500">
-                <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center shrink-0 shadow-inner">
-                   <MapPin className="text-primary w-10 h-10 animate-bounce" />
+        {/* Real Google Maps Integration */}
+        <section className="h-[550px] relative w-full overflow-hidden bg-gray-100 border-t border-border/50">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.755444585145!2d44.20468925!3d15.352011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1603db0260467777%3A0x1d3783a388f8c44c!2z2LXYp9ix2LHYjCDYp9mE2YrZhdmG!5e0!3m2!1sar!2sye!4v1710000000000!5m2!1sar!2sye" 
+            width="100%" 
+            height="100%" 
+            style={{ border: 0, filter: 'grayscale(0.2) contrast(1.1) brightness(0.9)' }} 
+            allowFullScreen={true} 
+            loading="lazy" 
+            referrerPolicy="no-referrer-when-downgrade"
+            className="absolute inset-0"
+            title="موقع إيوان"
+          ></iframe>
+          
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-secondary/30 via-transparent to-transparent" />
+          
+          <div className="container relative h-full mx-auto px-4 flex items-center justify-center md:justify-end pointer-events-none">
+             <div className="p-8 md:p-10 bg-white/95 backdrop-blur-md rounded-[20px] shadow-2xl border-4 border-primary/20 flex flex-col items-center gap-6 max-w-sm pointer-events-auto transform hover:scale-105 transition-all duration-500">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center shrink-0 shadow-inner">
+                   <MapPin className="text-primary w-8 h-8 animate-bounce" />
                 </div>
-                <div className="text-center md:text-right space-y-3">
-                   <h4 className="text-2xl font-black text-secondary">زورونا في مكتبنا الرئيسي</h4>
-                   <p className="text-base text-muted-foreground font-bold">الجمهورية اليمنية، صنعاء، حي حدة، الطابق الثالث - مبنى إيوان.</p>
-                   <Button variant="outline" className="rounded-md border-primary text-primary font-black mt-2 hover:bg-primary hover:text-white">
-                      فتح في خرائط جوجل <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                <div className="text-center space-y-3">
+                   <h4 className="text-xl font-black text-secondary">تفضل بزيارة مكتبنا</h4>
+                   <p className="text-sm text-muted-foreground font-bold leading-relaxed">الجمهورية اليمنية، صنعاء، حي حدة، الطابق الثالث - مبنى إيوان.</p>
+                   <Button asChild variant="outline" className="w-full rounded-xl border-primary text-primary font-black mt-4 hover:bg-primary hover:text-white h-12 transition-all">
+                      <a href="https://maps.app.goo.gl/YourMapLink" target="_blank" rel="noopener noreferrer">
+                         فتح في خرائط جوجل <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                      </a>
                    </Button>
                 </div>
              </div>
