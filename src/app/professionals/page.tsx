@@ -206,7 +206,7 @@ export default function ProfessionalsPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black text-secondary">
                 {activeType === 'all' ? 'جميع الحرفيين والمصممين' : profTypes.find(t => t.id === activeType)?.name}
-                <span className="text-sm font-bold text-muted-foreground mr-3">({displayedProfessionals.length})</span>
+                <span className="text-sm font-bold text-muted-foreground mr-3">({displayedProfessionals.length.toLocaleString('en-US')})</span>
               </h2>
             </div>
 
@@ -222,7 +222,7 @@ export default function ProfessionalsPage() {
                   <Link 
                     href={`/vendors/${prof.id}`}
                     key={prof.id} 
-                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
+                    className="group bg-gray-50 border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image 

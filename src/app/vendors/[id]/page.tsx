@@ -120,7 +120,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             
             {/* Sidebar Info (Right Side) */}
             <div className="lg:col-span-1 space-y-8 order-1">
-              <div className="bg-white p-8 border border-border/50 rounded-[15px] shadow-sm space-y-8">
+              <div className="bg-gray-50 p-8 border border-border/50 rounded-[15px] shadow-sm space-y-8">
                 <div className="space-y-4">
                   <h3 className="font-black text-secondary flex items-center gap-2">
                     <Info className="w-4 h-4 text-primary" /> نبذة عن المتجر
@@ -136,7 +136,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   <h3 className="font-black text-secondary">إحصائيات سريعة</h3>
                   <div className="space-y-4">
                     {vendor.stats.map((stat, i) => (
-                      <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-[10px]">
+                      <div key={i} className="flex items-center justify-between p-4 bg-white/50 rounded-[10px]">
                         <div className="flex items-center gap-3">
                           <stat.icon className="w-5 h-5 text-primary" />
                           <span className="text-xs font-bold text-muted-foreground">{stat.label}</span>
@@ -153,7 +153,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   <h3 className="font-black text-secondary">مناطق الخدمة</h3>
                   <div className="flex flex-wrap gap-2">
                     {vendor.service_areas.map((area) => (
-                      <Badge key={area} variant="secondary" className="bg-primary/5 text-primary border-none rounded-md px-3">
+                      <Badge key={area} variant="secondary" className="bg-primary/10 text-primary border-none rounded-md px-3">
                         {area}
                       </Badge>
                     ))}
@@ -174,8 +174,8 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                 <TabsContent value="products" className="py-10 animate-in fade-in duration-500">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {mockProducts.map((product) => (
-                      <div key={product.id} className="group bg-white border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                        <div className="relative aspect-square overflow-hidden bg-gray-50">
+                      <div key={product.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                        <div className="relative aspect-square overflow-hidden bg-white/50">
                           <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                           <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
                             <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

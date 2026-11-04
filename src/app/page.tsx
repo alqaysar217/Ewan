@@ -193,8 +193,8 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <div key={product.id} className="group flex flex-col bg-gray-50 border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden bg-white/50">
                     <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" data-ai-hint="furniture product" />
                     <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
                       <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -255,7 +255,7 @@ export default function HomePage() {
                 <Link 
                   href={`/vendors/${store.id}`}
                   key={i} 
-                  className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
+                  className="group bg-gray-50 border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
                 >
                   <div className="relative h-48 w-full overflow-hidden">
                     <Image 

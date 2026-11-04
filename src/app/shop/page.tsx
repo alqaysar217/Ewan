@@ -121,8 +121,8 @@ export default function ShopPage() {
 
             <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-8`}>
               {products?.map((product: any) => (
-                <div key={product.id} className="group bg-white border border-border/50 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
-                  <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <div key={product.id} className="group bg-gray-50 border border-border/50 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                  <div className="relative aspect-square overflow-hidden bg-white/50">
                     <Image 
                       src={`https://picsum.photos/seed/${product.id}/600/600`} 
                       alt={product.name_ar} 
@@ -157,7 +157,7 @@ export default function ShopPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center text-[10px] font-black text-primary">
                         {product.vendor_id ? 'م' : 'إ'}
                       </div>

@@ -81,7 +81,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           
           {/* Product Images Gallery */}
           <div className="space-y-4 md:space-y-6">
-            <div className="relative aspect-square rounded-[15px] overflow-hidden border border-border/50 shadow-sm">
+            <div className="relative aspect-square rounded-[15px] overflow-hidden border border-border/50 shadow-sm bg-gray-50">
               <Image 
                 src={product.images[0]} 
                 alt={product.name} 
@@ -95,7 +95,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             </div>
             <div className="grid grid-cols-4 gap-2 md:gap-4">
               {product.images.map((img, i) => (
-                <div key={i} className="relative aspect-square rounded-[10px] overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer transition-all">
+                <div key={i} className="relative aspect-square rounded-[10px] overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer transition-all bg-gray-50">
                   <Image src={img} alt={`${product.name} ${i}`} fill className="object-cover" />
                 </div>
               ))}
@@ -165,21 +165,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6">
-              <div className="flex items-start gap-3 p-4 bg-white border rounded-[15px] shadow-sm">
+              <div className="flex items-start gap-3 p-4 bg-gray-50 border rounded-[15px] shadow-sm">
                 <Truck className="w-6 h-6 text-primary shrink-0" />
                 <div className="space-y-1">
                   <p className="text-xs font-black text-secondary">توصيل وتركيب</p>
                   <p className="text-[10px] text-muted-foreground font-bold">متاح لمعظم المدن</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-white border rounded-[15px] shadow-sm">
+              <div className="flex items-start gap-3 p-4 bg-gray-50 border rounded-[15px] shadow-sm">
                 <ShieldCheck className="w-6 h-6 text-primary shrink-0" />
                 <div className="space-y-1">
                   <p className="text-xs font-black text-secondary">ضمان الجودة</p>
                   <p className="text-[10px] text-muted-foreground font-bold">5 سنوات حقيقية</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-white border rounded-[15px] shadow-sm">
+              <div className="flex items-start gap-3 p-4 bg-gray-50 border rounded-[15px] shadow-sm">
                 <Hammer className="w-6 h-6 text-primary shrink-0" />
                 <div className="space-y-1">
                   <p className="text-xs font-black text-secondary">صنع في اليمن</p>
@@ -258,7 +258,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
             <TabsContent value="store" className="py-6 md:py-10 animate-in fade-in duration-500">
               <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start">
-                <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-[15px] flex items-center justify-center text-3xl md:text-4xl font-black text-secondary border shadow-sm shrink-0">
+                <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-50 rounded-[15px] flex items-center justify-center text-3xl md:text-4xl font-black text-secondary border shadow-sm shrink-0">
                   {product.store[0]}
                 </div>
                 <div className="flex-1 space-y-4 text-center md:text-right">

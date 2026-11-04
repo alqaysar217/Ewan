@@ -16,12 +16,13 @@ import {
   ChevronLeft,
   Award
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/input';
 import { Input } from '@/components/ui/input';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button as ShButton } from '@/components/ui/button';
 
 const MOCK_STORES = [
   {
@@ -146,9 +147,9 @@ export default function StoresPage() {
                     <Award className="w-8 h-8 text-primary" />
                     <h4 className="font-black text-lg leading-tight">هل لديك معرض أثاث؟</h4>
                     <Link href="/register" className="block">
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 rounded-md">
+                      <ShButton className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 rounded-md">
                         سجل معرضك الآن
-                      </Button>
+                      </ShButton>
                     </Link>
                   </div>
                 </div>
@@ -160,7 +161,7 @@ export default function StoresPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black text-secondary">
                 جميع المتاجر المتاحة
-                <span className="text-sm font-bold text-muted-foreground mr-3">({displayedStores.length})</span>
+                <span className="text-sm font-bold text-muted-foreground mr-3">({displayedStores.length.toLocaleString('en-US')})</span>
               </h2>
             </div>
 
@@ -176,7 +177,7 @@ export default function StoresPage() {
                   <Link 
                     href={`/vendors/${store.id}`}
                     key={store.id} 
-                    className="group bg-white border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
+                    className="group bg-gray-50 border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image 
@@ -225,10 +226,10 @@ export default function StoresPage() {
                           <MapPin className="w-3.5 h-3.5 text-primary" />
                           {store.city}
                         </div>
-                        <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                        <ShButton variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
                           تصفح المنتجات 
                           <ArrowLeft className="w-4 h-4 mr-2" />
-                        </Button>
+                        </ShButton>
                       </div>
                     </div>
                   </Link>
