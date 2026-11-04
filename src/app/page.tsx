@@ -160,11 +160,16 @@ export default function HomePage() {
         {/* Features Section */}
         <section className="py-24 bg-gray-50">
           <div className="container px-4 md:px-8 mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <div className="h-8 w-1 bg-primary inline-block align-middle ml-4 rounded-full"></div>
+              <h2 className="text-3xl md:text-4xl font-black text-secondary inline-block align-middle">لماذا تختار إيوان؟</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نقدم لك تجربة فريدة تجمع بين التكنولوجيا المتطورة والحرفية التقليدية.</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, i) => (
-                <div key={i} className="group p-8 bg-gray-50 border border-border/50 rounded-[15px] shadow-sm hover:shadow-xl transition-all duration-300">
-                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110", feature.bg, feature.color)}>
-                    <feature.icon className="w-7 h-7" />
+                <div key={i} className="group p-8 bg-gray-50 border border-border/50 rounded-[15px] shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
+                  <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110", feature.bg, feature.color)}>
+                    <feature.icon className="w-8 h-8" />
                   </div>
                   <h3 className="text-xl font-black text-secondary mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground font-medium leading-relaxed">{feature.desc}</p>
