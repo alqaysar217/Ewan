@@ -32,12 +32,18 @@ export default function LoginPage() {
     } catch (error: any) {
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
       
+      // تفصيل الأخطاء بناءً على رمز الخطأ من Firebase
       if (error.code === 'auth/user-not-found') {
         errorMessage = "هذا الحساب غير موجود. يرجى التأكد من البريد الإلكتروني.";
       } else if (error.code === 'auth/wrong-password') {
         errorMessage = "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.";
       } else if (error.code === 'auth/invalid-email') {
         errorMessage = "البريد الإلكتروني المدخل غير صالح.";
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
+      } else if (error.message) {
+        // إذا كان هناك رسالة خطأ أخرى غير معروفة الرمز، نعرضها لمساعدة المستخدم
+        errorMessage = `فشل تسجيل الدخول: ${error.message}`;
       }
 
       toast({
