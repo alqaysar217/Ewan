@@ -193,7 +193,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
         {/* Detailed Tabs */}
         <div className="mt-20">
-          <Tabs defaultValue="specs" className="w-full">
+          <Tabs defaultValue="specs" className="w-full" dir="rtl">
             <TabsList className="w-full justify-start h-14 bg-transparent border-b rounded-none p-0 gap-8">
               <TabsTrigger value="specs" className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-6">المواصفات الفنية</TabsTrigger>
               <TabsTrigger value="reviews" className="h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-6">آراء العملاء</TabsTrigger>
