@@ -32,7 +32,7 @@
     --input: 180 8% 91%;
     --ring: 188 75% 34%;
     
-    --radius: 0.75rem; /* Softer corners as requested (around 12px) */
+    --radius: 15px; /* Updated to 15px as requested */
   }
 
   .dark {

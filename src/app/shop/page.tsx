@@ -13,7 +13,6 @@ import {
   LayoutGrid, 
   List,
   Star,
-  Percent
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,11 +25,6 @@ import {
 } from '@/components/ui/select';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-// Helper to convert numbers to Arabic numerals
-const toArabicNums = (num: number | string) => {
-  return num.toString().replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[parseInt(d)]);
-};
 
 export default function ShopPage() {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
@@ -112,7 +106,7 @@ export default function ShopPage() {
                 >
                   <List className="w-5 h-5" />
                 </Button>
-                <span className="text-sm font-bold text-muted-foreground mr-4">عرض {toArabicNums(products?.length || 0)} منتج</span>
+                <span className="text-sm font-bold text-muted-foreground mr-4">عرض {products?.length || 0} منتج</span>
               </div>
 
               <div className="flex items-center gap-4">
@@ -144,6 +138,18 @@ export default function ShopPage() {
                         <span className="bg-white text-secondary font-bold rounded-md shadow-xl px-6 py-2">عرض التفاصيل</span>
                       </div>
                     </Link>
+                    
+                    <div className="absolute top-3 left-3 z-20">
+                      <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-full text-secondary hover:text-destructive shadow-sm w-9 h-9">
+                        <Heart className="w-5 h-5" />
+                      </Button>
+                    </div>
+
+                    <div className="absolute top-3 right-3 z-20">
+                      <Badge className="bg-secondary text-white font-bold rounded-md px-2 py-1 shadow-sm border-none">
+                         15% خصم
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="p-5 space-y-3 flex-1 flex flex-col">
@@ -152,14 +158,14 @@ export default function ShopPage() {
                       <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{product.name_ar}</h4>
                       <div className="flex items-center gap-1 text-amber-500 shrink-0">
                         <Star className="w-3.5 h-3.5 fill-current" />
-                        <span className="text-xs font-black">{toArabicNums(4.9)}</span>
+                        <span className="text-xs font-black">4.9</span>
                       </div>
                     </div>
 
                     {/* Row 2: Store */}
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center text-[10px] font-black text-primary">
-                        {product.vendor_id ? 'م' : 'م'}
+                        {product.vendor_id ? 'م' : 'إ'}
                       </div>
                       <span className="text-xs font-bold text-muted-foreground">متجر إيوان المعتمد</span>
                     </div>
@@ -174,8 +180,8 @@ export default function ShopPage() {
                     {/* Row 4: Price */}
                     <div className="mt-auto pt-2">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-black text-secondary">
-                          {toArabicNums((product.price || 0).toLocaleString())} <span className="text-xs font-bold">ر.ي</span>
+                        <span className="text-lg font-black text-secondary leading-none">
+                          {(product.price || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span>
                         </span>
                       </div>
                       <Button className="w-full mt-4 bg-secondary hover:bg-primary text-white font-bold gap-2 h-11 rounded-md transition-all shadow-sm">
