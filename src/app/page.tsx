@@ -1,11 +1,30 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { Search, ShoppingBag, Palette, MessageCircle, User, Heart, ArrowRight, Sparkles, LayoutGrid } from 'lucide-react';
+import { Search, ShoppingBag, Palette, MessageCircle, User, Heart, ArrowRight, Sparkles, LayoutGrid, LogOut } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { toast } from '@/hooks/use-toast';
 
 export default function HomePage() {
+  const { user, loading } = useUser();
+  const { auth } = useAuth();
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-interior');
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "تم تسجيل الخروج",
+        description: "إلى اللقاء قريباً",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -27,7 +46,6 @@ export default function HomePage() {
                 <Sparkles className="w-4 h-4 text-primary" />
                 استوديو التصميم الذكي
               </Link>
-              <Link href="/about" className="transition-colors hover:text-primary">عن إيوان</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -45,10 +63,29 @@ export default function HomePage() {
                 <ShoppingBag className="w-5 h-5" />
                 <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center">٠</span>
               </Button>
-              <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-border hover:bg-secondary hover:text-white transition-all px-6">
-                <User className="w-4 h-4" />
-                دخول
-              </Button>
+              
+              {!loading && (
+                user ? (
+                  <div className="flex items-center gap-2">
+                    <Link href="/vendor/dashboard">
+                      <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-border hover:bg-secondary hover:text-white transition-all">
+                        <User className="w-4 h-4" />
+                        حسابي
+                      </Button>
+                    </Link>
+                    <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full text-destructive hover:bg-destructive/10">
+                      <LogOut className="w-5 h-5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Link href="/login">
+                    <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-border hover:bg-secondary hover:text-white transition-all px-6">
+                      <User className="w-4 h-4" />
+                      دخول
+                    </Button>
+                  </Link>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -196,35 +233,6 @@ export default function HomePage() {
                 ابدأ تجربتك الآن
                 <Sparkles className="w-5 h-5 mr-2" />
               </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Benefits */}
-        <section className="py-24 bg-white">
-          <div className="container px-4 md:px-8">
-            <div className="grid md:grid-cols-3 gap-12">
-              <div className="space-y-6 text-center lg:text-right">
-                <div className="w-16 h-16 bg-primary/5 rounded-3xl flex items-center justify-center text-primary mx-auto lg:mx-0">
-                  <ShoppingBag className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-bold text-secondary">جودة مضمونة</h3>
-                <p className="text-muted-foreground leading-relaxed">نتعامل مع أفضل المتاجر والنجارين لضمان حصولك على قطع أثاث تدوم طويلاً.</p>
-              </div>
-              <div className="space-y-6 text-center lg:text-right">
-                <div className="w-16 h-16 bg-primary/5 rounded-3xl flex items-center justify-center text-primary mx-auto lg:mx-0">
-                  <MessageCircle className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-bold text-secondary">دعم فني متواصل</h3>
-                <p className="text-muted-foreground leading-relaxed">فريقنا متاح دائماً للإجابة على استفساراتك ومساعدتك في عملية الشراء والتصميم.</p>
-              </div>
-              <div className="space-y-6 text-center lg:text-right">
-                <div className="w-16 h-16 bg-primary/5 rounded-3xl flex items-center justify-center text-primary mx-auto lg:mx-0">
-                  <User className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-bold text-secondary">تجربة مخصصة</h3>
-                <p className="text-muted-foreground leading-relaxed">كل حساب في إيوان هو استوديو خاص بك، يحفظ تفضيلاتك وتصاميمك المفضلة.</p>
-              </div>
             </div>
           </div>
         </section>
