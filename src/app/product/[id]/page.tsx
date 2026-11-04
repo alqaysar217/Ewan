@@ -134,8 +134,8 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             <div className="p-6 md:p-8 bg-gray-50 rounded-[15px] space-y-4">
               <div className="flex flex-col gap-1">
                 <div className="flex flex-wrap items-baseline gap-3 md:gap-4">
-                  <span className="text-3xl md:text-4xl font-black text-secondary">{product.price.toLocaleString()} <span className="text-sm md:text-lg font-bold">ريال يمني</span></span>
-                  <span className="text-lg md:text-xl text-muted-foreground line-through font-bold">{product.oldPrice.toLocaleString()} ريال</span>
+                  <span className="text-3xl md:text-4xl font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-sm md:text-lg font-bold">ريال يمني</span></span>
+                  <span className="text-lg md:text-xl text-muted-foreground line-through font-bold">{product.oldPrice.toLocaleString('en-US')} ريال</span>
                 </div>
                 <p className="text-[10px] md:text-xs text-muted-foreground font-bold flex items-center gap-1.5">
                   <Info className="w-3.5 h-3.5" /> {product.taxInfo}

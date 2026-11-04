@@ -45,7 +45,6 @@ export default function ShopPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Header />
 
-      {/* Header Section */}
       <div className="bg-secondary text-white py-16 px-4">
         <div className="container mx-auto px-4 md:px-8">
           <h1 className="text-4xl md:text-5xl font-black mb-4">متجر إيوان</h1>
@@ -57,8 +56,6 @@ export default function ShopPage() {
 
       <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-10">
-          
-          {/* Sidebar Filters */}
           <aside className="w-full lg:w-72 space-y-10">
             <div className="space-y-6">
               <h3 className="text-xl font-bold text-secondary flex items-center gap-2">
@@ -86,7 +83,6 @@ export default function ShopPage() {
             </div>
           </aside>
 
-          {/* Product Grid */}
           <div className="flex-1 space-y-8">
             <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-border/50">
               <div className="flex items-center gap-4">
@@ -106,7 +102,7 @@ export default function ShopPage() {
                 >
                   <List className="w-5 h-5" />
                 </Button>
-                <span className="text-sm font-bold text-muted-foreground mr-4">عرض {products?.length || 0} منتج</span>
+                <span className="text-sm font-bold text-muted-foreground mr-4">عرض {(products?.length || 0).toLocaleString('en-US')} منتج</span>
               </div>
 
               <div className="flex items-center gap-4">
@@ -153,16 +149,14 @@ export default function ShopPage() {
                   </div>
 
                   <div className="p-5 space-y-3 flex-1 flex flex-col">
-                    {/* Row 1: Name & Rating */}
                     <div className="flex justify-between items-start gap-2">
                       <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{product.name_ar}</h4>
                       <div className="flex items-center gap-1 text-amber-500 shrink-0">
                         <Star className="w-3.5 h-3.5 fill-current" />
-                        <span className="text-xs font-black">4.9</span>
+                        <span className="text-xs font-black">{(4.9).toLocaleString('en-US')}</span>
                       </div>
                     </div>
 
-                    {/* Row 2: Store */}
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center text-[10px] font-black text-primary">
                         {product.vendor_id ? 'م' : 'إ'}
@@ -170,18 +164,16 @@ export default function ShopPage() {
                       <span className="text-xs font-bold text-muted-foreground">متجر إيوان المعتمد</span>
                     </div>
 
-                    {/* Row 3: Category */}
                     <div className="flex">
                       <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0">
                         {product.category_id || 'أثاث منزلي'}
                       </Badge>
                     </div>
 
-                    {/* Row 4: Price */}
                     <div className="mt-auto pt-2">
                       <div className="flex items-baseline gap-2">
                         <span className="text-lg font-black text-secondary leading-none">
-                          {(product.price || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span>
+                          {(product.price || 0).toLocaleString('en-US')} <span className="text-xs font-bold">ر.ي</span>
                         </span>
                       </div>
                       <Button className="w-full mt-4 bg-secondary hover:bg-primary text-white font-bold gap-2 h-11 rounded-md transition-all shadow-sm">
