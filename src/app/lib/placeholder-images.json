@@ -1,29 +1,28 @@
-
 {
   "placeholderImages": [
     {
       "id": "hero-interior",
-      "description": "صورة داخلية لغرفة معيشة مودرن وأنيقة",
-      "imageUrl": "https://picsum.photos/seed/ewan-main/1920/1080",
-      "imageHint": "modern luxury interior living room"
+      "description": "تصميم داخلي مودرن وأنيق لغرفة معيشة",
+      "imageUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200",
+      "imageHint": "luxury modern teal living room"
     },
     {
-      "id": "living-room",
-      "description": "غرفة معيشة دافئة",
-      "imageUrl": "https://picsum.photos/seed/ewan-living/800/600",
-      "imageHint": "cozy living room"
+      "id": "ai-showcase",
+      "description": "معاينة قبل وبعد لتصميم ذكاء اصطناعي",
+      "imageUrl": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&q=80&w=800",
+      "imageHint": "interior design before and after"
     },
     {
-      "id": "bedroom",
-      "description": "غرفة نوم هادئة",
-      "imageUrl": "https://picsum.photos/seed/ewan-bed/800/600",
-      "imageHint": "peaceful bedroom decor"
+      "id": "category-living",
+      "description": "غرفة معيشة فخمة",
+      "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600",
+      "imageHint": "teal luxury living room"
     },
     {
-      "id": "kitchen",
-      "description": "مطبخ عصري",
-      "imageUrl": "https://picsum.photos/seed/ewan-kitchen/800/600",
-      "imageHint": "modern kitchen design"
+      "id": "category-bedroom",
+      "description": "غرفة نوم عصرية",
+      "imageUrl": "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=600",
+      "imageHint": "modern bedroom design"
     }
   ]
 }

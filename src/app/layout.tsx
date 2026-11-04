@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -12,8 +11,8 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: 'إيوان | تصميم وأثاث بالذكاء الاصطناعي',
-  description: 'إيوان هو منصتك الذكية لتصميم منزلك واكتشاف أرقى قطع الأثاث باستخدام الذكاء الاصطناعي.',
+  title: 'إيوان | تصميم الأثاث والمساحات بالذكاء الاصطناعي',
+  description: 'إيوان هو منصتك المتكاملة لتصميم منزلك واكتشاف قطع الأثاث الفاخرة باستخدام أحدث تقنيات الذكاء الاصطناعي.',
 };
 
 export default function RootLayout({

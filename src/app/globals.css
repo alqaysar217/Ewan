@@ -1,48 +1,47 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 37 45% 94%; /* #F5F0E7 - Primary warm cream */
-    --foreground: 24 6% 13%; /* #252321 - Dark charcoal */
+    --background: 150 6% 96%; /* #F4F6F5 - Main background */
+    --foreground: 193 13% 17%; /* #252D30 - Primary text */
     
-    --card: 37 38% 97%; /* #FAF8F3 - Light ivory */
-    --card-foreground: 24 6% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 193 13% 17%;
     
-    --popover: 37 38% 97%;
-    --popover-foreground: 24 6% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 193 13% 17%;
     
-    --primary: 10 43% 46%; /* #A65343 - Main terracotta */
-    --primary-foreground: 37 45% 94%;
+    --primary: 188 75% 34%; /* #168899 - Turquoise accent */
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 37 25% 86%; /* #E8DFD0 - Secondary beige */
-    --secondary-foreground: 10 43% 46%;
+    --secondary: 191 82% 16%; /* #073D49 - Deep Teal */
+    --secondary-foreground: 0 0% 100%;
     
-    --muted: 33 8% 50%; /* #8A8278 - Muted gray */
-    --muted-foreground: 33 8% 30%;
+    --muted: 193 7% 53%;
+    --muted-foreground: 193 10% 30%;
     
-    --accent: 37 25% 86%;
-    --accent-foreground: 10 43% 46%;
+    --accent: 188 75% 34%;
+    --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 37 20% 86%; /* #E5DED3 - Subtle borders */
-    --input: 37 20% 86%;
-    --ring: 10 43% 46%;
+    --border: 180 8% 91%; /* #E2E8E8 */
+    --input: 180 8% 91%;
+    --ring: 188 75% 34%;
     
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 24 6% 13%;
-    --foreground: 37 45% 94%;
-    --card: 24 6% 10%;
-    --card-foreground: 37 45% 94%;
-    --primary: 10 43% 55%;
-    --border: 24 6% 20%;
+    --background: 193 13% 10%;
+    --foreground: 150 6% 96%;
+    --card: 193 13% 12%;
+    --card-foreground: 150 6% 96%;
+    --primary: 188 75% 45%;
+    --border: 193 13% 20%;
   }
 }
 
@@ -53,5 +52,17 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .bg-deep-teal {
+    background-color: #073D49;
+  }
+  .text-deep-teal {
+    color: #073D49;
+  }
+  .border-deep-teal {
+    border-color: #073D49;
   }
 }
