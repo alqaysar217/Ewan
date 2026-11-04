@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -40,8 +41,6 @@ export default function LoginPage() {
         errorMessage = "البريد الإلكتروني المدخل غير صالح.";
       } else if (error.code === 'auth/invalid-credential') {
         errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
-      } else if (error.message) {
-        errorMessage = `فشل تسجيل الدخول: ${error.message}`;
       }
 
       toast({
@@ -55,66 +54,99 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4" dir="rtl">
-      <Card className="w-full max-w-md border-border/50 shadow-xl rounded-[2rem] overflow-hidden bg-white">
-        <CardHeader className="space-y-4 text-center pt-10">
-          <div className="mx-auto relative w-16 h-16 overflow-hidden rounded-2xl shadow-lg shadow-primary/20 bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4" dir="rtl">
+      {/* Decorative Background */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23073D49' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+      
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+      <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-xl relative z-10">
+        <div className="absolute inset-0 border border-white/60 rounded-[2.5rem] pointer-events-none" />
+        
+        <CardHeader className="space-y-6 text-center pt-12 pb-8">
+          <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-[22px] shadow-2xl shadow-primary/20 bg-white p-3 flex items-center justify-center border border-gray-50">
             <Image 
               src="/logo.png" 
               alt="إيوان" 
-              fill 
-              className="object-contain p-2"
+              width={60}
+              height={60}
+              className="object-contain"
             />
           </div>
-          <CardTitle className="text-3xl font-extrabold text-secondary">تسجيل الدخول</CardTitle>
-          <CardDescription className="text-muted-foreground font-medium">
-            مرحباً بك في منصة إيوان لتصميم الأثاث
-          </CardDescription>
+          <div className="space-y-2">
+            <CardTitle className="text-3xl font-black text-secondary tracking-tight">تسجيل الدخول</CardTitle>
+            <CardDescription className="text-muted-foreground font-bold flex items-center justify-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" /> الوصول الآمن لمنصة إيوان
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="px-8 pb-8">
           <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="example@mail.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="rounded-xl h-12 border-border/60"
-              />
+            <div className="space-y-3">
+              <Label htmlFor="email" className="font-black text-secondary mr-1">البريد الإلكتروني</Label>
+              <div className="relative group">
+                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="name@example.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="rounded-[15px] h-14 pr-12 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="rounded-xl h-12 border-border/60"
-              />
+
+            <div className="space-y-3">
+              <div className="flex justify-between items-center mr-1">
+                <Label htmlFor="password" className="font-black text-secondary">كلمة المرور</Label>
+                <button type="button" className="text-xs font-bold text-primary hover:underline">نسيت كلمة المرور؟</button>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="rounded-[15px] h-14 pr-12 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                />
+              </div>
             </div>
+
             <Button 
               type="submit" 
-              className="w-full h-12 rounded-xl text-lg font-bold bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+              className="w-full h-14 rounded-[15px] text-lg font-black bg-secondary hover:bg-secondary/90 text-white transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3 group active:scale-[0.98]"
               disabled={loading}
             >
-              {loading ? "جاري التحميل..." : "دخول"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  جاري الدخول...
+                </>
+              ) : (
+                <>
+                  دخول آمن
+                  <ArrowRight className="w-5 h-5 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4 pb-10">
-          <p className="text-sm text-muted-foreground">
-            ليس لديك حساب؟{' '}
-            <Link href="/register" className="text-primary font-bold hover:underline">
-              إنشاء حساب جديد
-            </Link>
-          </p>
-          <Link href="/" className="text-xs text-muted-foreground hover:text-secondary transition-colors">
-            العودة للرئيسية
+
+        <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
+          <Link href="/" className="text-sm font-black text-muted-foreground hover:text-primary transition-all flex items-center gap-2 group">
+             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+             العودة للصفحة الرئيسية
           </Link>
+          <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest text-center">
+            نظام تشفير وحماية بيانات متطور © إيوان
+          </div>
         </CardFooter>
       </Card>
     </div>
