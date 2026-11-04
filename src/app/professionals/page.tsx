@@ -133,17 +133,19 @@ export default function ProfessionalsPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Header />
 
-      <section className="relative py-16 bg-secondary overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 -skew-x-12 translate-x-1/4" />
-        <div className="container relative z-10 px-4 md:px-8 mx-auto">
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border-r-4 border-primary text-primary text-xs font-black uppercase tracking-widest">
+      <section className="relative py-12 md:py-16 bg-secondary overflow-hidden">
+        {/* Hexagon Pattern Backdrop */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+        
+        <div className="container relative z-10 px-4 md:px-8 mx-auto text-center">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 backdrop-blur-xl border-r-4 border-primary text-primary text-[10px] font-black uppercase tracking-[0.2em] mx-auto rounded-sm">
               نخبة النجارين والمصممين في اليمن
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
+            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">
               تعرف على صُنّاع <span className="text-primary">الإبداع</span>
             </h1>
-            <p className="text-lg text-gray-300 font-medium max-w-xl">
+            <p className="text-base md:text-lg text-gray-300 font-medium max-w-xl mx-auto">
               نجمع لك أمهر الحرفيين ومصممي الديكور لتحويل مساحتك إلى واقع ملموس.
             </p>
           </div>
