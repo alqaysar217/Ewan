@@ -91,7 +91,7 @@ export default function HomePage() {
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
                 اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium max-w-xl">
+              <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium max-w-xl text-right">
                 أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
@@ -268,12 +268,12 @@ export default function HomePage() {
                       <Star key={star} className={cn("w-4 h-4", star >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
                     ))}
                   </div>
-                  <p className="text-lg italic font-medium leading-relaxed">"{t.text}"</p>
-                  <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                  <p className="text-lg italic font-medium leading-relaxed text-right">"{t.text}"</p>
+                  <div className="flex items-center gap-4 pt-4 border-t border-white/10 flex-row-reverse">
                     <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center font-black text-primary text-xl">
                       {t.name[0]}
                     </div>
-                    <div>
+                    <div className="text-right">
                       <h4 className="font-black text-white">{t.name}</h4>
                       <p className="text-xs text-gray-400">{t.role}</p>
                     </div>
@@ -285,33 +285,33 @@ export default function HomePage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-24 bg-white">
+        <section className="py-20 md:py-24 bg-white">
           <div className="container px-4 md:px-8 max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-              <div className="space-y-4 text-right">
-                <div className="h-8 w-1 bg-primary inline-block align-middle ml-4 rounded-full"></div>
-                <h2 className="text-4xl font-black text-secondary inline-block align-middle">الأسئلة الشائعة</h2>
-                <p className="text-muted-foreground text-lg">كل ما تحتاج معرفته حول رحلتك مع إيوان.</p>
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 md:mb-16 gap-6 text-center md:text-right">
+              <div className="space-y-3 md:space-y-4">
+                <div className="h-6 md:h-8 w-1 bg-primary inline-block align-middle ml-3 md:ml-4 rounded-full"></div>
+                <h2 className="text-2xl md:text-4xl font-black text-secondary inline-block align-middle">الأسئلة الشائعة</h2>
+                <p className="text-muted-foreground text-sm md:text-lg">كل ما تحتاج معرفته حول رحلتك مع إيوان.</p>
               </div>
               <Link href="/faq">
-                <Button variant="ghost" className="text-primary font-black text-lg p-0 flex gap-2 group hover:bg-transparent">
+                <Button variant="ghost" className="text-primary font-black text-base md:text-lg p-0 flex gap-2 group hover:bg-transparent">
                   عرض كل الأسئلة
                   <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
 
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
               {[
                 { q: "كيف يعمل التصميم بالذكاء الاصطناعي؟", a: "ببساطة، ترفع صورة لغرفتك الحالية، تختار الطراز المفضل (مودرن، كلاسيك..)، وتحدد ميزانيتك. سيقوم نظامنا بتحليل المساحة واقتراح قطع أثاث حقيقية متوفرة في متجرنا تناسب مساحتك." },
                 { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
                 { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." }
               ].map((item, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-6 overflow-hidden">
-                  <AccordionTrigger className="text-lg font-bold text-secondary hover:no-underline py-6 text-right">
+                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
+                  <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
                     {item.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed text-[15px] pb-6 text-right">
+                  <AccordionContent className="text-muted-foreground leading-relaxed text-[13px] md:text-[15px] pb-4 md:pb-6 text-right">
                     {item.a}
                   </AccordionContent>
                 </AccordionItem>
@@ -325,4 +325,3 @@ export default function HomePage() {
     </div>
   );
 }
-
