@@ -1,24 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useAuth } from '@/firebase';
+import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, UserPlus } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, UserPlus, Copy, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
   const auth = useAuth();
+  const { user } = useUser();
+  const db = useFirestore();
   const router = useRouter();
+
+  // جلب بيانات المستخدم الحالية للتحقق من الصلاحيات
+  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  const { data: userData } = useDoc(userDocRef);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,17 +41,9 @@ export default function LoginPage() {
       router.push('/');
     } catch (error: any) {
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
-      
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = "هذا الحساب غير موجود. يرجى التأكد من البريد الإلكتروني.";
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.";
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "البريد الإلكتروني المدخل غير صالح.";
-      } else if (error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/invalid-credential') {
         errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
       }
-
       toast({
         variant: "destructive",
         title: "خطأ في تسجيل الدخول",
@@ -50,6 +51,15 @@ export default function LoginPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const copyUid = () => {
+    if (user) {
+      navigator.clipboard.writeText(user.uid);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({ title: "تم نسخ المعرف (UID)", description: "يمكنك الآن استخدامه في Firebase Console" });
     }
   };
 
@@ -83,23 +93,35 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="px-8 pb-8">
+          {/* مساعدة للمسؤول في حال عدم وجود صلاحيات */}
+          {user && !userData && (
+            <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-2xl space-y-3">
+              <p className="text-[11px] font-bold text-primary leading-relaxed text-center">أنت مسجل الدخول، لكن حسابك غير مفعل كمسؤول في قاعدة البيانات.</p>
+              <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-gray-100">
+                <code className="text-[10px] font-mono text-secondary truncate max-w-[200px]">{user.uid}</code>
+                <Button size="sm" variant="ghost" className="h-8 px-2 text-primary" onClick={copyUid}>
+                  {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+              <p className="text-[9px] text-muted-foreground text-center">انسخ الـ UID أعلاه وضعه كـ Document ID في مجموعة users بالكونسول.</p>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
                 البريد الإلكتروني
               </Label>
-              <div className="relative group">
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
-                />
-              </div>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+              />
             </div>
 
             <div className="space-y-3">
@@ -108,31 +130,26 @@ export default function LoginPage() {
                   <Lock className="w-4 h-4 text-primary" />
                   كلمة المرور
                 </Label>
-                <button type="button" className="text-xs font-bold text-primary hover:underline">نسيت كلمة المرور؟</button>
+                <button type="button" className="text-xs font-bold text-primary hover:underline">نسيت؟</button>
               </div>
-              <div className="relative group">
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
-                />
-              </div>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+              />
             </div>
 
             <Button 
               type="submit" 
-              className="w-full h-14 rounded-[15px] text-lg font-black bg-secondary hover:bg-secondary/90 text-white transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3 group active:scale-[0.98]"
+              className="w-full h-14 rounded-[15px] text-lg font-black bg-secondary hover:bg-secondary/90 text-white transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3 group"
               disabled={loading}
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  جاري الدخول...
-                </>
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
                   دخول آمن
@@ -146,7 +163,7 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
           <div className="flex flex-col gap-4 w-full">
             <Link href="/register" className="text-sm font-black text-primary hover:underline flex items-center justify-center gap-2">
-               <UserPlus className="w-4 h-4" /> ليس لديك حساب؟ إنشاء حساب جديد
+               <UserPlus className="w-4 h-4" /> إنشاء حساب جديد للمعاينة
             </Link>
             <Link href="/" className="text-sm font-black text-muted-foreground hover:text-primary transition-all flex items-center justify-center gap-2 group">
                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -154,7 +171,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest text-center">
-            نظام تشفير وحماية بيانات متطور © إيوان
+            إيوان © نظام إدارة متطور
           </div>
         </CardFooter>
       </Card>
