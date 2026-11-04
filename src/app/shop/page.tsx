@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import Image from 'next/width';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
@@ -74,7 +74,7 @@ export default function ShopPage() {
               </div>
             </div>
 
-            <div className="p-6 bg-primary/5 rounded-lg border border-primary/10 space-y-4">
+            <div className="p-6 bg-primary/5 rounded-[15px] border border-primary/10 space-y-4">
               <Sparkles className="w-8 h-8 text-primary" />
               <h4 className="font-black text-secondary">تحتاج مساعدة في الاختيار؟</h4>
               <Link href="/ai-design" className="block">
@@ -121,7 +121,7 @@ export default function ShopPage() {
 
             <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-8`}>
               {products?.map((product: any) => (
-                <div key={product.id} className="group bg-gray-50 border border-border/50 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                <div key={product.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
                   <div className="relative aspect-square overflow-hidden bg-white/50">
                     <Image 
                       src={`https://picsum.photos/seed/${product.id}/600/600`} 

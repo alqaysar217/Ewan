@@ -162,7 +162,7 @@ export default function HomePage() {
           <div className="container px-4 md:px-8 mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, i) => (
-                <div key={i} className="group p-8 bg-white border border-border/50 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300">
+                <div key={i} className="group p-8 bg-gray-50 border border-border/50 rounded-[15px] shadow-sm hover:shadow-xl transition-all duration-300">
                   <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110", feature.bg, feature.color)}>
                     <feature.icon className="w-7 h-7" />
                   </div>
@@ -193,7 +193,7 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-gray-50 border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div key={product.id} className="group flex flex-col bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300">
                   <div className="relative aspect-square overflow-hidden bg-white/50">
                     <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" data-ai-hint="furniture product" />
                     <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
@@ -332,7 +332,7 @@ export default function HomePage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 items-center opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                 {partners.map((partner, i) => (
                   <div key={i} className="flex justify-center">
-                    <div className="relative w-24 h-24 overflow-hidden rounded-xl border border-border/50 bg-white p-2">
+                    <div className="relative w-24 h-24 overflow-hidden rounded-xl border border-border/50 bg-gray-50 p-2">
                       <Image src={partner.logo} alt={partner.name} fill className="object-contain p-2" />
                     </div>
                   </div>
@@ -358,7 +358,7 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((t, i) => (
-                <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full">
+                <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full">
                   <div className="flex gap-1 text-amber-500">
                     {Array.from({ length: 5 }).map((_, starIdx) => (
                       <Star key={starIdx} className={cn("w-4 h-4", starIdx >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
@@ -415,7 +415,7 @@ export default function HomePage() {
                 { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
                 { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." }
               ].map((item, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-2xl px-4 md:px-6 overflow-hidden">
+                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
                   <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
                     {item.q}
                   </AccordionTrigger>
