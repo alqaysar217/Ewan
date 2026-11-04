@@ -204,50 +204,47 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1">
-        {/* Hero Section - Redesigned for visual clarity */}
-        <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-secondary">
-          {/* Main Hero Background Split */}
-          <div className="absolute inset-0 flex flex-col lg:flex-row">
-            <div className="w-full lg:w-1/2 bg-secondary flex items-center justify-center p-8 lg:p-24 relative z-10">
-              <div className="max-w-xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-primary border border-white/10">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-bold">مستقبل التصميم الداخلي هنا</span>
-                </div>
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
-                  اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
-                </h1>
-                <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium">
-                  أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                  <Link href="/ai-design">
-                    <Button size="lg" className="h-16 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
-                      ابدأ التصميم بالذكاء الاصطناعي <Sparkles className="w-5 h-5 mr-2" />
-                    </Button>
-                  </Link>
-                  <Link href="/shop">
-                    <Button size="lg" variant="outline" className="h-16 px-10 rounded-2xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
-                      اكتشف المجموعات
-                    </Button>
-                  </Link>
-                </div>
+        {/* Hero Section - Premium Blended Design */}
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-secondary">
+          {/* Background Image that covers the section */}
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
+              alt="Modern Interior Design"
+              fill
+              className="object-cover"
+              priority
+              data-ai-hint="luxury modern teal living room"
+            />
+          </div>
+          
+          {/* Gradient Blur Overlay - Fixed for RTL */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-l from-secondary via-secondary/85 to-transparent backdrop-blur-[1px]" />
+          
+          <div className="container relative z-20 px-4 md:px-8">
+            <div className="max-w-2xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-primary border border-white/10">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-bold">مستقبل التصميم الداخلي هنا</span>
               </div>
-            </div>
-            
-            <div className="w-full lg:w-1/2 relative h-[400px] lg:h-auto">
-              <Image 
-                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
-                alt="Modern Interior Design"
-                fill
-                className="object-cover"
-                priority
-                data-ai-hint="luxury modern teal living room"
-              />
-              {/* Overlay for better blending on mobile */}
-              <div className="absolute inset-0 bg-gradient-to-t from-secondary via-transparent to-transparent lg:hidden" />
-              {/* Subtle light effect */}
-              <div className="absolute top-0 right-0 w-full h-full bg-primary/5 pointer-events-none" />
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
+                اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
+              </h1>
+              <p className="text-lg md:text-xl text-gray-300 leading-relaxed font-medium">
+                أثاث يلائم ذوقك، وتصاميم ذكية تحول أفكارك إلى واقع. ارفع صورة غرفتك ودع الذكاء الاصطناعي يقترح لك الأفضل.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-5 pt-4">
+                <Link href="/ai-design">
+                  <Button size="lg" className="h-16 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
+                    ابدأ التصميم بالذكاء الاصطناعي <Sparkles className="w-5 h-5 mr-2" />
+                  </Button>
+                </Link>
+                <Link href="/shop">
+                  <Button size="lg" variant="outline" className="h-16 px-10 rounded-2xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold text-lg transition-all">
+                    اكتشف المجموعات
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -327,28 +324,24 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Floating AI Assistant Button - Premium Redesign */}
+      {/* Floating AI Assistant Button - Refined Circular Design */}
       <Link href="/ai-design" className="fixed bottom-10 left-10 z-[100] group">
         <div className="relative flex items-center gap-4">
           {/* Label Tooltip */}
-          <div className="bg-secondary text-white px-6 py-3 rounded-2xl text-sm font-black shadow-2xl border border-white/10 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block whitespace-nowrap">
+          <div className="bg-secondary text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-2xl border border-white/10 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block whitespace-nowrap">
             صمم غرفتك بذكاء ✨
           </div>
           
           <div className="relative">
-            {/* Pulsing Effect */}
-            <div className="absolute inset-0 bg-primary/40 rounded-full blur-xl group-hover:bg-primary/60 transition-all duration-500 animate-pulse scale-125" />
+            {/* Pulsing Effect - Matching Primary Color */}
+            <div className="absolute inset-0 bg-primary/30 rounded-full blur-lg group-hover:bg-primary/50 transition-all duration-500 animate-pulse scale-125" />
             
             <Button 
               size="icon" 
-              className="w-20 h-20 rounded-[2rem] bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-all hover:scale-110 hover:-rotate-6 duration-300 overflow-hidden"
+              className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-all hover:scale-110 duration-300 overflow-hidden border-2 border-white/20"
             >
-              {/* Inner Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-              <Bot className="w-10 h-10 drop-shadow-lg" />
-              
-              {/* Notification dot */}
-              <div className="absolute top-4 right-4 w-3 h-3 bg-white rounded-full animate-bounce shadow-sm" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+              <Bot className="w-9 h-9 drop-shadow-lg" />
             </Button>
           </div>
         </div>
