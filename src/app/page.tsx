@@ -17,7 +17,7 @@ import {
   ShieldCheck,
   Truck,
   Hammer,
-  Quote as QuoteIcon,
+  Quote,
   ChevronRight,
   Sparkles
 } from 'lucide-react';
@@ -58,13 +58,13 @@ export default function HomePage() {
   ];
 
   const testimonials = [
-    { name: 'محمد القاضي', role: 'عميل من صنعاء', text: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة، ساعدتني كثيراً في اختيار اللون المناسب لمجلسي الجديد.', rating: 5 },
-    { name: 'سارة باوزير', role: 'عميلة من المكلا', text: 'جودة الخشب في الطقم الحضرمي الذي طلبته تفوقت على توقعاتي، والتوصيل كان في الموعد تماماً.', rating: 5 },
-    { name: 'أحمد علي', role: 'عميل من عدن', text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة.', rating: 4.8 }
+    { name: 'محمد القاضي', role: 'عميل من صنعاء', text: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة، ساعدتني كثيراً في اختيار اللون المناسب لمجلسي الجديد وبكل سهولة.', rating: 5 },
+    { name: 'سارة باوزير', role: 'عميلة من المكلا', text: 'جودة الخشب في الطقم الحضرمي الذي طلبته تفوقت على توقعاتي، والتوصيل كان في الموعد تماماً وبكل احترافية.', rating: 5 },
+    { name: 'أحمد علي', role: 'عميل من عدن', text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة جداً.', rating: 4.8 }
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background" dir="rtl">
       <Header />
 
       <main className="flex-1">
@@ -161,7 +161,6 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-1 gap-4">
-                    {/* Row 1: Name & Rating */}
                     <div className="flex justify-between items-start gap-2">
                       <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{product.name}</h4>
                       <div className="flex items-center gap-1 text-amber-500 shrink-0">
@@ -169,19 +168,16 @@ export default function HomePage() {
                         <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
                       </div>
                     </div>
-                    {/* Row 2: Store */}
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Store className="w-4 h-4 text-primary" />
                       <span className="text-xs font-bold">{product.store}</span>
                     </div>
-                    {/* Row 3: Category */}
                     <div className="flex items-center gap-2">
                       <Layout className="w-4 h-4 text-primary" />
                       <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0">
                         {product.category}
                       </Badge>
                     </div>
-                    {/* Row 4: Price & Action */}
                     <div className="mt-auto pt-2 space-y-4">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xl font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-xs font-bold">ر.ي</span></span>
@@ -254,28 +250,45 @@ export default function HomePage() {
 
         {/* Testimonials Section */}
         <section className="py-24 bg-secondary text-white relative overflow-hidden">
+          {/* Decorative quotes in background */}
+          <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
+          <Quote className="absolute -bottom-10 -left-10 w-64 h-64 text-white/5 -rotate-12" />
+          
           <div className="container px-4 md:px-8 mx-auto relative z-10">
-            <div className="text-center mb-20 space-y-4">
-              <QuoteIcon className="w-12 h-12 text-primary mx-auto mb-6 opacity-50" />
-              <h2 className="text-4xl font-black">ماذا يقول عملاؤنا؟</h2>
-              <p className="text-gray-400 text-lg">قصص نجاح حقيقية بدأت بلمسة من إيوان.</p>
+            <div className="text-center mb-20 space-y-6">
+              <div className="w-20 h-20 bg-primary/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mx-auto mb-4 border border-white/10">
+                <Quote className="w-10 h-10 text-primary" />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black">ماذا يقول عملاؤنا؟</h2>
+              <p className="text-gray-400 text-lg max-w-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
             </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {testimonials.map((t, i) => (
-                <div key={i} className="p-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[2.5rem] space-y-6">
+                <div key={i} className="group relative p-10 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] space-y-8 hover:bg-white/10 transition-all duration-500 shadow-2xl">
+                  {/* Rating Stars */}
                   <div className="flex gap-1 text-amber-500">
                     {Array.from({ length: 5 }).map((_, star) => (
                       <Star key={star} className={cn("w-4 h-4", star >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
                     ))}
                   </div>
-                  <p className="text-lg italic font-medium leading-relaxed text-right">"{t.text}"</p>
-                  <div className="flex items-center gap-4 pt-4 border-t border-white/10 flex-row-reverse">
-                    <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center font-black text-primary text-xl">
+                  
+                  {/* Testimonial Text with large quotes */}
+                  <div className="relative">
+                    <Quote className="absolute -top-6 -right-6 w-12 h-12 text-primary opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <p className="text-lg md:text-xl italic font-medium leading-relaxed text-right relative z-10">
+                      {t.text}
+                    </p>
+                  </div>
+                  
+                  {/* User Profile */}
+                  <div className="flex items-center gap-4 pt-6 border-t border-white/10 flex-row-reverse">
+                    <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center font-black text-white text-2xl shadow-xl shadow-black/20 shrink-0 transform group-hover:scale-110 transition-transform">
                       {t.name[0]}
                     </div>
                     <div className="text-right">
-                      <h4 className="font-black text-white">{t.name}</h4>
-                      <p className="text-xs text-gray-400">{t.role}</p>
+                      <h4 className="font-black text-white text-lg">{t.name}</h4>
+                      <p className="text-xs text-primary font-bold mt-0.5">{t.role}</p>
                     </div>
                   </div>
                 </div>
