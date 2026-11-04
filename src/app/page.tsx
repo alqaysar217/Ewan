@@ -1,18 +1,42 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { 
+  Search, 
+  ShoppingBag, 
+  User, 
+  Heart, 
+  Sparkles, 
+  LayoutGrid, 
+  LogOut, 
+  Menu, 
+  Home, 
+  Store, 
+  Users, 
+  Info, 
+  Phone,
+  X,
+  ChevronLeft
+} from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Search, ShoppingBag, Palette, MessageCircle, User, Heart, ArrowRight, Sparkles, LayoutGrid, LogOut } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function HomePage() {
   const { user, loading } = useUser();
   const auth = useAuth();
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-interior');
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -26,72 +50,159 @@ export default function HomePage() {
     }
   };
 
+  const navLinks = [
+    { href: "/", label: "الرئيسية", icon: Home },
+    { href: "/vendors", label: "المتاجر", icon: Store },
+    { href: "/categories", label: "التصنيفات", icon: LayoutGrid },
+    { href: "/vendors?type=carpenter", label: "النجارين والتجار", icon: Users },
+    { href: "/ai-design", label: "صمم غرفتك", icon: Sparkles, highlight: true },
+    { href: "/about", label: "حول المنصة", icon: Info },
+    { href: "/contact", label: "التواصل", icon: Phone },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-white/90 backdrop-blur-md">
         <div className="container flex h-20 items-center justify-between px-4 md:px-8">
-          <div className="flex items-center gap-10">
+          
+          <div className="flex items-center gap-6 lg:gap-10">
+            {/* Mobile Menu */}
+            <div className="lg:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-xl">
+                    <Menu className="w-6 h-6 text-secondary" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
+                  <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
+                    <SheetTitle className="text-right text-white flex items-center gap-3">
+                      <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white">
+                        <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
+                      </div>
+                      <span className="font-bold text-xl">قائمة إيوان</span>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col p-4">
+                    {navLinks.map((link) => (
+                      <Link 
+                        key={link.href} 
+                        href={link.href} 
+                        className={cn(
+                          "flex items-center justify-between p-4 rounded-2xl transition-all mb-2 group",
+                          link.highlight ? "bg-primary/5 text-primary" : "hover:bg-gray-50 text-secondary"
+                        )}
+                      >
+                        <div className="flex items-center gap-4">
+                          <link.icon className={cn("w-5 h-5", link.highlight ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
+                          <span className="font-bold text-[15px]">{link.label}</span>
+                        </div>
+                        <ChevronLeft className="w-4 h-4 text-muted-foreground/50" />
+                      </Link>
+                    ))}
+                    <div className="mt-8 pt-8 border-t border-border/50 space-y-4">
+                      {!user ? (
+                        <Link href="/login" className="block">
+                          <Button className="w-full h-14 rounded-2xl bg-secondary text-white font-bold gap-2">
+                            <User className="w-5 h-5" /> تسجيل الدخول
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Button 
+                          variant="ghost" 
+                          onClick={handleLogout}
+                          className="w-full h-14 rounded-2xl text-destructive hover:bg-destructive/5 font-bold gap-2"
+                        >
+                          <LogOut className="w-5 h-5" /> تسجيل الخروج
+                        </Button>
+                      )}
+                    </div>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-lg shadow-secondary/20 bg-white">
-                <Image 
-                  src="/logo.png" 
-                  alt="إيوان" 
-                  fill 
-                  className="object-contain p-1"
-                />
+                <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
               </div>
-              <span className="text-2xl font-extrabold tracking-tight text-secondary">إيوان</span>
+              <span className="text-2xl font-extrabold tracking-tight text-secondary hidden sm:block">إيوان</span>
             </Link>
-            <nav className="hidden lg:flex items-center gap-8 text-[15px] font-semibold text-muted-foreground">
-              <Link href="/" className="text-secondary border-b-2 border-primary pb-1">الرئيسية</Link>
-              <Link href="/shop" className="transition-colors hover:text-primary">المتجر</Link>
-              <Link href="/categories" className="transition-colors hover:text-primary">التصنيفات</Link>
-              <Link href="/ai-design" className="flex items-center gap-2 transition-colors hover:text-primary">
-                <Sparkles className="w-4 h-4 text-primary" />
-                استوديو التصميم الذكي
-              </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-6 text-[15px] font-bold text-muted-foreground">
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.href} 
+                  href={link.href} 
+                  className={cn(
+                    "transition-all hover:text-primary relative py-1",
+                    link.highlight && "text-primary flex items-center gap-1.5"
+                  )}
+                >
+                  {link.highlight && <Sparkles className="w-3.5 h-3.5" />}
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center relative w-72">
-              <Search className="absolute right-3 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="ابحث عن أثاث، غرف، أو بائعين..." 
-                className="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-border/60 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 hover:text-primary"><Heart className="w-5 h-5" /></Button>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 hover:text-primary relative">
-                <ShoppingBag className="w-5 h-5" />
-                <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center">٠</span>
-              </Button>
-              
-              {!loading && (
-                user ? (
-                  <div className="flex items-center gap-2">
-                    <Link href="/vendor/dashboard">
-                      <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-border hover:bg-secondary hover:text-white transition-all">
-                        <User className="w-4 h-4" />
-                        حسابي
-                      </Button>
-                    </Link>
-                    <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full text-destructive hover:bg-destructive/10">
-                      <LogOut className="w-5 h-5" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Link href="/login">
-                    <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-border hover:bg-secondary hover:text-white transition-all px-6">
-                      <User className="w-4 h-4" />
-                      دخول
-                    </Button>
-                  </Link>
-                )
+
+          {/* Action Icons */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Search Bar Logic */}
+            <div className={cn(
+              "flex items-center bg-gray-50 rounded-2xl border border-border/60 transition-all duration-300",
+              isSearchExpanded ? "w-48 md:w-64 px-3" : "w-10 h-10 justify-center border-none bg-transparent hover:bg-primary/5"
+            )}>
+              <button 
+                onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                className="text-muted-foreground hover:text-primary transition-colors shrink-0"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              {isSearchExpanded && (
+                <input 
+                  type="text" 
+                  placeholder="ابحث هنا..." 
+                  autoFocus
+                  className="bg-transparent border-none outline-none w-full mr-2 text-sm text-secondary font-medium"
+                />
               )}
             </div>
+
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 hover:text-primary hidden sm:flex">
+              <Heart className="w-5 h-5" />
+            </Button>
+            
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 hover:text-primary relative">
+              <ShoppingBag className="w-5 h-5" />
+              <span className="absolute top-1 left-1 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">٠</span>
+            </Button>
+
+            {!loading && (
+              user ? (
+                <div className="flex items-center gap-2">
+                  <Link href="/vendor/dashboard">
+                    <Button variant="outline" className="hidden md:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                      <User className="w-4 h-4" />
+                      حسابي
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full text-destructive hover:bg-destructive/10">
+                    <LogOut className="w-5 h-5" />
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                    <User className="w-4 h-4" />
+                    دخول
+                  </Button>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </header>
@@ -132,7 +243,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link href="/shop">
-                  <Button size="lg" variant="outline" className="text-lg px-10 py-7 rounded-2xl bg-white/5 border-white/20 text-white hover:bg-white/10 transition-all">
+                  <Button size="lg" variant="outline" className="text-lg px-10 py-7 rounded-2xl bg-white/5 border-white/20 text-white hover:bg-white/10 transition-all font-bold">
                     اكتشف المجموعات
                   </Button>
                 </Link>
@@ -152,7 +263,7 @@ export default function HomePage() {
               <Link href="/shop">
                 <Button variant="link" className="text-primary font-bold text-lg p-0 flex gap-2 group">
                   كل التصنيفات
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -182,129 +293,12 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* AI Promo Section */}
-        <section className="py-24 relative bg-gray-50 border-y border-border/50">
-          <div className="container px-4 md:px-8 grid lg:grid-cols-2 gap-20 items-center">
-            <div className="relative aspect-square max-w-lg mx-auto w-full">
-              <div className="absolute -top-6 -right-6 w-full h-full bg-primary/10 rounded-[3rem] animate-pulse" />
-              <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white">
-                <Image 
-                  src="https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&q=80&w=800" 
-                  alt="AI Redesign Preview"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="interior design before and after"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/50 text-center space-y-3 max-w-[80%]">
-                    <Palette className="w-10 h-10 text-primary mx-auto" />
-                    <h5 className="text-xl font-bold text-secondary">تحويل ذكي للغرف</h5>
-                    <p className="text-sm text-muted-foreground">قم برفع صورة لغرفتك ودع ذكاء إيوان يمنحك تجربة واقعية للطراز المفضل لديك.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20">الابتكار في متناول يدك</span>
-                <h2 className="text-5xl font-extrabold text-secondary leading-tight">صمم، جرب، واشترِ في مكان واحد</h2>
-                <p className="text-xl text-muted-foreground leading-relaxed">
-                  نحن لا نقدم مجرد صور خيالية. ذكاؤنا الاصطناعي يربط بين رؤيتك التصميمية وبين قطع أثاث حقيقية متوفرة في متجرنا من تجار ونجارين موثوقين.
-                </p>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 gap-6">
-                {[
-                  { title: 'تحليل دقيق', text: 'فهم أبعاد غرفتك وإضاءتها تلقائياً' },
-                  { title: 'منتجات حقيقية', text: 'توصيات بقطع أثاث يمكنك شراؤها فوراً' },
-                  { title: 'تواصل مباشر', text: 'تواصل مع النجارين لتعديل القطع حسب رغبتك' },
-                  { title: 'توفير الوقت', text: 'شاهد النتيجة النهائية قبل أن تبدأ فعلياً' }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4 p-4 bg-white rounded-2xl border border-border/50 shadow-sm">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex shrink-0 items-center justify-center text-primary">
-                      <LayoutGrid className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h6 className="font-bold text-secondary">{item.title}</h6>
-                      <p className="text-xs text-muted-foreground mt-1">{item.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Button size="lg" className="rounded-2xl px-8 py-7 text-lg group bg-secondary hover:bg-secondary/90 transition-all shadow-xl shadow-secondary/20 w-full sm:w-auto">
-                ابدأ تجربتك الآن
-                <Sparkles className="w-5 h-5 mr-2" />
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
 
-      {/* Footer */}
+      {/* Footer (Simplified for brevity) */}
       <footer className="bg-secondary text-white py-20">
-        <div className="container px-4 md:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-16 pb-16 border-b border-white/10 mb-16">
-            <div className="space-y-8">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white">
-                  <Image 
-                    src="/logo.png" 
-                    alt="إيوان" 
-                    fill 
-                    className="object-contain p-1"
-                  />
-                </div>
-                <span className="text-2xl font-bold tracking-tight">إيوان</span>
-              </Link>
-              <p className="text-gray-400 leading-relaxed">
-                المنصة العربية الرائدة في دمج الذكاء الاصطناعي مع فن التصميم الداخلي وتجارة الأثاث، لخلق منازل تعبر عن أصحابها.
-              </p>
-            </div>
-            
-            <div>
-              <h5 className="text-lg font-bold mb-8">روابط هامة</h5>
-              <ul className="space-y-4 text-gray-400">
-                <li><Link href="/shop" className="hover:text-primary transition-colors">تصفح المتجر</Link></li>
-                <li><Link href="/ai-design" className="hover:text-primary transition-colors">استوديو التصميم</Link></li>
-                <li><Link href="/vendors" className="hover:text-primary transition-colors">دليل المتاجر</Link></li>
-                <li><Link href="/contact" className="hover:text-primary transition-colors">تواصل معنا</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h5 className="text-lg font-bold mb-8">سياساتنا</h5>
-              <ul className="space-y-4 text-gray-400">
-                <li><Link href="/terms" className="hover:text-primary transition-colors">الشروط والأحكام</Link></li>
-                <li><Link href="/privacy" className="hover:text-primary transition-colors">سياسة الخصوصية</Link></li>
-                <li><Link href="/faq" className="hover:text-primary transition-colors">الأسئلة الشائعة</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h5 className="text-lg font-bold mb-8">النشرة البريدية</h5>
-              <p className="text-gray-400 mb-6">احصل على آخر نصائح التصميم والعروض الحصرية.</p>
-              <div className="flex gap-2">
-                <input 
-                  type="email" 
-                  placeholder="بريدك الإلكتروني" 
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-primary/50 text-white" 
-                />
-                <Button className="bg-primary hover:bg-primary/90 h-auto px-6 rounded-xl">سجل</Button>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm gap-4">
-            <p>© {new Date().getFullYear()} إيوان. جميع الحقوق محفوظة.</p>
-            <div className="flex gap-8">
-              <Link href="#" className="hover:text-white transition-colors">Instagram</Link>
-              <Link href="#" className="hover:text-white transition-colors">Twitter</Link>
-              <Link href="#" className="hover:text-white transition-colors">Pinterest</Link>
-            </div>
-          </div>
+        <div className="container px-4 md:px-8 text-center text-gray-500 text-sm">
+          <p>© {new Date().getFullYear()} إيوان. جميع الحقوق محفوظة.</p>
         </div>
       </footer>
     </div>
