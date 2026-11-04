@@ -258,7 +258,6 @@ export default function HomePage() {
                 { name: 'خالد عبد الله', role: 'عميل جديد', comment: 'سرعة في التوصيل واحترافية في التعامل. المتجر يضم تشكيلة واسعة تناسب كل الأذواق.', rating: 4 }
               ].map((testimonial, idx) => (
                 <div key={idx} className="bg-white/5 p-8 rounded-2xl border border-white/10 relative group hover:bg-white/10 transition-all duration-300">
-                  <QuoteIcon className="w-10 h-10 text-primary/20 absolute top-6 left-6" />
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className={cn("w-4 h-4", i < testimonial.rating ? "fill-primary text-primary" : "text-white/20")} />
@@ -361,24 +360,4 @@ export default function HomePage() {
       <Footer />
     </div>
   );
-}
-
-function QuoteIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H5c-1.25 0-2 .75-2 2v3c0 1.25.75 2 2 2h3c0 4-4 4-4 4" />
-      <path d="M14 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-3c-1.25 0-2 .75-2 2v3c0 1.25.75 2 2 2h3c0 4-4 4-4 4" />
-    </svg>
-  )
 }

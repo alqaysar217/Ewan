@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
 
@@ -63,6 +64,8 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+      <Header />
+      
       {/* Breadcrumbs */}
       <nav className="bg-white border-b py-4">
         <div className="container mx-auto px-4 flex items-center gap-2 text-sm font-bold text-muted-foreground">
@@ -88,7 +91,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 priority
               />
               <div className="absolute top-4 right-4">
-                <Badge className="bg-destructive text-white font-bold text-lg px-4 py-1.5 shadow-xl">خصم 15%</Badge>
+                <Badge className="bg-secondary text-white font-bold text-lg px-4 py-1.5 shadow-xl">خصم 15%</Badge>
               </div>
             </div>
             <div className="grid grid-cols-4 gap-4">
