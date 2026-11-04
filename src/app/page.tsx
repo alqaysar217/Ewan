@@ -394,6 +394,14 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-16 text-center">
+               <Link href="/faq">
+                 <Button variant="outline" size="lg" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-black px-12 h-14 transition-all">
+                   عرض كافة الآراء <ArrowLeft className="w-5 h-5 mr-2" />
+                 </Button>
+               </Link>
+            </div>
           </div>
         </section>
 
