@@ -24,7 +24,8 @@ import {
   Search,
   Layout,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -420,4 +421,3 @@ export default function AIDesignStudio() {
     </div>
   );
 }
-
