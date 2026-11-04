@@ -40,6 +40,17 @@ import Footer from '@/components/Footer';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
+const MOCK_PRODUCTS = [
+  { id: 'm1', name_ar: 'أريكة مخملية زرقاء', price: 250000, category_id: 'living' },
+  { id: 'm2', name_ar: 'طاولة طعام خشبية', price: 120000, category_id: 'dining' },
+  { id: 'm3', name_ar: 'سرير كلاسيكي فاخر', price: 380000, category_id: 'bedroom' },
+  { id: 'm4', name_ar: 'مصباح أرضي مودرن', price: 45000, category_id: 'lighting' },
+  { id: 'm5', name_ar: 'خزانة ملابس خشب زان', price: 550000, category_id: 'bedroom' },
+  { id: 'm6', name_ar: 'طقم ديوان حضرمي مطور', price: 450000, category_id: 'majlis' },
+  { id: 'm7', name_ar: 'كرسي مكتب مريح', price: 65000, category_id: 'office' },
+  { id: 'm8', name_ar: 'سجاد يدوي تراثي', price: 85000, category_id: 'decor' },
+];
+
 export default function AIDesignStudio() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -52,13 +63,16 @@ export default function AIDesignStudio() {
   const db = useFirestore();
   const { data: allProducts, loading: productsLoading } = useCollection(collection(db, 'products'));
 
+  const displayProducts = useMemo(() => {
+    return (allProducts && allProducts.length > 0) ? allProducts : MOCK_PRODUCTS;
+  }, [allProducts]);
+
   const filteredProducts = useMemo(() => {
-    if (!allProducts) return [];
-    return allProducts.filter(p => 
+    return displayProducts.filter(p => 
       p.name_ar?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.category_id?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [allProducts, searchQuery]);
+  }, [displayProducts, searchQuery]);
 
   const toggleProductSelection = (id: string) => {
     setSelectedProductIds(prev => 
@@ -116,7 +130,7 @@ export default function AIDesignStudio() {
             <Progress value={(step / totalSteps) * 100} className="h-1.5 rounded-full bg-gray-100" />
           </div>
 
-          <Card className="rounded-[10px] border border-border/50 shadow-xl overflow-hidden bg-white">
+          <Card className="rounded-[8px] border border-border/50 shadow-xl overflow-hidden bg-white">
             <CardContent className="p-0">
               <div className="p-4 md:p-10 min-h-[500px] flex flex-col">
                 
@@ -366,16 +380,7 @@ export default function AIDesignStudio() {
 
               <div className="p-4 md:p-6 bg-gray-50/50 border-t border-border/50 flex flex-row items-center justify-between gap-4">
                 
-                <Button 
-                  variant="ghost" 
-                  onClick={handleBack} 
-                  disabled={step === 1}
-                  className="rounded-[8px] h-10 px-6 font-bold text-secondary text-xs flex items-center gap-1.5 order-2"
-                >
-                  <ArrowRight className="w-4 h-4" /> السابق
-                </Button>
-
-                <div className="flex-1 max-w-[200px] order-1">
+                <div className="flex-1 max-w-[200px] order-2">
                    {step < totalSteps ? (
                     <Button 
                       onClick={handleNext} 
@@ -392,6 +397,15 @@ export default function AIDesignStudio() {
                     </Button>
                   )}
                 </div>
+
+                <Button 
+                  variant="ghost" 
+                  onClick={handleBack} 
+                  disabled={step === 1}
+                  className="rounded-[8px] h-10 px-6 font-bold text-secondary text-xs flex items-center gap-1.5 order-1"
+                >
+                  السابق <ArrowRight className="w-4 h-4" />
+                </Button>
                 
               </div>
             </CardContent>
