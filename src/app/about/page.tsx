@@ -118,7 +118,7 @@ export default function AboutPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {values.map((val, i) => (
-                <div key={i} className="bg-white p-10 rounded-[15px] border border-border/50 shadow-sm hover:shadow-xl transition-all group">
+                <div key={i} className="bg-white p-10 rounded-[15px] border border-border/50 shadow-sm hover:shadow-xl transition-all group flex flex-col items-center text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
                     <val.icon className="w-8 h-8" />
                   </div>
