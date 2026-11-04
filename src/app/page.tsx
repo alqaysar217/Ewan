@@ -67,62 +67,6 @@ export default function HomePage() {
         <div className="container flex h-20 items-center justify-between px-4 md:px-8">
           
           <div className="flex items-center gap-6 lg:gap-10">
-            {/* Mobile Menu */}
-            <div className="lg:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-xl">
-                    <Menu className="w-6 h-6 text-secondary" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
-                  <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
-                    <SheetTitle className="text-right text-white flex items-center gap-3">
-                      <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white">
-                        <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
-                      </div>
-                      <span className="font-bold text-xl">قائمة إيوان</span>
-                    </SheetTitle>
-                  </SheetHeader>
-                  <nav className="flex flex-col p-4">
-                    {navLinks.map((link) => (
-                      <Link 
-                        key={link.href} 
-                        href={link.href} 
-                        className={cn(
-                          "flex items-center justify-between p-4 rounded-2xl transition-all mb-2 group",
-                          link.highlight ? "bg-primary/5 text-primary" : "hover:bg-gray-50 text-secondary"
-                        )}
-                      >
-                        <div className="flex items-center gap-4">
-                          <link.icon className={cn("w-5 h-5", link.highlight ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
-                          <span className="font-bold text-[15px]">{link.label}</span>
-                        </div>
-                        <ChevronLeft className="w-4 h-4 text-muted-foreground/50" />
-                      </Link>
-                    ))}
-                    <div className="mt-8 pt-8 border-t border-border/50 space-y-4">
-                      {!user ? (
-                        <Link href="/login" className="block">
-                          <Button className="w-full h-14 rounded-2xl bg-secondary text-white font-bold gap-2">
-                            <User className="w-5 h-5" /> تسجيل الدخول
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Button 
-                          variant="ghost" 
-                          onClick={handleLogout}
-                          className="w-full h-14 rounded-2xl text-destructive hover:bg-destructive/5 font-bold gap-2"
-                        >
-                          <LogOut className="w-5 h-5" /> تسجيل الخروج
-                        </Button>
-                      )}
-                    </div>
-                  </nav>
-                </SheetContent>
-              </Sheet>
-            </div>
-
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
               <div className="relative w-10 h-10 overflow-hidden rounded-xl shadow-lg shadow-secondary/20 bg-white">
@@ -183,17 +127,12 @@ export default function HomePage() {
 
             {!loading && (
               user ? (
-                <div className="flex items-center gap-2">
-                  <Link href="/vendor/dashboard">
-                    <Button variant="outline" className="hidden md:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
-                      <User className="w-4 h-4" />
-                      حسابي
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full text-destructive hover:bg-destructive/10">
-                    <LogOut className="w-5 h-5" />
+                <Link href="/vendor/dashboard">
+                  <Button variant="outline" className="hidden md:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
+                    <User className="w-4 h-4" />
+                    حسابي
                   </Button>
-                </div>
+                </Link>
               ) : (
                 <Link href="/login">
                   <Button variant="outline" className="hidden sm:flex gap-2 rounded-xl border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
@@ -203,6 +142,62 @@ export default function HomePage() {
                 </Link>
               )
             )}
+
+            {/* Mobile Menu - Moved to the far end */}
+            <div className="lg:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-xl">
+                    <Menu className="w-6 h-6 text-secondary" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50">
+                  <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
+                    <SheetTitle className="text-right text-white flex items-center gap-3">
+                      <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white">
+                        <Image src="/logo.png" alt="إيوان" fill className="object-contain p-1" />
+                      </div>
+                      <span className="font-bold text-xl">قائمة إيوان</span>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col p-4">
+                    {navLinks.map((link) => (
+                      <Link 
+                        key={link.href} 
+                        href={link.href} 
+                        className={cn(
+                          "flex items-center justify-between p-4 rounded-2xl transition-all mb-2 group",
+                          link.highlight ? "bg-primary/5 text-primary" : "hover:bg-gray-50 text-secondary"
+                        )}
+                      >
+                        <div className="flex items-center gap-4">
+                          <link.icon className={cn("w-5 h-5", link.highlight ? "text-primary" : "text-muted-foreground group-hover:text-primary")} />
+                          <span className="font-bold text-[15px]">{link.label}</span>
+                        </div>
+                        <ChevronLeft className="w-4 h-4 text-muted-foreground/50" />
+                      </Link>
+                    ))}
+                    <div className="mt-8 pt-8 border-t border-border/50 space-y-4">
+                      {!user ? (
+                        <Link href="/login" className="block">
+                          <Button className="w-full h-14 rounded-2xl bg-secondary text-white font-bold gap-2">
+                            <User className="w-5 h-5" /> تسجيل الدخول
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Button 
+                          variant="ghost" 
+                          onClick={handleLogout}
+                          className="w-full h-14 rounded-2xl text-destructive hover:bg-destructive/5 font-bold gap-2"
+                        >
+                          <LogOut className="w-5 h-5" /> تسجيل الخروج
+                        </Button>
+                      )}
+                    </div>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </header>
@@ -295,7 +290,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer (Simplified for brevity) */}
+      {/* Footer */}
       <footer className="bg-secondary text-white py-20">
         <div className="container px-4 md:px-8 text-center text-gray-500 text-sm">
           <p>© {new Date().getFullYear()} إيوان. جميع الحقوق محفوظة.</p>
