@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
+import Footer from '@/components/Footer';
 
 export default function AIDesignStudio() {
   const [step, setStep] = useState(1);
@@ -26,8 +27,8 @@ export default function AIDesignStudio() {
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      <div className="container mx-auto py-12 px-4 max-w-5xl">
+    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+      <div className="container mx-auto py-12 px-4 max-w-5xl flex-1">
         
         {/* Header */}
         <div className="text-center space-y-4 mb-16">
@@ -50,7 +51,7 @@ export default function AIDesignStudio() {
         </div>
 
         {/* Wizard Content */}
-        <div className="bg-white rounded-[3rem] shadow-xl shadow-secondary/5 border border-border/50 overflow-hidden min-h-[500px] flex flex-col">
+        <div className="bg-white rounded-[3rem] shadow-xl shadow-secondary/5 border border-border/50 overflow-hidden min-h-[500px] flex flex-col mb-12">
           
           <div className="flex-1 p-8 md:p-12">
             {step === 1 && (
@@ -165,6 +166,8 @@ export default function AIDesignStudio() {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }

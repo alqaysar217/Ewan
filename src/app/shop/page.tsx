@@ -26,6 +26,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
+import Footer from '@/components/Footer';
 
 export default function ShopPage() {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
@@ -44,7 +45,7 @@ export default function ShopPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       {/* Header Section */}
       <div className="bg-secondary text-white py-16 px-4">
         <div className="container mx-auto">
@@ -55,7 +56,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <main className="container mx-auto py-12 px-4">
+      <main className="container mx-auto py-12 px-4 flex-1">
         <div className="flex flex-col lg:flex-row gap-10">
           
           {/* Sidebar Filters */}
@@ -181,6 +182,8 @@ export default function ShopPage() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }

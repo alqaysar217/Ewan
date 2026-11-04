@@ -32,6 +32,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Footer from '@/components/Footer';
 
 export default function HomePage() {
   const { user, loading } = useUser();
@@ -146,7 +147,7 @@ export default function HomePage() {
               )
             )}
 
-            {/* Mobile Menu - Moved to the far end */}
+            {/* Mobile Menu */}
             <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
@@ -293,12 +294,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-secondary text-white py-20">
-        <div className="container px-4 md:px-8 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} إيوان. جميع الحقوق محفوظة.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
