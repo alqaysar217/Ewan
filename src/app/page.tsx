@@ -333,16 +333,26 @@ export default function HomePage() {
         </section>
 
         {/* Partners Section */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-28 bg-white border-y border-border/50">
           <div className="container px-4 md:px-8 mx-auto">
-            <div className="flex flex-col gap-12">
-              <h3 className="text-center text-lg font-black text-muted-foreground">شركاء النجاح العالميين والمحليين</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 items-center opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+            <div className="space-y-20">
+              <div className="text-center space-y-4 max-w-2xl mx-auto">
+                <div className="h-1 w-12 bg-primary mx-auto rounded-full mb-4"></div>
+                <h3 className="text-3xl font-black text-secondary">شركاء النجاح</h3>
+                <p className="text-muted-foreground font-medium leading-relaxed">
+                  نتعاون مع أفضل الخبرات المحلية والعالمية لتقديم الجودة والابتكار التي يستحقها عملاؤنا في اليمن.
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
                 {partners.map((partner, i) => (
-                  <div key={i} className="flex justify-center">
-                    <div className="relative w-24 h-24 overflow-hidden rounded-xl border border-border/50 bg-gray-50 p-2">
-                      <Image src={partner.logo} alt={partner.name} fill className="object-contain p-2" />
-                    </div>
+                  <div key={i} className="relative w-32 h-14 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group">
+                    <Image 
+                      src={partner.logo} 
+                      alt={partner.name} 
+                      fill 
+                      className="object-contain opacity-70 group-hover:opacity-100 transition-opacity" 
+                    />
                   </div>
                 ))}
               </div>
