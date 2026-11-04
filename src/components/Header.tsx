@@ -128,20 +128,26 @@ export default function Header() {
           {!userLoading && (
             user ? (
               <div className="flex items-center gap-2">
-                {userData?.role === 'admin' ? (
+                {userData?.role === 'admin' && (
                   <Link href="/admin">
                     <Button className="hidden md:flex gap-2 rounded-md bg-secondary text-white hover:bg-secondary/90 transition-all px-6 font-bold shadow-lg shadow-secondary/10">
                       <ShieldCheck className="w-4 h-4 text-primary" />
                       لوحة الإدارة
                     </Button>
                   </Link>
-                ) : (
+                )}
+                {userData?.role === 'vendor' && (
                   <Link href="/vendor/dashboard">
                     <Button variant="outline" className="hidden md:flex gap-2 rounded-md border-primary text-primary hover:bg-primary hover:text-white transition-all px-6 font-bold">
                       <User className="w-4 h-4" />
                       حسابي
                     </Button>
                   </Link>
+                )}
+                {userData?.role === 'customer' && (
+                  <Button variant="ghost" className="hidden md:flex gap-2 font-bold text-secondary">
+                    <User className="w-4 h-4 text-primary" /> {userData?.full_name?.split(' ')[0]}
+                  </Button>
                 )}
                 <Button variant="ghost" size="icon" onClick={handleLogout} className="text-destructive hover:bg-destructive/10">
                   <LogOut className="w-5 h-5" />

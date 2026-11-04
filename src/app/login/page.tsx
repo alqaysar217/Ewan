@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, UserPlus } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -144,10 +144,15 @@ export default function LoginPage() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
-          <Link href="/" className="text-sm font-black text-muted-foreground hover:text-primary transition-all flex items-center gap-2 group">
-             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-             العودة للصفحة الرئيسية
-          </Link>
+          <div className="flex flex-col gap-4 w-full">
+            <Link href="/register" className="text-sm font-black text-primary hover:underline flex items-center justify-center gap-2">
+               <UserPlus className="w-4 h-4" /> ليس لديك حساب؟ إنشاء حساب جديد
+            </Link>
+            <Link href="/" className="text-sm font-black text-muted-foreground hover:text-primary transition-all flex items-center justify-center gap-2 group">
+               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+               العودة للصفحة الرئيسية
+            </Link>
+          </div>
           <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest text-center">
             نظام تشفير وحماية بيانات متطور © إيوان
           </div>
