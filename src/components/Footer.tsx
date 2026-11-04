@@ -20,7 +20,7 @@ export default function Footer() {
     platform: [
       { label: "الرئيسية", href: "/" },
       { label: "المتاجر", href: "/vendors" },
-      { label: "التصنيفات", href: "/shop" },
+      { label: "المنتجات", href: "/shop" },
       { label: "النجارين والتجار", href: "/professionals" },
       { label: "صمم غرفتك", href: "/ai-design" },
     ],
