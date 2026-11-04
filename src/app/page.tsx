@@ -8,7 +8,7 @@ import {
   ShoppingBag, 
   User, 
   Heart, 
-  Sparkles, 
+  Zap, 
   LayoutGrid, 
   LogOut, 
   Menu, 
@@ -223,9 +223,9 @@ export default function HomePage() {
           
           <div className="container relative z-20 px-4 md:px-8">
             <div className="max-w-2xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-primary border border-white/10">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-bold">مستقبل التصميم الداخلي هنا</span>
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-primary/20 backdrop-blur-xl rounded-2xl text-primary border border-primary/30 shadow-xl shadow-primary/5">
+                <Zap className="w-4 h-4 fill-primary" />
+                <span className="text-sm font-black tracking-wide">ابتكار ذكي لمساحتك الخاصة</span>
               </div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight">
                 اكتشف مساحة أحلامك مع <span className="text-primary">إيوان</span>
@@ -236,7 +236,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-5 pt-4">
                 <Link href="/ai-design">
                   <Button size="lg" className="h-16 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-2xl shadow-primary/30 transition-all hover:-translate-y-1">
-                    ابدأ التصميم بالذكاء الاصطناعي <Sparkles className="w-5 h-5 mr-2" />
+                    ابدأ التصميم بالذكاء الاصطناعي <Zap className="w-5 h-5 mr-2" />
                   </Button>
                 </Link>
                 <Link href="/shop">
@@ -269,7 +269,7 @@ export default function HomePage() {
               {[
                 { id: 'living', name: 'غرفة المعيشة', hint: 'teal luxury living room', img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600' },
                 { id: 'bedroom', name: 'غرفة النوم', hint: 'modern bedroom design', img: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=600' },
-                { id: 'kitchen', name: 'المطبخ', hint: 'contemporary kitchen', img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=600' },
+                { id: 'kitchen', name: 'المطبخ', hint: 'contemporary kitchen', img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=crop&q=80&w=600' },
                 { id: 'office', name: 'المكتب المنزلي', hint: 'modern home office', img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=600' }
               ].map((cat, idx) => (
                 <Link key={idx} href={`/shop?category=${cat.id}`} className="group relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700">
@@ -338,10 +338,10 @@ export default function HomePage() {
             
             <Button 
               size="icon" 
-              className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-all hover:scale-110 duration-300 overflow-hidden border-2 border-white/20"
+              className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/40 relative flex items-center justify-center transition-all hover:scale-110 duration-300 overflow-hidden border-2 border-white/20"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-              <Bot className="w-9 h-9 drop-shadow-lg" />
+              <Bot className="w-8 h-8 drop-shadow-lg" />
             </Button>
           </div>
         </div>
