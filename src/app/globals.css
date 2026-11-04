@@ -32,7 +32,7 @@
     --input: 180 8% 91%;
     --ring: 188 75% 34%;
     
-    --radius: 0.5rem; /* Reduced from 1rem for sharper look */
+    --radius: 0.35rem; /* Shaper look as requested */
   }
 
   .dark {
