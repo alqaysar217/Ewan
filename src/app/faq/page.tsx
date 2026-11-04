@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -8,7 +9,8 @@ import {
   Phone, 
   Mail,
   ArrowRight,
-  ChevronLeft
+  ChevronLeft,
+  Filter
 } from 'lucide-react';
 import { 
   Accordion, 
@@ -158,3 +160,4 @@ export default function FAQPage() {
     </div>
   );
 }
+
