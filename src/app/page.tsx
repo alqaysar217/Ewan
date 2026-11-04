@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -49,12 +48,12 @@ export default function HomePage() {
   ];
 
   const partners = [
-    { name: 'IKEA Global', logo: 'https://picsum.photos/seed/p1/200/100' },
-    { name: 'Gulf Furniture', logo: 'https://picsum.photos/seed/p2/200/100' },
-    { name: 'Yemen Wood', logo: 'https://picsum.photos/seed/p3/200/100' },
-    { name: 'Modern Living', logo: 'https://picsum.photos/seed/p4/200/100' },
-    { name: 'Royal Decor', logo: 'https://picsum.photos/seed/p5/200/100' },
-    { name: 'Elite Stores', logo: 'https://picsum.photos/seed/p6/200/100' }
+    { name: 'IKEA Global', logo: 'https://picsum.photos/seed/p1/200/200' },
+    { name: 'Gulf Furniture', logo: 'https://picsum.photos/seed/p2/200/200' },
+    { name: 'Yemen Wood', logo: 'https://picsum.photos/seed/p3/200/200' },
+    { name: 'Modern Living', logo: 'https://picsum.photos/seed/p4/200/200' },
+    { name: 'Royal Decor', logo: 'https://picsum.photos/seed/p5/200/200' },
+    { name: 'Elite Stores', logo: 'https://picsum.photos/seed/p6/200/200' }
   ];
 
   const testimonials = [
@@ -254,11 +253,13 @@ export default function HomePage() {
         <section className="py-20 bg-gray-50">
           <div className="container px-4 md:px-8 mx-auto">
             <div className="flex flex-col gap-12">
-              <h3 className="text-center text-sm font-black text-muted-foreground uppercase tracking-[0.3em]">شركاء النجاح العالميين والمحليين</h3>
+              <h3 className="text-center text-lg font-black text-muted-foreground">شركاء النجاح العالميين والمحليين</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 items-center opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                 {partners.map((partner, i) => (
                   <div key={i} className="flex justify-center">
-                    <Image src={partner.logo} alt={partner.name} width={150} height={75} className="object-contain h-12" />
+                    <div className="relative w-24 h-24 overflow-hidden">
+                      <Image src={partner.logo} alt={partner.name} fill className="object-contain" />
+                    </div>
                   </div>
                 ))}
               </div>
