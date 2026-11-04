@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -36,6 +36,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection } from 'firebase/firestore';
 
 export default function AIDesignStudio() {
   const [step, setStep] = useState(1);
@@ -43,7 +45,25 @@ export default function AIDesignStudio() {
   const [selectionMode, setSelectionMode] = useState<'auto' | 'manual' | null>(null);
   const [roomType, setRoomType] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const totalSteps = 6;
+
+  const db = useFirestore();
+  const { data: allProducts, loading: productsLoading } = useCollection(collection(db, 'products'));
+
+  const filteredProducts = useMemo(() => {
+    if (!allProducts) return [];
+    return allProducts.filter(p => 
+      p.name_ar?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.category_id?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [allProducts, searchQuery]);
+
+  const toggleProductSelection = (id: string) => {
+    setSelectedProductIds(prev => 
+      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+    );
+  };
 
   const styles = [
     { id: 'modern', name: 'مودرن حديث', img: 'https://picsum.photos/seed/style-modern/400/300', hint: 'modern interior' },
@@ -77,7 +97,6 @@ export default function AIDesignStudio() {
       <main className="flex-1 py-6 md:py-12">
         <div className="container mx-auto px-4 max-w-5xl">
           
-          {/* Header Section */}
           <div className="text-center space-y-3 mb-8 md:mb-12">
             <div className="inline-flex items-center px-3 py-1 bg-primary/10 border-r-2 border-primary text-primary mx-auto rounded-l-sm">
               <span className="text-[10px] font-bold uppercase tracking-wider">استوديو إيوان الذكي</span>
@@ -88,7 +107,6 @@ export default function AIDesignStudio() {
             </p>
           </div>
 
-          {/* Progress Bar */}
           <div className="mb-8 space-y-3 max-w-md mx-auto">
             <div className="flex justify-between items-center text-[10px] md:text-xs font-bold text-secondary">
               <span className="bg-secondary text-white px-2 py-0.5 rounded-sm">الخطوة {step}</span>
@@ -97,12 +115,10 @@ export default function AIDesignStudio() {
             <Progress value={(step / totalSteps) * 100} className="h-1.5 rounded-full bg-gray-100" />
           </div>
 
-          {/* Main Content Area - Reduced rounding to [10px] for sharper look */}
           <Card className="rounded-[10px] border border-border/50 shadow-xl overflow-hidden bg-white">
             <CardContent className="p-0">
-              <div className="p-4 md:p-10 min-h-[450px] flex flex-col">
+              <div className="p-4 md:p-10 min-h-[500px] flex flex-col">
                 
-                {/* Step 1: Upload */}
                 {step === 1 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6 flex-1">
                     <div className="text-center space-y-1">
@@ -112,8 +128,8 @@ export default function AIDesignStudio() {
                       <p className="text-xs text-muted-foreground">تأكد من وضوح الإضاءة وزاوية التصوير</p>
                     </div>
                     
-                    <div className="border-2 border-dashed border-gray-100 rounded-[10px] p-8 md:p-16 text-center hover:border-primary/30 transition-all cursor-pointer group bg-gray-50/50 flex flex-col items-center justify-center gap-4">
-                      <div className="w-16 h-16 bg-white rounded-[10px] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                    <div className="border-2 border-dashed border-gray-100 rounded-[8px] p-8 md:p-16 text-center hover:border-primary/30 transition-all cursor-pointer group bg-gray-50/50 flex flex-col items-center justify-center gap-4">
+                      <div className="w-16 h-16 bg-white rounded-[8px] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                         <Upload className="w-8 h-8 text-primary" />
                       </div>
                       <div className="space-y-1">
@@ -124,7 +140,6 @@ export default function AIDesignStudio() {
                   </div>
                 )}
 
-                {/* Step 2: Dimensions & Budget */}
                 {step === 2 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6 flex-1">
                     <div className="text-center space-y-1">
@@ -170,22 +185,15 @@ export default function AIDesignStudio() {
                           <Label className="font-bold text-xs">مقاسات المساحة (متر)</Label>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                          <div className="space-y-1">
-                             <Input placeholder="الطول" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
-                          </div>
-                          <div className="space-y-1">
-                             <Input placeholder="العرض" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
-                          </div>
-                          <div className="space-y-1">
-                             <Input placeholder="الارتفاع" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
-                          </div>
+                          <Input placeholder="الطول" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
+                          <Input placeholder="العرض" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
+                          <Input placeholder="الارتفاع" type="number" className="rounded-[8px] h-11 bg-gray-50 border-none font-bold text-center text-xs" />
                         </div>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Step 3: Selection Strategy */}
                 {step === 3 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6 flex-1">
                     <div className="text-center space-y-1">
@@ -203,7 +211,7 @@ export default function AIDesignStudio() {
                       <Label
                         htmlFor="mode-auto"
                         className={cn(
-                          "flex flex-col items-center gap-4 p-6 rounded-[10px] border-2 transition-all cursor-pointer text-center",
+                          "flex flex-col items-center gap-4 p-6 rounded-[8px] border-2 transition-all cursor-pointer text-center",
                           selectionMode === 'auto' ? "border-primary bg-primary/5" : "border-gray-50 hover:bg-gray-50"
                         )}
                       >
@@ -213,14 +221,14 @@ export default function AIDesignStudio() {
                         </div>
                         <div className="space-y-1">
                           <p className="font-black text-secondary">اختيار ذكي تلقائي</p>
-                          <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">سيتولى النظام اختيار القطع الأكثر تناسقاً مع مساحتك.</p>
+                          <p className="text-[10px] text-muted-foreground font-medium">سيتولى النظام اختيار القطع الأكثر تناسقاً.</p>
                         </div>
                       </Label>
 
                       <Label
                         htmlFor="mode-manual"
                         className={cn(
-                          "flex flex-col items-center gap-4 p-6 rounded-[10px] border-2 transition-all cursor-pointer text-center",
+                          "flex flex-col items-center gap-4 p-6 rounded-[8px] border-2 transition-all cursor-pointer text-center",
                           selectionMode === 'manual' ? "border-primary bg-primary/5" : "border-gray-50 hover:bg-gray-50"
                         )}
                       >
@@ -230,19 +238,20 @@ export default function AIDesignStudio() {
                         </div>
                         <div className="space-y-1">
                           <p className="font-black text-secondary">اختيار يدوي مخصص</p>
-                          <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">تصفح الكتالوج واختر القطع التي تحبها لنضعها في التصميم.</p>
+                          <p className="text-[10px] text-muted-foreground font-medium">تصفح الكتالوج واختر القطع التي تحبها.</p>
                         </div>
                       </Label>
                     </RadioGroup>
                   </div>
                 )}
 
-                {/* Step 4: Product Picking (Manual Mode Only) */}
                 {step === 4 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4 flex-1">
                     <div className="text-center space-y-1">
-                      <h3 className="text-lg font-black text-secondary">حدد المنتجات المطلوبة</h3>
-                      <p className="text-[10px] text-muted-foreground">اختر 3 قطع على الأقل ليتم دمجها في صورتك</p>
+                      <h3 className="text-lg font-black text-secondary flex items-center justify-center gap-2">
+                        <ShoppingBag className="w-5 h-5 text-primary" /> حدد المنتجات المطلوبة
+                      </h3>
+                      <p className="text-[10px] text-muted-foreground">اختر قطعة واحدة على الأقل ليتم دمجها في صورتك</p>
                     </div>
 
                     <div className="relative max-w-md mx-auto">
@@ -255,29 +264,52 @@ export default function AIDesignStudio() {
                        />
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                        <div key={i} className="aspect-square bg-gray-50 rounded-[8px] border border-transparent hover:border-primary cursor-pointer relative overflow-hidden group shadow-sm">
-                           <Image 
-                            src={`https://picsum.photos/seed/product-${i}/300/300`} 
-                            alt="Product" 
-                            fill 
-                            className="object-cover group-hover:scale-105 transition-transform"
-                            data-ai-hint="furniture item"
-                           />
-                           <div className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
-                             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                           </div>
-                           <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-black/60 text-white text-[9px] font-bold">
-                             منتج إيوان المختار {i}
-                           </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 pt-2">
+                      {productsLoading ? (
+                        Array.from({ length: 8 }).map((_, i) => (
+                          <div key={i} className="aspect-square bg-gray-50 rounded-[8px] animate-pulse" />
+                        ))
+                      ) : filteredProducts.length > 0 ? (
+                        filteredProducts.map(product => {
+                          const isSelected = selectedProductIds.includes(product.id);
+                          return (
+                            <div 
+                              key={product.id} 
+                              onClick={() => toggleProductSelection(product.id)}
+                              className={cn(
+                                "aspect-square bg-white rounded-[8px] border-2 transition-all cursor-pointer relative overflow-hidden group shadow-sm",
+                                isSelected ? "border-primary" : "border-transparent hover:border-primary/50"
+                              )}
+                            >
+                              <Image 
+                                src={`https://picsum.photos/seed/${product.id}/400/400`} 
+                                alt={product.name_ar} 
+                                fill 
+                                className="object-cover transition-transform group-hover:scale-105"
+                                data-ai-hint="furniture product"
+                              />
+                              {isSelected && (
+                                <div className="absolute top-1 right-1 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50 duration-200">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                </div>
+                              )}
+                              <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white backdrop-blur-[2px]">
+                                <p className="text-[9px] font-black truncate">{product.name_ar}</p>
+                                <p className="text-[8px] font-bold text-primary-foreground/80">{(product.price || 0).toLocaleString()} ر.ي</p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="col-span-full py-20 text-center space-y-2">
+                          <Search className="w-8 h-8 text-muted-foreground mx-auto opacity-20" />
+                          <p className="text-xs text-muted-foreground font-bold">عذراً، لم نجد منتجات تطابق بحثك</p>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 )}
 
-                {/* Step 5: Design Style with Images */}
                 {step === 5 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6 flex-1">
                     <div className="text-center space-y-1">
@@ -291,7 +323,7 @@ export default function AIDesignStudio() {
                       {styles.map((style) => (
                         <div 
                           key={style.id}
-                          className="group relative aspect-[4/3] rounded-[10px] overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer shadow-sm transition-all"
+                          className="group relative aspect-[4/3] rounded-[8px] overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer shadow-sm transition-all"
                         >
                           <Image src={style.img} alt={style.name} fill className="object-cover group-hover:scale-105 transition-transform" data-ai-hint={style.hint} />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
@@ -303,7 +335,6 @@ export default function AIDesignStudio() {
                   </div>
                 )}
 
-                {/* Step 6: Final Confirm */}
                 {step === 6 && (
                   <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6 flex-1 text-center py-6">
                     <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
@@ -314,28 +345,26 @@ export default function AIDesignStudio() {
                       <p className="text-[10px] md:text-xs text-muted-foreground font-medium">تم تجميع كافة تفضيلاتك، سنقوم الآن بإنتاج التصميم الخاص بك.</p>
                     </div>
                     
-                    <div className="max-w-xs mx-auto bg-gray-50 border-none rounded-[10px] p-4 text-right space-y-3">
+                    <div className="max-w-xs mx-auto bg-gray-50 border-none rounded-[8px] p-4 text-right space-y-3">
                       <div className="flex justify-between items-center text-[10px]">
                         <span className="text-muted-foreground font-bold flex items-center gap-1.5"><MousePointerClick className="w-3 h-3"/> النمط:</span>
                         <span className="font-black text-primary">{selectionMode === 'auto' ? 'تلقائي ذكي' : 'يدوي مخصص'}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px]">
                         <span className="text-muted-foreground font-bold flex items-center gap-1.5"><Home className="w-3 h-3"/> الغرفة:</span>
-                        <span className="font-black text-secondary">غرفة معيشة</span>
+                        <span className="font-black text-secondary">{roomType || 'لم يتم التحديد'}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px]">
-                        <span className="text-muted-foreground font-bold flex items-center gap-1.5"><Palette className="w-3 h-3"/> الطراز:</span>
-                        <span className="font-black text-secondary">مودرن حديث</span>
+                        <span className="text-muted-foreground font-bold flex items-center gap-1.5"><Layout className="w-3 h-3"/> قطع مختارة:</span>
+                        <span className="font-black text-secondary">{selectedProductIds.length} قطعة</span>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Swapped Navigation Buttons - "Next" on the Right, "Back" on the Left (in RTL context) */}
               <div className="p-4 md:p-6 bg-gray-50/50 border-t border-border/50 flex flex-row items-center justify-between gap-4">
                 
-                {/* Back Button (Moved to Right relative to text order, but visually Left in RTL) */}
                 <Button 
                   variant="ghost" 
                   onClick={handleBack} 
@@ -345,11 +374,11 @@ export default function AIDesignStudio() {
                   <ArrowRight className="w-4 h-4" /> السابق
                 </Button>
 
-                {/* Continue Button (Moved to Left relative to text order, but visually Right in RTL) */}
                 <div className="flex-1 max-w-[200px] order-1">
                    {step < totalSteps ? (
                     <Button 
                       onClick={handleNext} 
+                      disabled={step === 4 && selectionMode === 'manual' && selectedProductIds.length === 0}
                       className="w-full h-10 px-6 bg-secondary hover:bg-secondary/90 text-white font-black text-xs shadow-md rounded-[8px] flex items-center gap-1.5"
                     >
                       متابعة الخطوات <ArrowLeft className="w-4 h-4" />
@@ -367,14 +396,13 @@ export default function AIDesignStudio() {
             </CardContent>
           </Card>
 
-          {/* Guidelines */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { title: 'دقة التصوير', desc: 'استخدم صوراً واضحة لنتائج دقيقة.', icon: Info },
               { title: 'أثاث حقيقي', desc: 'كافة المقترحات متوفرة في إيوان.', icon: Sparkles },
               { title: 'تنسيق ذكي', desc: 'الذكاء الاصطناعي يراعي مقاساتك.', icon: Ruler }
             ].map((tip, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-white rounded-[10px] border border-border/50 shadow-sm">
+              <div key={i} className="flex items-start gap-3 p-4 bg-white rounded-[8px] border border-border/50 shadow-sm">
                 <div className="w-8 h-8 bg-primary/10 rounded-[6px] flex items-center justify-center shrink-0">
                   <tip.icon className="w-4 h-4 text-primary" />
                 </div>
@@ -392,3 +420,4 @@ export default function AIDesignStudio() {
     </div>
   );
 }
+
