@@ -65,7 +65,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 border border-white/60 rounded-[2.5rem] pointer-events-none" />
         
         <CardHeader className="space-y-6 text-center pt-12 pb-8">
-          <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-[22px] shadow-2xl shadow-primary/20 bg-white p-3 flex items-center justify-center border border-gray-50">
+          <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-xl shadow-2xl shadow-primary/20 bg-white p-3 flex items-center justify-center border border-gray-50">
             <Image 
               src="/logo.png" 
               alt="إيوان" 
@@ -85,9 +85,11 @@ export default function LoginPage() {
         <CardContent className="px-8 pb-8">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="email" className="font-black text-secondary mr-1">البريد الإلكتروني</Label>
+              <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary" />
+                البريد الإلكتروني
+              </Label>
               <div className="relative group">
-                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 <Input 
                   id="email" 
                   type="email" 
@@ -95,18 +97,20 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="rounded-[15px] h-14 pr-12 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                  className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
                 />
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between items-center mr-1">
-                <Label htmlFor="password" className="font-black text-secondary">كلمة المرور</Label>
+                <Label htmlFor="password" className="font-black text-secondary flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-primary" />
+                  كلمة المرور
+                </Label>
                 <button type="button" className="text-xs font-bold text-primary hover:underline">نسيت كلمة المرور؟</button>
               </div>
               <div className="relative group">
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 <Input 
                   id="password" 
                   type="password" 
@@ -114,7 +118,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="rounded-[15px] h-14 pr-12 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                  className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
                 />
               </div>
             </div>
