@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Cairo } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase';
+import FloatingActions from '@/components/FloatingActions';
 
 const cairo = Cairo({ 
   subsets: ['arabic', 'latin'],
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="antialiased font-sans selection:bg-primary/20">
         <FirebaseClientProvider>
           {children}
+          <FloatingActions />
           <Toaster />
         </FirebaseClientProvider>
       </body>
