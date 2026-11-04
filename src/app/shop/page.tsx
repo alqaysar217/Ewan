@@ -87,14 +87,19 @@ export default function ShopPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Header />
 
-      <div className="bg-secondary text-white py-16 px-4">
-        <div className="container mx-auto px-4 md:px-8">
-          <h1 className="text-4xl md:text-5xl font-black mb-4">متجر إيوان</h1>
-          <p className="text-gray-300 max-w-2xl text-lg font-medium">
-            تصفح أرقى قطع الأثاث المختارة بعناية لتناسب ذوقك الرفيع.
-          </p>
+      <section className="relative py-12 md:py-16 bg-secondary overflow-hidden">
+        {/* Subtle Hexagonal Pattern */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+        
+        <div className="container relative z-10 px-4 md:px-8 mx-auto text-center">
+          <div className="max-w-3xl mx-auto space-y-4">
+            <h1 className="text-3xl md:text-5xl font-black text-white">متجر إيوان</h1>
+            <p className="text-base md:text-lg text-gray-300 font-medium max-w-2xl mx-auto">
+              تصفح أرقى قطع الأثاث المختارة بعناية لتناسب ذوقك الرفيع.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-10">
