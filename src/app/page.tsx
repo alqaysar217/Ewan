@@ -207,7 +207,7 @@ export default function HomePage() {
                       </div>
                     </Link>
                     <div className="absolute top-3 right-3 z-20">
-                      <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1 shadow-sm border-none">
+                      <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
                          {product.discount.toLocaleString('en-US')}% خصم
                       </Badge>
                     </div>
@@ -248,6 +248,9 @@ export default function HomePage() {
 
         {/* Featured Stores Section */}
         <section className="py-24 bg-secondary relative overflow-hidden">
+          {/* Hexagonal Pattern Backdrop */}
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+          
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
             <div className="text-center mb-16 space-y-4">
@@ -349,6 +352,9 @@ export default function HomePage() {
 
         {/* Testimonials Section */}
         <section className="py-24 bg-secondary text-white relative overflow-hidden">
+          {/* Hexagonal Pattern Backdrop */}
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+          
           <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
           <Quote className="absolute -bottom-10 -left-10 w-64 h-64 text-white/5 -rotate-12" />
           
