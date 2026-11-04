@@ -4,28 +4,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Users, 
   Store, 
-  Package, 
   TrendingUp, 
   ArrowUpRight, 
   ArrowDownRight,
   ShoppingBag,
   Activity
 } from 'lucide-react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ChartContainer, 
-  ChartTooltip, 
-  ChartTooltipContent 
-} from '@/components/ui/chart';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const data = [
   { name: 'السبت', sales: 4000 },

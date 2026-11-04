@@ -6,17 +6,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Hammer, 
   MapPin, 
   Star, 
-  CheckCircle2, 
   Plus, 
-  Search,
   MoreVertical,
   MessageSquare,
   Clock
 } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export default function AdminCarpenters() {
   const db = useFirestore();
@@ -49,7 +47,7 @@ export default function AdminCarpenters() {
             <CardHeader className="p-0 relative h-32 bg-secondary">
                <div className="absolute inset-0 bg-primary/10 mix-blend-overlay opacity-30" />
                <div className="absolute -bottom-6 right-8 w-20 h-20 rounded-2xl bg-white p-1 shadow-2xl overflow-hidden border-4 border-white">
-                  <Image src={c.logo} alt={c.business_name} fill className="object-cover" />
+                  <Image src={c.logo || `https://picsum.photos/seed/${c.id}/100/100`} alt={c.business_name} fill className="object-cover" />
                </div>
                <div className="absolute top-4 left-4">
                   <Badge className={cn(

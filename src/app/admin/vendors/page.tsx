@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -31,11 +31,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
 
 export default function AdminVendors() {
   const db = useFirestore();
   const vendorsQuery = query(collection(db, 'vendors'), where('business_type', '==', 'furniture_store'));
-  const { data: vendors, loading } = useCollection(vendorsQuery);
+  const { data: vendors } = useCollection(vendorsQuery);
 
   const [searchTerm, setSearchTerm] = useState('');
 

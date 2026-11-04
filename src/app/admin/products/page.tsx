@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -18,20 +17,21 @@ import { Input } from '@/components/ui/input';
 import { 
   Search, 
   Plus, 
-  Package, 
   Eye, 
   Edit3, 
   Trash2, 
   Filter,
   ArrowUpDown,
-  Layers
+  Layers,
+  Store
 } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export default function AdminProducts() {
   const db = useFirestore();
   const q = query(collection(db, 'products'), orderBy('created_at', 'desc'));
-  const { data: products, loading } = useCollection(q);
+  const { data: products } = useCollection(q);
 
   const mockProducts = [
     { id: '1', name_ar: 'طقم ديوان حضرمي', price: 450000, category_id: 'living', status: 'approved', store: 'ورشة المكلا' },
