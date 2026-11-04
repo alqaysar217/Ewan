@@ -32,7 +32,7 @@
     --input: 180 8% 91%;
     --ring: 188 75% 34%;
     
-    --radius: 0.35rem; /* Shaper look as requested */
+    --radius: 0.75rem; /* Softer corners as requested (around 12px) */
   }
 
   .dark {

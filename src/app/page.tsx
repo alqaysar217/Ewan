@@ -23,10 +23,7 @@ import {
   Star,
   Quote,
   CheckCircle2,
-  Hammer,
-  Palette,
   MapPin,
-  HelpCircle,
   Percent,
   Eye,
   ArrowRight
@@ -284,63 +281,60 @@ export default function HomePage() {
                 { id: 3, name: 'طاولة طعام دائرية مودرن', category: 'مطابخ', price: 120000, oldPrice: 150000, discount: 20, store: 'مودرن هوم', img: 'https://images.unsplash.com/photo-1577145000247-a737ad733c99?auto=format&fit=crop&q=80&w=600' },
                 { id: 4, name: 'كرسي مكتب مريح', category: 'مكاتب', price: 45000, oldPrice: 60000, discount: 25, store: 'الرويشان للأثاث', img: 'https://images.unsplash.com/photo-1505797149-43b0ad766a0e?auto=format&fit=crop&q=80&w=600' }
               ].map((product) => (
-                <div key={product.id} className="group relative bg-white border border-border/50 rounded-md overflow-hidden hover:shadow-2xl transition-all duration-500">
-                  <div className="relative aspect-[4/5] overflow-hidden">
+                <Link href={`/product/${product.id}`} key={product.id} className="group flex flex-col bg-white border border-border/50 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden">
                     <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" data-ai-hint="furniture product" />
                     
-                    {/* Blurry Primary Overlay */}
-                    <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                      <Button variant="white" size="icon" className="w-12 h-12 rounded-md shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform">
-                        <Eye className="w-6 h-6 text-secondary" />
-                      </Button>
-                      <Button className="bg-white text-secondary hover:bg-primary hover:text-white font-bold rounded-md shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform delay-75 px-6">
+                    {/* Blurry Primary Overlay on Hover */}
+                    <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                       <Button variant="white" className="bg-white text-secondary font-bold rounded-md shadow-xl px-6">
                         عرض التفاصيل
                       </Button>
                     </div>
 
-                    <div className="absolute top-4 left-4">
-                      <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-md text-secondary hover:text-destructive shadow-sm">
+                    <div className="absolute top-3 left-3">
+                      <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-full text-secondary hover:text-destructive shadow-sm w-9 h-9">
                         <Heart className="w-5 h-5" />
                       </Button>
                     </div>
                     
-                    <div className="absolute top-4 right-4 flex flex-col gap-2">
-                      <Badge className="bg-destructive text-white font-bold rounded-md px-2 py-1 flex items-center gap-1">
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-destructive text-white font-bold rounded-md px-2 py-1 flex items-center gap-1 shadow-sm">
                         <Percent className="w-3 h-3" /> {product.discount}%
                       </Badge>
-                      <Badge className="bg-secondary text-white font-bold rounded-md px-2 py-1">جديد</Badge>
                     </div>
                   </div>
 
-                  <div className="p-5 space-y-3">
+                  <div className="p-4 flex flex-col flex-1 gap-2">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">{product.category}</p>
-                        <h4 className="text-lg font-black text-secondary group-hover:text-primary transition-colors truncate">{product.name}</h4>
-                      </div>
+                      <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{product.category}</p>
                       <div className="flex items-center gap-1 text-amber-500">
                         <Star className="w-3 h-3 fill-current" />
                         <span className="text-[10px] font-bold">4.9</span>
                       </div>
                     </div>
                     
-                    <div className="flex flex-col">
-                      <span className="text-xl font-black text-secondary">{product.price.toLocaleString()} <span className="text-[10px] font-bold">ريال يمني</span></span>
-                      <span className="text-xs font-bold text-muted-foreground line-through">{product.oldPrice.toLocaleString()} ريال</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
-                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[8px] font-black text-secondary uppercase">
-                        {product.store[0]}
+                    <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors truncate">{product.name}</h4>
+                    
+                    <div className="mt-auto pt-2 space-y-3">
+                      <div className="flex flex-col">
+                        <span className="text-lg font-black text-secondary leading-none">{product.price.toLocaleString()} <span className="text-[10px] font-bold italic">ريال يمني</span></span>
+                        <span className="text-xs font-bold text-muted-foreground line-through mt-0.5">{product.oldPrice.toLocaleString()} ريال</span>
                       </div>
-                      <span className="text-[10px] font-bold text-muted-foreground">{product.store}</span>
-                    </div>
 
-                    <Button className="w-full mt-2 bg-secondary hover:bg-primary text-white font-bold gap-2 h-12 rounded-md transition-all">
-                      <ShoppingBag className="w-4 h-4" /> إضافة للسلة
-                    </Button>
+                      <div className="flex items-center gap-2 pb-2">
+                        <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center text-[8px] font-black text-secondary uppercase">
+                          {product.store[0]}
+                        </div>
+                        <span className="text-[10px] font-bold text-muted-foreground">{product.store}</span>
+                      </div>
+
+                      <Button className="w-full bg-secondary hover:bg-primary text-white font-bold gap-2 h-10 rounded-md transition-all">
+                        <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -369,7 +363,7 @@ export default function HomePage() {
                 { name: 'تصاميم رؤية', type: 'تصميم داخلي', rating: 4.8, location: 'عدن، المنصورة', img: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=600', desc: 'نحول مساحات منزلك إلى لوحات فنية بلمسات عصرية وأسعار تنافسية.' },
                 { name: 'الخشب الفاخر', type: 'أثاث مخصص', rating: 5.0, location: 'حضرموت، المكلا', img: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=600', desc: 'أثاث منزلي ومكتبي مخصص حسب الطلب من أفضل أنواع الأخشاب الطبيعية.' }
               ].map((vendor, idx) => (
-                <div key={idx} className="bg-white rounded-md shadow-sm border border-border/50 group hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                <div key={idx} className="bg-white rounded-lg shadow-sm border border-border/50 group hover:shadow-xl transition-all overflow-hidden flex flex-col">
                   <div className="relative h-56 w-full">
                     <Image src={vendor.img} alt={vendor.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" data-ai-hint="carpentry workshop" />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-md shadow-lg flex items-center gap-1">
@@ -428,7 +422,7 @@ export default function HomePage() {
                 { name: 'سارة المطيري', role: 'مصممة مستقلة', comment: 'إيوان سهل علي التواصل مع أفضل النجارين في اليمن. القطع المخصصة كانت تحفة فنية حقيقية.', rating: 5 },
                 { name: 'خالد عبد الله', role: 'عميل جديد', comment: 'سرعة في التوصيل واحترافية في التعامل. المتجر يضم تشكيلة واسعة تناسب كل الأذواق.', rating: 4 }
               ].map((testimonial, idx) => (
-                <div key={idx} className="bg-white/5 p-8 rounded-md border border-white/10 relative group hover:bg-white/10 transition-all duration-300">
+                <div key={idx} className="bg-white/5 p-8 rounded-lg border border-white/10 relative group hover:bg-white/10 transition-all duration-300">
                   <Quote className="w-10 h-10 text-primary/20 absolute top-6 left-6" />
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -474,7 +468,7 @@ export default function HomePage() {
                 { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
                 { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." }
               ].map((item, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-md px-6 overflow-hidden">
+                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-lg px-6 overflow-hidden">
                   <AccordionTrigger className="text-lg font-bold text-secondary hover:no-underline py-6">{item.q}</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed text-[15px] pb-6">
                     {item.a}

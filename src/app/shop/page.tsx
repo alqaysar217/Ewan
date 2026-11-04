@@ -4,23 +4,19 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
 import { 
   Search, 
   Filter, 
-  ChevronDown, 
   Heart, 
   ShoppingBag, 
   Sparkles, 
   LayoutGrid, 
   List,
-  SlidersHorizontal,
   Star,
-  Eye,
   Percent
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Select, 
@@ -147,10 +143,10 @@ export default function ShopPage() {
             ) : (
               <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-8`}>
                 {products?.map((product: any) => (
-                  <Card key={product.id} className="group overflow-hidden rounded-lg border-none shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+                  <Link href={`/product/${product.id}`} key={product.id} className="group bg-white border border-border/50 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                    <div className="relative aspect-square overflow-hidden bg-gray-50">
                       <Image 
-                        src={`https://picsum.photos/seed/${product.id}/600/800`} 
+                        src={`https://picsum.photos/seed/${product.id}/600/600`} 
                         alt={product.name_ar} 
                         fill 
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -158,61 +154,59 @@ export default function ShopPage() {
                       />
                       
                       {/* Overlay */}
-                      <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                         <Button size="icon" className="w-12 h-12 bg-white text-secondary hover:bg-primary hover:text-white rounded-lg shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform">
-                            <Eye className="w-6 h-6" />
-                         </Button>
-                         <Button className="bg-white text-secondary hover:bg-primary hover:text-white font-bold rounded-lg shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform delay-75">
+                      <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                         <Button className="bg-white text-secondary font-bold rounded-md shadow-xl px-6">
                             عرض التفاصيل
                          </Button>
                       </div>
 
-                      <div className="absolute top-4 left-4 flex flex-col gap-2">
-                        <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-lg text-secondary hover:text-destructive shadow-sm">
+                      <div className="absolute top-3 left-3">
+                        <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-full text-secondary hover:text-destructive shadow-sm w-9 h-9">
                           <Heart className="w-5 h-5" />
                         </Button>
                       </div>
 
-                      <div className="absolute top-4 right-4 flex flex-col gap-2">
-                        <Badge className="bg-secondary text-white font-bold px-3 py-1 rounded-lg border-none">جديد</Badge>
-                        <Badge className="bg-destructive text-white font-bold px-3 py-1 rounded-lg border-none flex items-center gap-1">
+                      <div className="absolute top-3 right-3">
+                        <Badge className="bg-destructive text-white font-bold px-2 py-1 rounded-md border-none flex items-center gap-1 shadow-sm">
                           <Percent className="w-3 h-3" /> ٢٥٪
                         </Badge>
                       </div>
-
-                      <div className="absolute bottom-4 right-4 left-4 flex justify-between items-center translate-y-12 group-hover:translate-y-0 transition-transform bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
-                        <div className="flex items-center gap-1">
-                           <Star className="w-3 h-3 text-amber-500 fill-current" />
-                           <span className="text-xs font-black text-secondary">٤.٩</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-muted-foreground">متجر إتقان</span>
-                      </div>
                     </div>
 
-                    <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
-                      <div className="space-y-2">
+                    <div className="p-4 space-y-3 flex-1 flex flex-col">
+                      <div className="flex justify-between items-start">
                         <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{product.category_id || 'أثاث منزلي'}</p>
-                        <h4 className="text-lg font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{product.name_ar}</h4>
+                        <div className="flex items-center gap-1 text-amber-500">
+                           <Star className="w-3 h-3 text-amber-500 fill-current" />
+                           <span className="text-[10px] font-black text-secondary">٤.٩</span>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-3 pt-2">
+                      <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{product.name_ar}</h4>
+
+                      <div className="mt-auto pt-2 space-y-3">
                         <div className="flex flex-col">
-                          <span className="text-2xl font-black text-secondary">
-                            {(product.price || 0).toLocaleString()} <span className="text-[10px] font-bold">ريال يمني</span>
+                          <span className="text-lg font-black text-secondary leading-none">
+                            {(product.price || 0).toLocaleString()} <span className="text-[10px] font-bold italic">ريال يمني</span>
                           </span>
-                          <span className="text-xs font-bold text-muted-foreground line-through">
+                          <span className="text-xs font-bold text-muted-foreground line-through mt-0.5">
                             {(product.price ? product.price * 1.25 : 0).toLocaleString()} ريال
                           </span>
                         </div>
-                      </div>
 
-                      <div className="pt-4 mt-auto border-t border-gray-50 flex gap-2">
-                        <Button className="flex-1 rounded-lg bg-secondary hover:bg-primary text-white font-bold gap-2 h-11 transition-all">
+                        <div className="flex items-center gap-2 pb-2">
+                          <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center text-[8px] font-black text-secondary uppercase">
+                            م
+                          </div>
+                          <span className="text-[10px] font-bold text-muted-foreground">متجر إتقان</span>
+                        </div>
+
+                        <Button className="w-full bg-secondary hover:bg-primary text-white font-bold gap-2 h-10 rounded-md transition-all">
                           <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </Link>
                 ))}
               </div>
             )}
