@@ -39,7 +39,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
-import Link from 'link';
+import Link from 'next/link';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
 
