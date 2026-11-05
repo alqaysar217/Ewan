@@ -1,32 +1,29 @@
+
 'use client';
 
 import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, orderBy, deleteDoc, doc, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Search, 
   Plus, 
-  Eye, 
   Edit3, 
   Trash2, 
   Filter,
-  ArrowUpDown,
   Layers,
   Store,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  Image as ImageIcon,
+  Info,
+  Package,
+  Settings,
+  Star
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -37,7 +34,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -50,7 +46,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function AdminProducts() {
   const db = useFirestore();
@@ -58,24 +56,29 @@ export default function AdminProducts() {
   const { data: products, loading } = useCollection(q);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDialogOpen, setIsSearchExpanded] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   
   // Form State
   const [formData, setFormData] = useState({
     name_ar: '',
+    description_ar: '',
     price: '',
     category_id: 'living',
-    status: 'approved'
+    status: 'approved',
+    image_base64: ''
   });
 
-  const mockProducts = [
-    { id: '1', name_ar: 'طقم ديوان حضرمي', price: 450000, category_id: 'living', status: 'approved', store: 'ورشة المكلا' },
-    { id: '2', name_ar: 'سرير كلاسيكي فاخر', price: 280000, category_id: 'bedroom', status: 'pending', store: 'أثاث الخليج' },
-    { id: '3', name_ar: 'طاولة طعام دائرية', price: 120000, category_id: 'dining', status: 'approved', store: 'مودرن هوم' },
-  ];
-
-  const displayed = (products && products.length > 0) ? products : mockProducts;
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image_base64: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSaveProduct = async () => {
     try {
@@ -96,9 +99,9 @@ export default function AdminProducts() {
         });
         toast({ title: "تمت الإضافة", description: "تم إضافة منتج جديد للكتالوج" });
       }
-      setIsSearchExpanded(false);
+      setIsDialogOpen(false);
       setEditingProduct(null);
-      setFormData({ name_ar: '', price: '', category_id: 'living', status: 'approved' });
+      setFormData({ name_ar: '', description_ar: '', price: '', category_id: 'living', status: 'approved', image_base64: '' });
     } catch (e) {
       toast({ variant: "destructive", title: "خطأ", description: "فشل في حفظ البيانات" });
     }
@@ -116,191 +119,206 @@ export default function AdminProducts() {
   const openEdit = (product: any) => {
     setEditingProduct(product);
     setFormData({
-      name_ar: product.name_ar,
-      price: product.price.toString(),
+      name_ar: product.name_ar || '',
+      description_ar: product.description_ar || '',
+      price: product.price?.toString() || '',
       category_id: product.category_id || 'living',
-      status: product.status || 'approved'
+      status: product.status || 'approved',
+      image_base64: product.image_base64 || ''
     });
-    setIsSearchExpanded(true);
+    setIsDialogOpen(true);
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-black text-secondary">إدارة الكتالوج والمنتجات</h1>
-          <p className="text-muted-foreground font-bold mt-1">مراجعة المنتجات المرفوعة من التجار وضمان جودة العرض والبيانات.</p>
+          <h1 className="text-3xl font-black text-secondary">إدارة الكتالوج</h1>
+          <p className="text-muted-foreground font-bold mt-1">إدارة المنتجات، التعديل، والحذف مع معاينة فورية.</p>
         </div>
-        <div className="flex gap-3">
-          <Dialog open={isDialogOpen} onOpenChange={setIsSearchExpanded}>
-            <DialogTrigger asChild>
-              <Button className="rounded-xl h-12 px-8 font-black shadow-lg shadow-primary/20" onClick={() => {setEditingProduct(null); setFormData({name_ar: '', price: '', category_id: 'living', status: 'approved'})}}>
-                <Plus className="w-5 h-5 ml-2" /> إضافة منتج
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] rounded-[24px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black text-secondary">{editingProduct ? 'تعديل المنتج' : 'إضافة منتج جديد'}</DialogTitle>
-                <DialogDescription className="font-bold">أدخل تفاصيل المنتج بدقة لضمان أفضل عرض للعملاء.</DialogDescription>
+        <Button 
+          onClick={() => {
+            setEditingProduct(null); 
+            setFormData({name_ar: '', description_ar: '', price: '', category_id: 'living', status: 'approved', image_base64: ''});
+            setIsDialogOpen(true);
+          }}
+          className="rounded-xl h-12 px-8 font-black shadow-lg shadow-primary/20"
+        >
+          <Plus className="w-5 h-5 ml-2" /> إضافة منتج جديد
+        </Button>
+      </div>
+
+      <div className="relative w-full max-w-xl">
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Input 
+          placeholder="ابحث عن منتج..." 
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="pr-12 h-14 bg-white border-none shadow-sm rounded-xl font-bold focus:ring-2 focus:ring-primary/20"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="font-bold text-muted-foreground">جاري تحميل الكتالوج...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products?.filter(p => p.name_ar?.toLowerCase().includes(searchTerm.toLowerCase())).map((p: any) => (
+            <Card key={p.id} className="rounded-3xl border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group border border-transparent hover:border-primary/20">
+              <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <Image 
+                  src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/600`} 
+                  alt={p.name_ar} 
+                  fill 
+                  className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+                <div className="absolute top-4 right-4 flex gap-2">
+                   <Badge className={cn(
+                     "font-black px-2 py-1 rounded-lg border-none shadow-lg",
+                     p.status === 'approved' ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
+                   )}>
+                     {p.status === 'approved' ? 'منشور' : 'مراجعة'}
+                   </Badge>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                   <div className="flex w-full gap-2">
+                      <Button onClick={() => openEdit(p)} className="flex-1 rounded-xl bg-white text-secondary hover:bg-primary hover:text-white font-black">تعديل</Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon" className="rounded-xl"><Trash2 className="w-5 h-5" /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-3xl">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-2xl font-black text-secondary flex items-center gap-3">
+                              <AlertTriangle className="text-destructive" /> حذف المنتج
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="font-bold">
+                              هل أنت متأكد من حذف "{p.name_ar}"؟ لا يمكن التراجع عن هذا الإجراء.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="rounded-xl">إلغاء</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(p.id)} className="rounded-xl bg-destructive text-white font-black">نعم، احذف</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                   </div>
+                </div>
+              </div>
+              <CardContent className="p-5 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h4 className="font-black text-secondary line-clamp-1">{p.name_ar}</h4>
+                  <div className="flex items-center gap-1 text-amber-500 shrink-0">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span className="text-xs font-black">4.9</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                   <p className="text-lg font-black text-primary">{(p.price || 0).toLocaleString()} <span className="text-[10px]">ر.ي</span></p>
+                   <Badge variant="outline" className="text-[10px] font-bold border-primary/20 bg-primary/5">{p.category_id}</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Edit/Add Dialog with Internal Tabs */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-3xl border-none shadow-2xl">
+          <Tabs defaultValue="basic" className="w-full">
+            <div className="bg-secondary p-6 pb-0">
+              <DialogHeader className="mb-6">
+                <DialogTitle className="text-2xl font-black text-white">{editingProduct ? 'تعديل المنتج' : 'منتج جديد'}</DialogTitle>
+                <DialogDescription className="text-gray-400 font-bold">إدارة تفاصيل المنتج، الصور، والإعدادات المتقدمة.</DialogDescription>
               </DialogHeader>
-              <div className="grid gap-6 py-4">
+              <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-14 p-0 gap-6">
+                <TabsTrigger value="basic" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
+                  <Package className="w-4 h-4" /> البيانات الأساسية
+                </TabsTrigger>
+                <TabsTrigger value="media" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
+                  <ImageIcon className="w-4 h-4" /> الوسائط
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
+                  <Settings className="w-4 h-4" /> الإعدادات
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="p-8 max-h-[60vh] overflow-y-auto">
+              <TabsContent value="basic" className="space-y-6 mt-0">
                 <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary mr-1">اسم المنتج بالعربية</label>
-                  <Input 
-                    value={formData.name_ar} 
-                    onChange={e => setFormData({...formData, name_ar: e.target.value})}
-                    placeholder="مثال: أريكة مخملية فاخرة" 
-                    className="rounded-xl h-12" 
-                  />
+                  <label className="text-sm font-black text-secondary">اسم المنتج (عربي)</label>
+                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} className="rounded-xl h-12" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary mr-1">السعر (ريال يمني)</label>
-                  <Input 
-                    type="number"
-                    value={formData.price} 
-                    onChange={e => setFormData({...formData, price: e.target.value})}
-                    placeholder="0.00" 
-                    className="rounded-xl h-12" 
-                  />
+                  <label className="text-sm font-black text-secondary">الوصف التفصيلي</label>
+                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} className="rounded-xl min-h-[120px]" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-black text-secondary mr-1">التصنيف</label>
-                    <select 
-                      value={formData.category_id}
-                      onChange={e => setFormData({...formData, category_id: e.target.value})}
-                      className="w-full h-12 rounded-xl border border-input bg-background px-3 font-bold outline-none focus:ring-2 focus:ring-primary/20"
-                    >
+                    <label className="text-sm font-black text-secondary">السعر</label>
+                    <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="rounded-xl h-12" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-black text-secondary">التصنيف</label>
+                    <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-12 rounded-xl border border-input bg-background px-3 font-bold">
                       <option value="living">غرف معيشة</option>
                       <option value="bedroom">غرف نوم</option>
                       <option value="dining">طعام</option>
                       <option value="office">مكاتب</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-black text-secondary mr-1">الحالة</label>
-                    <select 
-                      value={formData.status}
-                      onChange={e => setFormData({...formData, status: e.target.value})}
-                      className="w-full h-12 rounded-xl border border-input bg-background px-3 font-bold outline-none focus:ring-2 focus:ring-primary/20"
-                    >
+                </div>
+              </TabsContent>
+
+              <TabsContent value="media" className="space-y-6 mt-0">
+                <div className="space-y-4">
+                  <label className="text-sm font-black text-secondary">صورة المنتج الرئيسية</label>
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-3xl p-10 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                    {formData.image_base64 ? (
+                      <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
+                        <Image src={formData.image_base64} alt="Preview" fill className="object-cover" />
+                        <Button variant="destructive" size="sm" className="absolute top-2 right-2 rounded-lg" onClick={(e) => { e.stopPropagation(); setFormData({...formData, image_base64: ''})}}>إزالة</Button>
+                      </div>
+                    ) : (
+                      <div className="text-center space-y-2">
+                        <Upload className="w-12 h-12 text-primary mx-auto opacity-40" />
+                        <p className="font-black text-secondary">اسحب الصورة هنا أو انقر للرفع</p>
+                        <p className="text-xs text-muted-foreground">سيتم تحويل الصورة إلى نص وتخزينها في قاعدة البيانات</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="settings" className="space-y-6 mt-0">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    <div className="space-y-1">
+                      <p className="font-black text-secondary">حالة النشر</p>
+                      <p className="text-xs text-muted-foreground">تحديد ما إذا كان المنتج سيظهر للعملاء أم لا</p>
+                    </div>
+                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="h-10 rounded-lg border px-3 font-bold">
                       <option value="approved">منشور</option>
-                      <option value="pending">قيد المراجعة</option>
+                      <option value="pending">مسودة / مراجعة</option>
                     </select>
                   </div>
                 </div>
-              </div>
-              <DialogFooter className="gap-2">
-                <Button variant="outline" className="rounded-xl h-12 px-6" onClick={() => setIsSearchExpanded(false)}>إلغاء</Button>
-                <Button className="rounded-xl h-12 px-10 font-black" onClick={handleSaveProduct}>حفظ التغييرات</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+              </TabsContent>
+            </div>
 
-      <Card className="rounded-3xl border-none shadow-sm overflow-hidden bg-white">
-        <CardHeader className="p-8 border-b border-gray-50 flex flex-row items-center justify-between space-y-0">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input 
-              placeholder="ابحث عن منتج بالاسم أو التاجر..." 
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="pr-12 h-12 bg-gray-50 border-none rounded-xl font-bold"
-            />
-          </div>
-          <div className="flex items-center gap-4 text-sm font-bold text-muted-foreground">
-             <span className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg"><Layers className="w-4 h-4 text-primary" /> {displayed.length} منتج</span>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-gray-50/50">
-              <TableRow className="border-none">
-                <TableHead className="text-right h-16 font-black text-secondary px-8">المنتج</TableHead>
-                <TableHead className="text-right h-16 font-black text-secondary">التصنيف</TableHead>
-                <TableHead className="text-right h-16 font-black text-secondary">السعر</TableHead>
-                <TableHead className="text-right h-16 font-black text-secondary">التاجر / الورشة</TableHead>
-                <TableHead className="text-right h-16 font-black text-secondary">الحالة</TableHead>
-                <TableHead className="text-left h-16 font-black text-secondary px-8">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
-                    <p className="font-bold text-muted-foreground">جاري تحميل المنتجات...</p>
-                  </TableCell>
-                </TableRow>
-              ) : displayed.filter(p => p.name_ar?.toLowerCase().includes(searchTerm.toLowerCase())).map((p: any) => (
-                <TableRow key={p.id} className="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                  <TableCell className="px-8 font-black text-secondary">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg relative overflow-hidden shrink-0">
-                        <Image src={`https://picsum.photos/seed/${p.id}/100/100`} alt={p.name_ar} fill className="object-cover" />
-                      </div>
-                      {p.name_ar}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-gray-50 text-muted-foreground border-none font-bold rounded-lg px-3 py-1">
-                      {p.category_id === 'living' ? 'غرف معيشة' : p.category_id === 'bedroom' ? 'غرف نوم' : 'طعام'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-black text-primary">{(p.price || 0).toLocaleString()} ر.ي</TableCell>
-                  <TableCell className="font-bold text-secondary">
-                     <span className="flex items-center gap-2"><Store className="w-4 h-4 text-gray-300" /> {p.store || 'إيوان (داخلي)'}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn(
-                      "font-black px-3 py-1 rounded-lg",
-                      p.status === 'approved' ? "bg-emerald-50 text-emerald-600 border-none" : "bg-amber-50 text-amber-600 border-none"
-                    )}>
-                      {p.status === 'approved' ? 'منشور' : 'بانتظار المراجعة'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-left px-8">
-                    <div className="flex items-center justify-end gap-2">
-                       <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg hover:bg-white shadow-sm" onClick={() => openEdit(p)}>
-                         <Edit3 className="w-4 h-4 text-primary" />
-                       </Button>
-                       
-                       <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="w-9 h-9 rounded-lg hover:bg-white shadow-sm">
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-[24px]">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle className="text-2xl font-black text-secondary flex items-center gap-3">
-                                <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center text-destructive">
-                                  <AlertTriangle className="w-6 h-6" />
-                                </div>
-                                تأكيد الحذف النهائي
-                              </AlertDialogTitle>
-                              <AlertDialogDescription className="text-base font-bold py-4 leading-relaxed">
-                                هل أنت متأكد من حذف المنتج <span className="text-secondary">"{p.name_ar}"</span>؟ هذه العملية لا يمكن التراجع عنها وسيتم حذف كافة البيانات المرتبطة به.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="gap-2 pt-4">
-                              <AlertDialogCancel className="rounded-xl h-12 px-6 border-none bg-gray-100 font-bold">إلغاء</AlertDialogCancel>
-                              <AlertDialogAction className="rounded-xl h-12 px-8 bg-destructive text-white font-black hover:bg-destructive/90" onClick={() => handleDelete(p.id)}>
-                                نعم، احذف المنتج
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                       </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            <div className="p-6 bg-gray-50 border-t flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl px-8 h-12 font-bold">إلغاء</Button>
+              <Button onClick={handleSaveProduct} className="rounded-xl px-12 h-12 font-black shadow-lg shadow-primary/20">حفظ التغييرات</Button>
+            </div>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
