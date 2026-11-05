@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -22,7 +21,8 @@ import {
   Award,
   ChevronLeft,
   Mail,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
 import {
   Dialog,
