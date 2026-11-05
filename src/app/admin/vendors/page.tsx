@@ -25,7 +25,8 @@ import {
   Layers,
   Sparkles,
   User,
-  Trash2
+  Trash2,
+  Package
 } from 'lucide-react';
 import {
   Dialog,
