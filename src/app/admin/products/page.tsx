@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -47,6 +46,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 
+// وظيفة ضغط الصور التلقائي
+const compressImage = (base64Str: string, maxWidth = 1000, maxHeight = 800): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
+    };
+  });
+};
+
 export default function AdminProducts() {
   const db = useFirestore();
   const q = query(collection(db, 'products'), orderBy('created_at', 'desc'));
@@ -55,6 +85,7 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const [formData, setFormData] = useState({
     name_ar: '',
@@ -69,15 +100,18 @@ export default function AdminProducts() {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, image_base64: reader.result as string });
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result as string);
+        setFormData(prev => ({ ...prev, image_base64: compressed }));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleSaveProduct = async () => {
+    if (isSaving) return;
     try {
+      setIsSaving(true);
       const data = {
         ...formData,
         price: Number(formData.price),
@@ -99,6 +133,8 @@ export default function AdminProducts() {
       setEditingProduct(null);
     } catch (e) {
       toast({ variant: "destructive", title: "فشل في الحفظ" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -185,19 +221,19 @@ export default function AdminProducts() {
                         <AlertDialogTrigger asChild>
                           <Button variant="destructive" size="icon" className="rounded-[15px] w-14 h-14 shadow-xl"><Trash2 className="w-6 h-6" /></Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="rounded-[30px] border-none p-10 font-cairo">
+                        <AlertDialogContent className="rounded-[30px] border-none p-10 font-cairo" dir="rtl">
                           <AlertDialogHeader className="space-y-4">
                             <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto">
                                <AlertTriangle className="w-10 h-10" />
                             </div>
-                            <AlertDialogTitle className="text-3xl font-black text-secondary text-center">تأكيد الحذف النهائي</AlertDialogTitle>
+                            <AlertDialogTitle className="text-3xl font-black text-secondary text-center">تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription className="font-bold text-center text-lg leading-relaxed">
-                              هل أنت متأكد من رغبتك في حذف "{p.name_ar}"؟ لا يمكن التراجع عن هذا الإجراء وسيختفي المنتج من المتجر فوراً.
+                              هل أنت متأكد من رغبتك في حذف "{p.name_ar}"؟
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter className="flex-col sm:flex-row-reverse gap-4 mt-8">
-                            <AlertDialogAction onClick={() => handleDelete(p.id)} className="rounded-xl bg-destructive text-white font-black h-14 px-8 text-lg">نعم، احذف نهائياً</AlertDialogAction>
-                            <AlertDialogCancel className="rounded-xl h-14 px-8 font-black text-lg">إلغاء الأمر</AlertDialogCancel>
+                          <AlertDialogFooter className="flex-row gap-4 mt-8">
+                            <AlertDialogAction onClick={() => handleDelete(p.id)} className="flex-1 rounded-xl bg-destructive text-white font-black h-14 text-lg">نعم، احذف</AlertDialogAction>
+                            <AlertDialogCancel className="flex-1 rounded-xl h-14 font-black text-lg">إلغاء</AlertDialogCancel>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -222,15 +258,19 @@ export default function AdminProducts() {
         </div>
       )}
 
-      {/* Edit/Add Dialog with Internal Tabs */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden rounded-[35px] border-none shadow-2xl font-cairo">
+      <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!isSaving) setIsDialogOpen(open); }}>
+        <DialogContent 
+          className="sm:max-w-[850px] p-0 overflow-hidden rounded-[35px] border-none shadow-2xl font-cairo" 
+          dir="rtl"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <Tabs defaultValue="basic" className="w-full">
             <div className="bg-secondary p-10 pb-0 text-white relative">
               <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
               <DialogHeader className="mb-10 relative z-10">
-                <DialogTitle className="text-4xl font-black">{editingProduct ? 'تعديل بيانات المنتج' : 'إضافة قطعة جديدة للكتالوج'}</DialogTitle>
-                <DialogDescription className="text-gray-400 font-bold text-lg mt-2">إدارة شاملة لكافة تفاصيل المنتج والوسائط المرئية.</DialogDescription>
+                <DialogTitle className="text-4xl font-black">{editingProduct ? 'تعديل بيانات المنتج' : 'إضافة قطعة جديدة'}</DialogTitle>
+                <DialogDescription className="text-gray-400 font-bold text-lg mt-2">إدارة شاملة لكافة تفاصيل المنتج والوسائط.</DialogDescription>
               </DialogHeader>
               <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-16 p-0 gap-10">
                 <TabsTrigger value="basic" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-lg gap-3 transition-all">
@@ -245,15 +285,15 @@ export default function AdminProducts() {
               </TabsList>
             </div>
 
-            <div className="p-12 max-h-[65vh] overflow-y-auto bg-white">
+            <div className="p-12 max-h-[60vh] overflow-y-auto bg-white">
               <TabsContent value="basic" className="space-y-10 mt-0">
                 <div className="space-y-3">
-                  <label className="text-lg font-black text-secondary mr-2">اسم المنتج التجاري (عربي)</label>
-                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} placeholder="مثال: أريكة مخملية زرقاء فاخرة" className="rounded-2xl h-16 text-lg border-gray-100 bg-gray-50 focus:bg-white transition-all shadow-inner" />
+                  <label className="text-lg font-black text-secondary mr-2">اسم المنتج التجاري</label>
+                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} placeholder="مثال: أريكة مخملية زرقاء" className="rounded-2xl h-16 text-lg border-gray-100 bg-gray-50 shadow-inner" />
                 </div>
                 <div className="space-y-3">
-                  <label className="text-lg font-black text-secondary mr-2">وصف تفصيلي للقطعة</label>
-                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} placeholder="تحدث عن خامات الخشب، نوع القماش، وجمالية التصميم..." className="rounded-2xl min-h-[180px] text-lg border-gray-100 bg-gray-50 focus:bg-white transition-all py-6 shadow-inner" />
+                  <label className="text-lg font-black text-secondary mr-2">وصف تفصيلي</label>
+                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} placeholder="تحدث عن خامات الخشب، نوع القماش..." className="rounded-2xl min-h-[150px] text-lg border-gray-100 bg-gray-50 py-6 shadow-inner" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
@@ -262,7 +302,7 @@ export default function AdminProducts() {
                   </div>
                   <div className="space-y-3">
                     <label className="text-lg font-black text-secondary mr-2">الفئة / القسم</label>
-                    <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-16 rounded-2xl border border-gray-100 bg-gray-50 px-6 font-black text-lg outline-none focus:ring-2 focus:ring-primary/20 shadow-inner">
+                    <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-16 rounded-2xl border-none bg-gray-50 px-6 font-black text-lg outline-none shadow-inner">
                       <option value="living">غرف معيشة</option>
                       <option value="bedroom">غرف نوم</option>
                       <option value="dining">طاولات طعام</option>
@@ -275,26 +315,26 @@ export default function AdminProducts() {
 
               <TabsContent value="media" className="space-y-10 mt-0">
                 <div className="space-y-6">
-                  <label className="text-lg font-black text-secondary text-center block">صورة المنتج الرئيسية (سيتم تحويلها لبيانات نصية)</label>
-                  <div className="flex flex-col items-center justify-center border-4 border-dashed border-gray-100 rounded-[35px] p-16 bg-gray-50/50 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer relative group">
+                  <label className="text-lg font-black text-secondary text-center block">صورة المنتج الرئيسية (يتم ضغطها تلقائياً)</label>
+                  <div className="flex flex-col items-center justify-center border-4 border-dashed border-gray-100 rounded-[35px] p-16 bg-gray-50/50 hover:bg-primary/5 transition-all cursor-pointer relative group">
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                     {formData.image_base64 ? (
                       <div className="relative w-full aspect-video rounded-[25px] overflow-hidden shadow-2xl group/img">
                         <Image src={formData.image_base64} alt="Preview" fill className="object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                             <Button variant="destructive" size="lg" className="rounded-xl font-black gap-2 h-14 px-8" onClick={(e) => { e.stopPropagation(); setFormData({...formData, image_base64: ''})}}>
-                               <Trash2 className="w-5 h-5" /> إزالة واستبدال الصورة
+                               <Trash2 className="w-5 h-5" /> إزالة الصورة
                             </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="text-center space-y-6">
-                        <div className="w-24 h-24 bg-white rounded-[25px] flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                        <div className="w-24 h-24 bg-white rounded-[25px] flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-all duration-500">
                            <Upload className="w-10 h-10 text-primary" />
                         </div>
                         <div>
                            <p className="text-2xl font-black text-secondary">اسحب الصورة هنا أو انقر للتصفح</p>
-                           <p className="text-muted-foreground font-bold mt-2">دقة عالية لضمان أفضل ظهور للعميل</p>
+                           <p className="text-muted-foreground font-bold mt-2">سيتم تحسين الحجم تلقائياً للحفاظ على جودة العرض</p>
                         </div>
                       </div>
                     )}
@@ -304,14 +344,14 @@ export default function AdminProducts() {
 
               <TabsContent value="settings" className="space-y-8 mt-0">
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between p-8 bg-gray-50 rounded-[25px] border border-gray-100 hover:border-primary/20 transition-all">
+                  <div className="flex items-center justify-between p-8 bg-gray-50 rounded-[25px] border border-gray-100 transition-all">
                     <div className="space-y-2">
                       <p className="text-xl font-black text-secondary flex items-center gap-3">
                          <CheckCircle2 className="w-6 h-6 text-primary" /> حالة النشر العامة
                       </p>
-                      <p className="text-base text-muted-foreground font-medium">تحكم في ظهور هذا المنتج لزوار المنصة بشكل فوري.</p>
+                      <p className="text-base text-muted-foreground font-medium">تحكم في ظهور هذا المنتج لزوار المنصة.</p>
                     </div>
-                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="h-14 rounded-xl border border-gray-200 px-6 font-black bg-white shadow-sm outline-none focus:ring-2 focus:ring-primary/20">
+                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="h-14 rounded-xl border-none px-6 font-black bg-white shadow-sm outline-none">
                       <option value="approved">منشور (مرئي للجميع)</option>
                       <option value="pending">مسودة (للمراجعة فقط)</option>
                     </select>
@@ -321,8 +361,10 @@ export default function AdminProducts() {
             </div>
 
             <div className="p-10 bg-gray-50 border-t flex justify-end gap-5">
-              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-xl px-10 h-16 font-black text-xl hover:bg-white">إلغاء</Button>
-              <Button onClick={handleSaveProduct} className="rounded-xl px-16 h-16 font-black text-xl bg-secondary text-white shadow-2xl shadow-secondary/20 hover:-translate-y-1 transition-all">حفظ التغييرات ونشرها</Button>
+              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="rounded-xl px-10 h-16 font-black text-xl hover:bg-white">إلغاء</Button>
+              <Button onClick={handleSaveProduct} disabled={isSaving} className="rounded-xl px-16 h-16 font-black text-xl bg-secondary text-white shadow-2xl shadow-secondary/20 hover:-translate-y-1 transition-all">
+                {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : 'حفظ ونشر'}
+              </Button>
             </div>
           </Tabs>
         </DialogContent>
