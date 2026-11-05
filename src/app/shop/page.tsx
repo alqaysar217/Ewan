@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { 
   Filter, 
   Heart, 
@@ -17,7 +17,9 @@ import {
   Palette,
   Layers,
   CircleDollarSign,
-  Maximize2
+  Maximize2,
+  Store,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,17 +38,20 @@ import {
 } from "@/components/ui/accordion";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function ShopPage() {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  const [maxPrice, setMaxPrice] = useState([500000]);
+  const [maxPrice, setMaxPrice] = useState([1000000]);
   const db = useFirestore();
   
-  const productsQuery = collection(db, 'products');
-  const { data: products, loading } = useCollection(productsQuery);
+  // جلب المنتجات الحقيقية
+  const productsQuery = query(collection(db, 'products'), orderBy('created_at', 'desc'));
+  const { data: products, loading: productsLoading } = useCollection(productsQuery);
+
+  // جلب المتاجر لعرض أسمائها
+  const { data: vendors } = useCollection(collection(db, 'vendors'));
 
   const categories = [
     { id: 'living', name: 'غرف المعيشة' },
@@ -54,72 +59,37 @@ export default function ShopPage() {
     { id: 'dining', name: 'الطعام' },
     { id: 'majlis', name: 'المجالس' },
     { id: 'lighting', name: 'الإضاءة' },
-    { id: 'rugs', name: 'السجاد' },
-    { id: 'antiques', name: 'التحف' }
-  ];
-
-  const styles = [
-    { id: 'modern', name: 'حديث' },
-    { id: 'minimalist', name: 'مينمليست' },
-    { id: 'traditional', name: 'طابع تراثي' },
-    { id: 'contemporary', name: 'كونتمبوراري' },
-    { id: 'scandinavian', name: 'اسكندنافي' }
-  ];
-
-  const colors = [
-    { id: 'creamy', name: 'كريمي', hex: '#F5F5DC' },
-    { id: 'beige', name: 'بيج', hex: '#F5F5DC' },
-    { id: 'walnut', name: 'جوز داكن', hex: '#3B2F2F' },
-    { id: 'oak', name: 'بلوط', hex: '#9E7E53' }
-  ];
-
-  const materials = [
-    { id: 'wood', name: 'خشب' },
-    { id: 'fabric', name: 'قماش' },
-    { id: 'linen', name: 'كتان' },
-    { id: 'metal', name: 'معدن' },
-    { id: 'copper', name: 'نحاس' },
-    { id: 'bamboo', name: 'خيزران' },
-    { id: 'woven', name: 'منسوج' }
+    { id: 'office', name: 'المكاتب' }
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col font-cairo" dir="rtl">
       <Header />
 
       <section className="relative py-12 md:py-16 bg-secondary overflow-hidden">
-        {/* Subtle Hexagonal Pattern */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
-        
         <div className="container relative z-10 px-4 md:px-8 mx-auto text-center">
           <div className="max-w-3xl mx-auto space-y-4">
-            <h1 className="text-3xl md:text-5xl font-black text-white">متجر إيوان</h1>
-            <p className="text-base md:text-lg text-gray-300 font-medium max-w-2xl mx-auto">
-              تصفح أرقى قطع الأثاث المختارة بعناية لتناسب ذوقك الرفيع.
-            </p>
+            <h1 className="text-3xl md:text-5xl font-black text-white">كتالوج إيوان الفاخر</h1>
+            <p className="text-base md:text-lg text-gray-300 font-medium max-w-2xl mx-auto">تصفح أرقى قطع الأثاث من أمهر النجارين والمتاجر المعتمدة في اليمن.</p>
           </div>
         </div>
       </section>
 
       <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* Sidebar Filters */}
           <aside className="w-full lg:w-80 space-y-10">
-            <div className="bg-white p-6 rounded-[15px] border border-border/50 shadow-sm space-y-6">
+            <div className="bg-white p-6 rounded-xl border border-border/50 shadow-sm space-y-6">
               <div className="flex items-center justify-between pb-4 border-b">
                 <h3 className="text-xl font-black text-secondary flex items-center gap-2">
-                  <Filter className="w-5 h-5 text-primary" /> تصفية المنتجات
+                  <Filter className="w-5 h-5 text-primary" /> تصفية الكتالوج
                 </h3>
-                <Button variant="ghost" size="sm" className="text-xs font-bold text-primary h-auto p-0">إعادة تعيين</Button>
               </div>
 
               <Accordion type="multiple" defaultValue={["categories", "price"]} className="w-full">
-                {/* Categories Section */}
                 <AccordionItem value="categories" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="font-bold text-secondary flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-primary" /> الأقسام الرئيسية
-                    </span>
+                  <AccordionTrigger className="hover:no-underline py-4 font-bold text-secondary">
+                    الأقسام الرئيسية
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 pt-1">
@@ -135,228 +105,108 @@ export default function ShopPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Style Section */}
-                <AccordionItem value="styles" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="font-bold text-secondary flex items-center gap-2">
-                      <Maximize2 className="w-4 h-4 text-primary" /> الأنماط والتصاميم
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-1">
-                      {styles.map((style) => (
-                        <div key={style.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
-                          <Checkbox id={`style-${style.id}`} className="rounded-sm" />
-                          <label htmlFor={`style-${style.id}`} className="text-sm font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
-                            {style.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Price Range Section */}
                 <AccordionItem value="price" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="font-bold text-secondary flex items-center gap-2">
-                      <CircleDollarSign className="w-4 h-4 text-primary" /> الميزانية (ر.ي)
-                    </span>
+                  <AccordionTrigger className="hover:no-underline py-4 font-bold text-secondary">
+                    الميزانية (ر.ي)
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="pt-6 px-2 space-y-6">
-                      <Slider 
-                        defaultValue={[500000]} 
-                        max={1000000} 
-                        step={1000} 
-                        value={maxPrice}
-                        onValueChange={setMaxPrice}
-                        className="cursor-pointer"
-                      />
+                      <Slider defaultValue={[1000000]} max={2000000} step={10000} value={maxPrice} onValueChange={setMaxPrice} />
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-muted-foreground">0</span>
-                        <span className="text-sm font-black text-primary">حتى {maxPrice[0].toLocaleString('en-US')}</span>
+                        <span className="text-sm font-black text-primary">حتى {maxPrice[0].toLocaleString()}</span>
                       </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Colors Section */}
-                <AccordionItem value="colors" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="font-bold text-secondary flex items-center gap-2">
-                      <Palette className="w-4 h-4 text-primary" /> اللون السائد
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      {colors.map((color) => (
-                        <button 
-                          key={color.id}
-                          className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 border border-transparent hover:border-border transition-all text-right"
-                        >
-                          <div 
-                            className="w-4 h-4 rounded-full border border-border" 
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <span className="text-xs font-bold text-muted-foreground">{color.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Materials Section */}
-                <AccordionItem value="materials" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="font-bold text-secondary flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-primary" /> المادة والخامة
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {materials.map((mat) => (
-                        <Badge 
-                          key={mat.id} 
-                          variant="outline" 
-                          className="cursor-pointer hover:bg-primary hover:text-white hover:border-primary transition-all rounded-md px-3 py-1 font-bold text-xs"
-                        >
-                          {mat.name}
-                        </Badge>
-                      ))}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </div>
-
-            <div className="p-8 bg-secondary text-white rounded-[15px] space-y-4 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-110" />
-              <Sparkles className="w-10 h-10 text-primary relative z-10" />
-              <h4 className="font-black text-xl relative z-10">تحتاج مساعدة في الاختيار؟</h4>
-              <p className="text-sm text-gray-400 font-medium relative z-10 leading-relaxed">دع المصمم الذكي يساعدك في تنسيق مساحتك بأفضل القطع.</p>
-              <Link href="/ai-design" className="block relative z-10 pt-4">
-                <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white font-black h-12 shadow-xl shadow-primary/20">
-                  ابدأ استوديو التصميم
-                </Button>
-              </Link>
-            </div>
           </aside>
 
-          {/* Product Listing */}
           <div className="flex-1 space-y-8">
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-xl shadow-sm border border-border/50">
-              <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setViewType('grid')}
-                  className={`rounded-md w-10 h-10 ${viewType === 'grid' ? 'text-primary bg-primary/10' : ''}`}
-                >
-                  <LayoutGrid className="w-5 h-5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setViewType('list')}
-                  className={`rounded-md w-10 h-10 ${viewType === 'list' ? 'text-primary bg-primary/10' : ''}`}
-                >
-                  <List className="w-5 h-5" />
-                </Button>
-                <span className="text-sm font-bold text-muted-foreground mr-4">عرض {(products?.length || 0).toLocaleString('en-US')} منتج</span>
+            {productsLoading ? (
+              <div className="flex flex-col items-center justify-center py-40 gap-4">
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                <p className="font-black text-muted-foreground">جاري عرض الكتالوج...</p>
               </div>
-
-              <div className="flex items-center gap-4">
-                <Select defaultValue="newest">
-                  <SelectTrigger className="w-[180px] rounded-xl h-11 border-border/60 font-bold">
-                    <SelectValue placeholder="ترتيب حسب" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="newest" className="font-bold">الأحدث</SelectItem>
-                    <SelectItem value="price-asc" className="font-bold">السعر: من الأقل</SelectItem>
-                    <SelectItem value="price-desc" className="font-bold">السعر: من الأعلى</SelectItem>
-                    <SelectItem value="rating" className="font-bold">الأعلى تقييماً</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className={`grid ${viewType === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-8`}>
-              {products?.map((product: any) => (
-                <div key={product.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
-                  <div className="relative aspect-square overflow-hidden bg-white/50">
-                    <Image 
-                      src={`https://picsum.photos/seed/${product.id}/600/600`} 
-                      alt={product.name_ar} 
-                      fill 
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
-                      <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="bg-white text-secondary font-black rounded-xl shadow-xl px-8 py-3">عرض التفاصيل</span>
-                      </div>
-                    </Link>
-                    
-                    <div className="absolute top-4 left-4 z-20">
-                      <Button variant="ghost" size="icon" className="bg-white/80 backdrop-blur-md rounded-full text-secondary hover:text-destructive shadow-sm w-10 h-10">
-                        <Heart className="w-5 h-5" />
-                      </Button>
-                    </div>
-
-                    <div className="absolute top-4 right-4 z-20">
-                      <Badge className="bg-secondary text-white font-black rounded-lg px-3 py-1.5 shadow-sm border-none">
-                         15% خصم
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="p-6 space-y-4 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="text-lg font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{product.name_ar}</h4>
-                      <div className="flex items-center gap-1 text-amber-500 shrink-0 bg-white px-2 py-0.5 rounded-lg shadow-sm">
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <span className="text-xs font-black">{(4.9).toLocaleString('en-US')}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-[10px] font-black text-primary">
-                        {product.vendor_id ? 'م' : 'إ'}
-                      </div>
-                      <span className="text-xs font-bold text-muted-foreground">متجر إيوان المعتمد</span>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0 rounded-md">
-                        {product.category_id || 'أثاث منزلي'}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] font-bold text-secondary border-secondary/20 bg-secondary/5 px-2 py-0 rounded-md">
-                        خشب طبيعي
-                      </Badge>
-                    </div>
-
-                    <div className="mt-auto pt-4 border-t">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black text-secondary leading-none">
-                          {(product.price || 0).toLocaleString('en-US')} <span className="text-sm font-bold">ر.ي</span>
-                        </span>
-                      </div>
-                      <Button className="w-full mt-4 bg-secondary hover:bg-primary text-white font-black gap-2 h-12 rounded-xl transition-all shadow-xl shadow-secondary/10">
-                        <ShoppingBag className="w-5 h-5" /> إضافة للسلة
-                      </Button>
-                    </div>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-xl shadow-sm border border-border/50">
+                  <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => setViewType('grid')} className={cn("rounded-md", viewType === 'grid' && "text-primary bg-primary/10")}>
+                      <LayoutGrid className="w-5 h-5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setViewType('list')} className={cn("rounded-md", viewType === 'list' && "text-primary bg-primary/10")}>
+                      <List className="w-5 h-5" />
+                    </Button>
+                    <span className="text-sm font-bold text-muted-foreground mr-4">عرض {products?.length || 0} قطعة فاخرة</span>
                   </div>
                 </div>
-              ))}
-            </div>
-            
-            {/* Pagination Placeholder */}
-            {products && products.length > 0 && (
-              <div className="pt-10 flex justify-center">
-                <Button variant="outline" className="rounded-xl px-10 h-12 font-black border-primary text-primary hover:bg-primary/5">
-                  تحميل المزيد من المنتجات
-                </Button>
-              </div>
+
+                <div className={cn("grid gap-8", viewType === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1")}>
+                  {products?.map((p: any) => {
+                    const vendor = vendors?.find(v => v.id === p.vendor_id);
+                    return (
+                      <div key={p.id} className="group bg-white border border-border/50 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                        <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+                          <Image 
+                            src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
+                            alt={p.name_ar} 
+                            fill 
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
+                            <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="bg-white text-secondary font-black rounded-lg shadow-xl px-8 py-3">عرض التفاصيل</span>
+                            </div>
+                          </Link>
+                          <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+                             <Badge className={cn("font-black px-3 py-1 rounded-lg border-none shadow-lg", p.in_stock ? "bg-emerald-500/90" : "bg-destructive/90")}>
+                               {p.in_stock ? 'متوفر' : 'طلب مسبق'}
+                             </Badge>
+                             {Number(p.discount) > 0 && (
+                               <Badge className="bg-secondary text-white font-black rounded-lg shadow-lg">خصم {p.discount}%</Badge>
+                             )}
+                          </div>
+                        </div>
+
+                        <div className="p-6 space-y-4 flex-1 flex flex-col">
+                          <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-primary flex items-center gap-1">
+                              <Store className="w-3.5 h-3.5" /> {vendor?.business_name || 'إيوان المعتمد'}
+                            </p>
+                            <div className="flex justify-between items-start gap-2">
+                              <h4 className="text-lg font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
+                              <div className="flex items-center gap-1 text-amber-500 shrink-0 bg-amber-50 px-2 py-0.5 rounded-lg">
+                                <Star className="w-3 h-3 fill-current" />
+                                <span className="text-xs font-black">{p.rating || '5.0'}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-[10px] font-bold text-muted-foreground border-gray-100 bg-gray-50 uppercase">{p.category_id}</Badge>
+                          </div>
+
+                          <div className="mt-auto pt-4 border-t flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <span className="text-2xl font-black text-secondary">
+                                {(Number(p.price) || 0).toLocaleString()} <span className="text-sm font-bold">ر.ي</span>
+                              </span>
+                              {Number(p.old_price) > 0 && (
+                                <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()} ر.ي</span>
+                              )}
+                            </div>
+                            <Button className="bg-secondary hover:bg-primary text-white font-black gap-2 h-11 px-4 rounded-xl transition-all shadow-lg shadow-secondary/10">
+                              <ShoppingBag className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         </div>

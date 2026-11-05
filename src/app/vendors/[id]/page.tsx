@@ -1,7 +1,6 @@
-
 'use client';
 
-import { use, useState, useEffect } from 'react';
+import { use, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -19,7 +18,9 @@ import {
   Quote,
   Layout,
   Hammer,
-  Palette
+  Palette,
+  ShoppingBag,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,8 +29,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
-import { useDoc, useFirestore } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useDoc, useFirestore, useCollection } from '@/firebase';
+import { doc, collection, query, where } from 'firebase/firestore';
 
 type VendorDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -38,7 +39,13 @@ type VendorDetailPageProps = {
 export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   const { id } = use(params);
   const db = useFirestore();
+  
+  // جلب بيانات المتجر
   const { data: vendorData, loading: vendorLoading } = useDoc(doc(db, 'vendors', id));
+
+  // جلب منتجات هذا المتجر حصراً
+  const productsQuery = query(collection(db, 'products'), where('vendor_id', '==', id));
+  const { data: vendorProducts, loading: productsLoading } = useCollection(productsQuery);
 
   const vendor = {
     ...vendorData,
@@ -47,24 +54,24 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
     description: vendorData?.description || 'هذا الشريك يقدم خدمات ومنتجات عالية الجودة موثقة من قبل إيوان لضمان رضاكم.',
     city: vendorData?.city || 'اليمن',
     average_rating: vendorData?.average_rating || 5.0,
-    reviewsCount: 154,
-    service_areas: vendorData?.service_areas || ['صنعاء', 'عدن', 'تعز'],
-    cover_url: vendorData?.cover_base64 || vendorData?.cover_url || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
-    logo_url: vendorData?.logo_base64 || vendorData?.logo_url || 'https://picsum.photos/seed/v1/200/200',
+    reviewsCount: (vendorData?.reviews?.length || 0) + 120,
+    cover_url: vendorData?.cover_url || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
+    logo_url: vendorData?.logo_url || 'https://picsum.photos/seed/v1/200/200',
     stats: [
-      { label: 'منتج متاح', value: '45+', icon: Package },
-      { label: 'سنة خبرة', value: vendorData?.experience_years || '10+', icon: Clock },
+      { label: 'منتج متاح', value: vendorProducts?.length || vendorData?.available_products || '0', icon: Package },
+      { label: 'سنة خبرة', value: vendorData?.experience_years || '1', icon: Clock },
       { label: 'تقييم عام', value: vendorData?.average_rating || '5.0', icon: Star },
     ]
   };
 
-  const reviews = [
-    { name: 'محمد القاضي', avatar: 'https://picsum.photos/seed/u1/100/100', text: 'شغل نظيف جداً ودقة في المواعيد. القطعة التي طلبتها كانت تحفة فنية حقيقية. شكراً للفريق على هذا المجهود الرائع.', rating: 5, date: 'منذ أسبوع' },
-    { name: 'سارة باوزير', avatar: 'https://picsum.photos/seed/u2/100/100', text: 'جودة ممتازة والتعامل راقي جداً. أنصح بالتعامل معهم لأي شخص يبحث عن التميز والقطع التي تدوم طويلاً.', rating: 5, date: 'منذ أسبوعين' },
-    { name: 'خالد الريمي', avatar: 'https://picsum.photos/seed/u3/100/100', text: 'احترافية عالية في تنفيذ المطابخ الخشبية. التفاصيل دقيقة جداً والخشب من أجود الأنواع الطبيعية.', rating: 4, date: 'منذ شهر' }
-  ];
-
-  if (vendorLoading) return <div className="h-screen flex items-center justify-center font-black text-2xl">جاري تحميل الملف الشخصي للشريك...</div>;
+  if (vendorLoading) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-background gap-4 font-cairo" dir="rtl">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="font-black text-xl text-secondary">جاري جلب ملف الشريك الفاخر...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-cairo" dir="rtl">
@@ -72,7 +79,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
       <main className="flex-1">
         {/* Premium Profile Header */}
-        <section className="relative h-[60vh] w-full">
+        <section className="relative h-[55vh] w-full overflow-hidden">
           <Image 
             src={vendor.cover_url} 
             alt={vendor.business_name} 
@@ -82,183 +89,208 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/40 to-transparent" />
           
-          <div className="container mx-auto px-4 md:px-8 h-full relative z-10 flex flex-col justify-end pb-20">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-12 text-center md:text-right">
-              <div className="w-48 h-48 md:w-64 md:h-64 bg-white p-2 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] relative overflow-hidden shrink-0 border-8 border-white/10 -mb-12 z-20">
+          <div className="container mx-auto px-4 md:px-8 h-full relative z-10 flex flex-col justify-end pb-16">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-8 text-center md:text-right">
+              <div className="w-40 h-40 md:w-56 md:h-56 bg-white p-1.5 rounded-2xl shadow-2xl relative overflow-hidden shrink-0 border-4 border-white/20 -mb-8 z-20">
                 <Image src={vendor.logo_url} alt="Logo" fill className="object-cover" />
               </div>
               
-              <div className="flex-1 space-y-6 text-white pb-6">
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                  <h1 className="text-4xl md:text-7xl font-black tracking-tight drop-shadow-2xl">{vendor.business_name}</h1>
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-2xl border-4 border-white/20 animate-pulse"><CheckCircle2 className="w-7 h-7 text-white" /></div>
+              <div className="flex-1 space-y-4 text-white pb-4">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tight drop-shadow-lg">{vendor.business_name}</h1>
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20"><CheckCircle2 className="w-6 h-6 text-white" /></div>
                 </div>
                 
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-10 text-lg md:text-2xl font-bold text-gray-200">
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-7 h-7 text-primary" />
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-8 text-base md:text-xl font-bold text-gray-200">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" />
                     {vendor.city}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Star className="w-7 h-7 text-amber-500 fill-current" />
-                    {vendor.average_rating} <span className="opacity-60 text-sm">({vendor.reviewsCount} مراجعة حقيقية)</span>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500 fill-current" />
+                    {vendor.average_rating} <span className="opacity-60 text-sm">({vendor.reviewsCount} تقييم)</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-5 pb-8">
-                <Button className="rounded-[20px] bg-primary hover:bg-primary/90 text-white font-black px-14 h-20 shadow-[0_20px_40px_-10px_rgba(22,136,153,0.4)] gap-4 text-2xl group transition-all hover:-translate-y-1">
-                  <MessageSquare className="w-8 h-8 group-hover:scale-110 transition-transform" /> محادثة فورية
+              <div className="flex gap-3 pb-4">
+                <Button className="rounded-xl bg-primary hover:bg-primary/90 text-white font-black px-8 h-16 shadow-xl gap-3 text-lg group transition-all hover:-translate-y-1">
+                  <MessageSquare className="w-6 h-6" /> تواصل مباشر
                 </Button>
-                <Button variant="outline" size="icon" className="rounded-[20px] bg-white/10 border-white/20 text-white hover:bg-white/20 w-20 h-20 shadow-2xl">
-                  <Share2 className="w-8 h-8" />
+                <Button variant="outline" size="icon" className="rounded-xl bg-white/10 border-white/20 text-white hover:bg-white/20 w-16 h-16">
+                  <Share2 className="w-6 h-6" />
                 </Button>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="container mx-auto px-4 md:px-8 pt-32 pb-32">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+        <section className="container mx-auto px-4 md:px-8 pt-20 pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             
-            {/* Sidebar Details */}
-            <div className="lg:col-span-1 space-y-12">
-              <div className="bg-white p-12 border border-border/50 rounded-[45px] shadow-sm space-y-12 relative overflow-hidden">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
-                    <Info className="w-7 h-7 text-primary" /> نبذة عن الشريك
+            <div className="lg:col-span-1 space-y-10">
+              <div className="bg-white p-10 border border-border/50 rounded-2xl shadow-sm space-y-10">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-black text-secondary flex items-center gap-2">
+                    <Info className="w-6 h-6 text-primary" /> عن الشريك
                   </h3>
-                  <p className="text-xl text-muted-foreground leading-loose font-medium">
+                  <p className="text-base text-muted-foreground leading-relaxed font-medium">
                     {vendor.description}
                   </p>
                 </div>
 
-                <Separator className="bg-gray-100" />
+                <Separator />
 
-                <div className="space-y-8">
-                  <h3 className="text-2xl font-black text-secondary">إحصائيات الأداء</h3>
-                  <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-6">
+                  <h3 className="text-xl font-black text-secondary">إحصائيات الموثوقية</h3>
+                  <div className="space-y-4">
                     {vendor.stats.map((stat, i) => (
-                      <div key={i} className="flex items-center justify-between p-8 bg-gray-50 rounded-[30px] border border-transparent hover:border-primary/10 transition-all group">
-                        <div className="flex items-center gap-5">
-                          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform">
-                            <stat.icon className="w-7 h-7" />
+                      <div key={i} className="flex items-center justify-between p-5 bg-gray-50 rounded-xl group transition-all hover:bg-primary/5">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm">
+                            <stat.icon className="w-5 h-5" />
                           </div>
-                          <span className="text-lg font-bold text-muted-foreground">{stat.label}</span>
+                          <span className="text-sm font-bold text-muted-foreground">{stat.label}</span>
                         </div>
-                        <span className="text-3xl font-black text-secondary">{stat.value}</span>
+                        <span className="text-xl font-black text-secondary">{stat.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Separator className="bg-gray-100" />
-
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-black text-secondary">نطاق التغطية</h3>
-                  <div className="flex flex-wrap gap-4">
-                    {vendor.service_areas.map((area: string) => (
-                      <Badge key={area} className="bg-primary/5 text-primary border border-primary/10 rounded-2xl px-6 py-3 font-black text-lg">
-                        {area}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+                {vendor.service_areas && (
+                  <>
+                    <Separator />
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-black text-secondary">مناطق الخدمة</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {vendor.service_areas.map((area: string) => (
+                          <Badge key={area} variant="outline" className="bg-primary/5 text-primary border-primary/10 rounded-lg px-4 py-1.5 font-bold">
+                            {area}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
-              <div className="p-12 bg-secondary text-white rounded-[45px] relative overflow-hidden group shadow-2xl">
-                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45 transition-transform group-hover:scale-110" />
-                 <Award className="w-16 h-16 text-primary mb-10" />
-                 <h4 className="text-3xl font-black mb-6">شريك إيوان الذهبي</h4>
-                 <p className="text-gray-400 text-lg font-medium leading-relaxed">هذا الشريك يلتزم بأعلى معايير الحرفة اليمنية ويقدم ضمانات استبدال وصيانة حقيقية.</p>
+              <div className="p-10 bg-secondary text-white rounded-2xl relative overflow-hidden group shadow-2xl">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45 transition-transform group-hover:scale-110" />
+                 <Award className="w-12 h-12 text-primary mb-8" />
+                 <h4 className="text-2xl font-black mb-4">شريك إيوان الذهبي</h4>
+                 <p className="text-gray-400 text-sm font-medium leading-relaxed">تلتزم هذه المنشأة بأعلى معايير الجودة اليمنية وتقدم ضمانات صيانة حقيقية موثقة من إيوان.</p>
               </div>
             </div>
 
-            {/* Main Tabs Area */}
-            <div className="lg:col-span-3 space-y-16">
+            <div className="lg:col-span-3 space-y-12">
               <Tabs defaultValue="products" className="w-full">
-                <TabsList className="w-full justify-start h-24 bg-white border border-border/50 rounded-[2.5rem] p-3 gap-3 shadow-sm mb-16">
-                  <TabsTrigger value="products" className="h-full rounded-[2rem] data-[state=active]:bg-primary data-[state=active]:text-white font-black text-2xl px-12 transition-all gap-3">
-                    <Package className="w-6 h-6" /> المنتجات
+                <TabsList className="w-full justify-start h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-10">
+                  <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-lg px-10 transition-all gap-2">
+                    <Package className="w-5 h-5" /> المنتجات
                   </TabsTrigger>
-                  <TabsTrigger value="reviews" className="h-full rounded-[2rem] data-[state=active]:bg-primary data-[state=active]:text-white font-black text-2xl px-12 transition-all gap-3">
-                    <Quote className="w-6 h-6" /> آراء العملاء
+                  <TabsTrigger value="reviews" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-lg px-10 transition-all gap-2">
+                    <Quote className="w-5 h-5" /> الآراء
                   </TabsTrigger>
-                  <TabsTrigger value="gallery" className="h-full rounded-[2rem] data-[state=active]:bg-primary data-[state=active]:text-white font-black text-2xl px-12 transition-all gap-3">
-                    <Sparkles className="w-6 h-6" /> معرض الأعمال
+                  <TabsTrigger value="gallery" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-lg px-10 transition-all gap-2">
+                    <Sparkles className="w-5 h-5" /> معرض الأعمال
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="products" className="animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="group bg-white border border-border/40 rounded-[3rem] overflow-hidden hover:shadow-2xl transition-all duration-700 flex flex-col h-full">
-                        <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
-                          <Image src={`https://picsum.photos/seed/v-prod-${i}-${id}/600/800`} alt="Product" fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                            <Button className="w-full bg-white text-secondary font-black rounded-2xl h-16 text-xl shadow-2xl">طلب السعر النهائي</Button>
+                <TabsContent value="products" className="animate-in fade-in duration-700">
+                  {productsLoading ? (
+                    <div className="flex flex-col items-center justify-center py-24 gap-4">
+                      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                      <p className="font-bold text-muted-foreground">جاري عرض منتجات المتجر...</p>
+                    </div>
+                  ) : vendorProducts?.length === 0 ? (
+                    <div className="py-24 text-center space-y-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
+                       <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto" />
+                       <p className="text-lg font-black text-muted-foreground">لا توجد منتجات معروضة حالياً لهذا الشريك.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {vendorProducts?.map((p: any) => (
+                        <div key={p.id} className="group bg-white border border-border/40 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-700 flex flex-col h-full">
+                          <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+                            <Image src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} alt={p.name_ar} fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+                            <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
+                              <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
+                                <Button className="w-full bg-white text-secondary font-black rounded-xl h-12 shadow-2xl">التفاصيل</Button>
+                              </div>
+                            </Link>
+                            {Number(p.discount) > 0 && (
+                              <div className="absolute top-4 right-4">
+                                <Badge className="bg-secondary text-white font-black rounded-lg">خصم {p.discount}%</Badge>
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-6 space-y-4">
+                            <h4 className="text-xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{p.name_ar}</h4>
+                            <div className="flex justify-between items-center">
+                               <p className="text-2xl font-black text-primary">{(Number(p.price) || 0).toLocaleString()} <span className="text-xs">ر.ي</span></p>
+                               <div className="flex text-amber-500 items-center gap-1">
+                                  <Star className="w-4 h-4 fill-current" />
+                                  <span className="text-sm font-black text-secondary">{p.rating || '5.0'}</span>
+                               </div>
+                            </div>
                           </div>
                         </div>
-                        <div className="p-10 space-y-5">
-                          <h4 className="text-2xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">منتج إيوان المميز {i}</h4>
-                          <div className="flex justify-between items-center">
-                             <p className="text-3xl font-black text-primary">٤٥٠,٠٠٠ <span className="text-xs">ر.ي</span></p>
-                             <div className="flex text-amber-500 items-center gap-1"><Star className="w-5 h-5 fill-current" /><span className="text-sm font-black text-secondary">5.0</span></div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </TabsContent>
 
-                <TabsContent value="reviews" className="animate-in fade-in slide-in-from-bottom-6 duration-1000 space-y-12">
-                  <div className="bg-primary/5 p-16 rounded-[50px] flex flex-col md:flex-row items-center justify-between gap-12 border border-primary/10 relative overflow-hidden">
-                     <div className="absolute top-0 left-0 w-64 h-64 bg-white/40 blur-3xl -translate-x-1/2 -translate-y-1/2" />
-                     <div className="text-center md:text-right relative z-10">
-                       <h3 className="text-8xl font-black text-primary mb-3">{vendor.average_rating}</h3>
-                       <div className="flex gap-3 justify-center md:justify-start text-amber-500 mb-4">
-                         {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current w-10 h-10" />)}
+                <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
+                   <div className="bg-primary/5 p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
+                     <div className="text-center md:text-right">
+                       <h3 className="text-7xl font-black text-primary mb-2">{vendor.average_rating}</h3>
+                       <div className="flex gap-2 justify-center md:justify-start text-amber-500 mb-2">
+                         {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current w-8 h-8" />)}
                        </div>
-                       <p className="text-muted-foreground font-black text-xl">بناءً على أكثر من {vendor.reviewsCount} تجربة موثقة</p>
+                       <p className="text-muted-foreground font-black text-lg">بناءً على تجارب العملاء الموثقة</p>
                      </div>
-                     <Button className="h-20 px-16 rounded-[25px] bg-secondary text-white font-black text-2xl shadow-2xl shadow-secondary/20 hover:-translate-y-2 transition-all relative z-10">شاركنا تجربتك الخاصة</Button>
+                     <Button className="h-16 px-12 rounded-xl bg-secondary text-white font-black text-xl shadow-2xl">أضف تقييمك الآن</Button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    {reviews.map((rev, i) => (
-                      <div key={i} className="p-12 bg-white border border-border/50 rounded-[3.5rem] space-y-10 shadow-sm hover:shadow-2xl transition-all relative group">
-                        <Quote className="absolute top-10 left-10 w-16 h-16 text-primary/5 group-hover:text-primary/10 transition-colors" />
-                        <div className="flex justify-between items-start relative z-10">
-                          <div className="flex items-center gap-6">
-                            <div className="relative w-20 h-20 rounded-3xl overflow-hidden border-4 border-primary/10 shadow-2xl">
-                              <Image src={rev.avatar} alt={rev.name} fill className="object-cover" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {(vendorData?.reviews || [
+                      { name: 'محمد القاضي', text: 'شغل نظيف جداً ودقة في المواعيد. القطعة التي طلبتها كانت تحفة فنية حقيقية.', rating: 5, date: 'منذ أسبوع' },
+                      { name: 'سارة باوزير', text: 'جودة ممتازة والتعامل راقي جداً. أنصح بالتعامل معهم للتميز.', rating: 5, date: 'منذ أسبوعين' }
+                    ]).map((rev: any, i: number) => (
+                      <div key={i} className="p-8 bg-white border border-border/50 rounded-2xl space-y-6 shadow-sm hover:shadow-lg transition-all relative">
+                        <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/5" />
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center font-black text-secondary text-xl border-2 border-primary/10">
+                              {rev.name[0]}
                             </div>
                             <div className="space-y-1">
-                              <p className="font-black text-secondary text-2xl">{rev.name}</p>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground font-bold">
-                                <Calendar className="w-4 h-4" /> {rev.date}
+                              <p className="font-black text-secondary text-lg">{rev.name}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
+                                <Calendar className="w-3.5 h-3.5" /> {rev.date || 'الآن'}
                               </div>
                             </div>
                           </div>
                           <div className="flex text-amber-500 gap-1">
-                            {Array.from({ length: rev.rating }).map((_, i) => <Star key={i} className="fill-current w-6 h-6" />)}
+                            {Array.from({ length: rev.rating || 5 }).map((_, i) => <Star key={i} className="fill-current w-4 h-4" />)}
                           </div>
                         </div>
-                        <p className="text-xl text-muted-foreground leading-loose font-medium italic relative z-10 pr-4 border-r-4 border-primary/20">"{rev.text}"</p>
+                        <p className="text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20">"{rev.text}"</p>
                       </div>
                     ))}
                   </div>
                 </TabsContent>
 
-                <TabsContent value="gallery" className="animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <div key={i} className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-50 group cursor-pointer shadow-xl border-4 border-white">
-                        <Image src={`https://picsum.photos/seed/gall-v2-${i}${id}/600/800`} alt="Portfolio" fill className="object-cover group-hover:scale-125 transition-transform duration-[2000ms]" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-secondary/95 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-8">
-                          <p className="text-white font-black text-lg mb-2">مشروع إيوان المتكامل {i}</p>
-                          <div className="flex items-center gap-3 text-primary text-xs font-bold bg-white/10 w-fit px-4 py-1.5 rounded-full backdrop-blur-md">
-                            <Sparkles className="w-4 h-4" /> تم الإنجاز في 2024
+                <TabsContent value="gallery" className="animate-in fade-in duration-700">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {(vendorData?.gallery || [1, 2, 3, 4, 5, 6, 7, 8]).map((img: any, i: number) => (
+                      <div key={i} className="relative aspect-[4/5] rounded-xl overflow-hidden bg-gray-50 group cursor-pointer shadow-md border-4 border-white">
+                        <Image src={typeof img === 'string' ? img : `https://picsum.photos/seed/gall-${i}-${id}/600/800`} alt="Portfolio" fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+                          <p className="text-white font-black text-sm mb-1">مشروع إيوان المتكامل {i + 1}</p>
+                          <div className="flex items-center gap-2 text-primary text-[10px] font-black bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-md">
+                            <Sparkles className="w-3 h-3" /> تم الإنجاز في 2024
                           </div>
                         </div>
                       </div>
