@@ -67,6 +67,7 @@ export default function AdminVendors() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingVendor, setEditingVendor] = useState<any>(null);
 
   const [vendorData, setVendorData] = useState({
@@ -88,6 +89,11 @@ export default function AdminVendors() {
   const handleImageUpload = (type: 'logo' | 'cover' | 'gallery', e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // تنبيه المستخدم إذا كانت الصورة كبيرة جداً
+      if (file.size > 500000) { // 500KB
+        toast({ variant: "destructive", title: "الصورة كبيرة جداً", description: "يرجى اختيار صورة بحجم أقل من 500 كيلوبايت لضمان الحفظ." });
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         if (type === 'gallery') {
@@ -101,39 +107,56 @@ export default function AdminVendors() {
   };
 
   const handleSaveVendor = async () => {
+    if (isSaving) return;
+    
     try {
       if (!vendorData.business_name || !vendorData.email) {
         toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء اسم المتجر والبريد الإلكتروني." });
         return;
       }
 
+      setIsSaving(true);
+
+      // استخراج البيانات وتحسينها لتوفير المساحة
+      const { logo_base64, cover_base64, ...rest } = vendorData;
+      
       const finalData = {
-        ...vendorData,
+        ...rest,
         average_rating: Number(vendorData.average_rating),
         experience_years: Number(vendorData.experience_years),
         available_products: Number(vendorData.available_products),
         approval_status: 'approved',
         updated_at: serverTimestamp(),
         slug: vendorData.business_name.toLowerCase().replace(/\s+/g, '-'),
-        logo_url: vendorData.logo_base64,
-        cover_url: vendorData.cover_base64
+        logo_url: logo_base64 || '', // حفظ الصورة في حقل واحد فقط
+        cover_url: cover_base64 || '',
+        // إزالة الحقول المؤقتة لتقليل حجم المستند
+        logo_base64: null,
+        cover_base64: null
       };
 
       if (editingVendor) {
         await updateDoc(doc(db, 'vendors', editingVendor.id), finalData);
-        toast({ title: "تم تحديث بيانات المعرض بنجاح" });
+        toast({ title: "تم التحديث بنجاح", description: "تم تحديث بيانات المعرض في قاعدة البيانات." });
       } else {
         await addDoc(collection(db, 'vendors'), {
           ...finalData,
           created_at: serverTimestamp(),
         });
-        toast({ title: "تم تسجيل المعرض بنجاح" });
+        toast({ title: "تم الحفظ بنجاح", description: "تم تسجيل المعرض الجديد بنجاح." });
       }
 
       setIsDialogOpen(false);
       resetForm();
     } catch (e: any) {
-      toast({ variant: "destructive", title: "فشل في الحفظ" });
+      console.error("Firestore Save Error:", e);
+      let errorMsg = "حدث خطأ غير متوقع أثناء الحفظ.";
+      if (e.code === 'permission-denied') errorMsg = "ليس لديك صلاحية للقيام بهذا الإجراء.";
+      if (e.message?.includes('too large')) errorMsg = "حجم البيانات كبير جداً! حاول تقليل عدد الصور أو حجمها.";
+      
+      toast({ variant: "destructive", title: "فشل في الحفظ", description: errorMsg });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -214,7 +237,7 @@ export default function AdminVendors() {
           {vendors?.filter(v => v.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) || v.city?.toLowerCase().includes(searchTerm.toLowerCase())).map((vendor: any) => (
             <Card key={vendor.id} className="rounded-2xl border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white flex flex-col group border border-transparent hover:border-primary/10">
               <div className="relative h-48 w-full overflow-hidden">
-                <Image src={vendor.cover_url || vendor.cover_base64 || `https://picsum.photos/seed/${vendor.id}/800/400`} alt={vendor.business_name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <Image src={vendor.cover_url || `https://picsum.photos/seed/${vendor.id}/800/400`} alt={vendor.business_name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 
                 {/* Actions Overlay */}
@@ -248,7 +271,7 @@ export default function AdminVendors() {
 
                 <div className="absolute bottom-4 right-6 left-6 flex items-center gap-3">
                    <div className="w-12 h-12 bg-white p-1 rounded-xl shadow-2xl relative overflow-hidden shrink-0">
-                      <Image src={vendor.logo_url || vendor.logo_base64 || `https://picsum.photos/seed/${vendor.id}-logo/200/200`} alt="Logo" fill className="object-cover" />
+                      <Image src={vendor.logo_url || `https://picsum.photos/seed/${vendor.id}-logo/200/200`} alt="Logo" fill className="object-cover" />
                    </div>
                    <div className="text-white">
                       <h4 className="font-black text-lg flex items-center gap-1.5">{vendor.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
@@ -291,7 +314,7 @@ export default function AdminVendors() {
       )}
 
       {/* Add/Edit Vendor Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!isSaving) setIsDialogOpen(open); }}>
         <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-2xl border-none shadow-2xl font-cairo" dir="rtl">
           <Tabs defaultValue="branding" className="w-full">
             <div className="bg-secondary p-8 pb-0 text-white relative">
@@ -458,10 +481,21 @@ export default function AdminVendors() {
             </div>
 
             <div className="p-8 bg-gray-50 border-t flex flex-row-reverse justify-start gap-4">
-              <Button onClick={handleSaveVendor} className="rounded-xl px-10 h-14 font-black text-lg bg-secondary text-white shadow-lg shadow-secondary/20 transition-all">
-                {editingVendor ? 'حفظ التعديلات' : 'تفعيل ونشر المعرض'}
+              <Button 
+                onClick={handleSaveVendor} 
+                disabled={isSaving}
+                className="rounded-xl px-10 h-14 font-black text-lg bg-secondary text-white shadow-lg shadow-secondary/20 transition-all min-w-[180px]"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  editingVendor ? 'حفظ التعديلات' : 'تفعيل ونشر المعرض'
+                )}
               </Button>
-              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-xl px-8 h-14 font-black text-lg hover:bg-white">إلغاء</Button>
+              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="rounded-xl px-8 h-14 font-black text-lg hover:bg-white">إلغاء</Button>
             </div>
           </Tabs>
         </DialogContent>
