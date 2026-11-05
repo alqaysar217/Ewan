@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, doc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,9 @@ import {
   Sparkles,
   User,
   Trash2,
-  Package
+  Package,
+  Filter,
+  ArrowRight
 } from 'lucide-react';
 import {
   Dialog,
@@ -51,7 +53,6 @@ export default function AdminVendors() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  // الحالة الموسعة لتشمل كافة تفاصيل المتجر
   const [vendorData, setVendorData] = useState({
     business_name: '',
     business_type: 'furniture_store',
@@ -92,16 +93,13 @@ export default function AdminVendors() {
         return;
       }
 
-      console.log("Saving Vendor Data...", vendorData);
-
-      // تنظيف البيانات والتأكد من الأنواع الصحيحة قبل الحفظ
       const finalData = {
         business_name: vendorData.business_name,
         business_type: vendorData.business_type,
         city: vendorData.city,
         email: vendorData.email,
         description: vendorData.description,
-        logo_url: vendorData.logo_base64, // استخدام base64 كـ url حالياً
+        logo_url: vendorData.logo_base64,
         cover_url: vendorData.cover_base64,
         average_rating: Number(vendorData.average_rating),
         experience_years: Number(vendorData.experience_years),
@@ -114,12 +112,10 @@ export default function AdminVendors() {
         gallery: vendorData.gallery
       };
 
-      const docRef = await addDoc(collection(db, 'vendors'), finalData);
-      console.log("Vendor saved with ID: ", docRef.id);
+      await addDoc(collection(db, 'vendors'), finalData);
 
       toast({ title: "تم تسجيل الشريك بنجاح", description: "تمت إضافة الشريك وتفعيل حسابه فوراً." });
       setIsAddOpen(false);
-      // إعادة تعيين الحالة
       setVendorData({ 
         business_name: '', business_type: 'furniture_store', city: 'صنعاء', email: '', 
         description: '', logo_base64: '', cover_base64: '', average_rating: 5, 
@@ -131,7 +127,7 @@ export default function AdminVendors() {
       toast({ 
         variant: "destructive", 
         title: "فشل في الحفظ", 
-        description: "تأكد من اتصالك بالإنترنت وصلاحيات قاعدة البيانات. الخطأ: " + e.message 
+        description: "تأكد من اتصالك بالإنترنت وصلاحيات قاعدة البيانات." 
       });
     }
   };
@@ -148,7 +144,6 @@ export default function AdminVendors() {
         </Button>
       </div>
 
-      {/* Filter & Search Bar */}
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
         <div className="relative w-full max-w-xl group">
           <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -239,13 +234,12 @@ export default function AdminVendors() {
         </div>
       )}
 
-      {/* Add Vendor Dialog - Tabbed Interface */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden rounded-[3rem] border-none shadow-2xl font-cairo">
+        <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden rounded-[3rem] border-none shadow-2xl font-cairo" dir="rtl">
           <Tabs defaultValue="branding" className="w-full">
             <div className="bg-secondary p-12 pb-0 text-white relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 -translate-y-1/2 translate-x-1/2 rotate-45 rounded-full blur-3xl" />
-              <DialogHeader className="mb-10 relative z-10">
+              <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 -translate-y-1/2 -translate-x-1/2 rotate-45 rounded-full blur-3xl" />
+              <DialogHeader className="mb-10 relative z-10 text-right">
                 <DialogTitle className="text-4xl font-black">تسجيل شريك استراتيجي</DialogTitle>
                 <DialogDescription className="text-gray-400 font-bold text-lg mt-3">قم بتقسيم بيانات الهوية التجارية والنشاط لضمان دقة العرض للعملاء.</DialogDescription>
               </DialogHeader>
@@ -267,7 +261,6 @@ export default function AdminVendors() {
             </div>
 
             <div className="p-12 max-h-[60vh] overflow-y-auto bg-white">
-              {/* BRANDING TAB */}
               <TabsContent value="branding" className="space-y-10 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4">
@@ -304,24 +297,25 @@ export default function AdminVendors() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-lg font-black text-secondary mr-2 flex items-center gap-2"><Store className="w-4 h-4 text-primary" /> اسم المتجر / الورشة</label>
-                    <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم الرسمي" className="rounded-2xl h-14 bg-gray-50 border-none shadow-inner text-lg" />
+                    <label className="text-lg font-black text-secondary flex items-center gap-2"><Store className="w-4 h-4 text-primary" /> اسم المتجر / الورشة</label>
+                    <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم الرسمي للمنشأة" className="rounded-2xl h-14 bg-gray-50 border-none shadow-inner text-lg" />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-lg font-black text-secondary mr-2 flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> البريد الإلكتروني</label>
+                    <label className="text-lg font-black text-secondary flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> البريد الإلكتروني</label>
                     <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="professional@ewan.ye" className="rounded-2xl h-14 bg-gray-50 border-none shadow-inner text-lg" />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-lg font-black text-secondary mr-2 flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> المدينة المقر</label>
+                    <label className="text-lg font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> المدينة المقر</label>
                     <select value={vendorData.city} onChange={e => setVendorData({...vendorData, city: e.target.value})} className="w-full h-14 rounded-2xl border-none bg-gray-50 px-6 font-black text-lg outline-none shadow-inner">
                       <option value="صنعاء">صنعاء</option>
                       <option value="عدن">عدن</option>
                       <option value="تعز">تعز</option>
                       <option value="المكلا">المكلا</option>
+                      <option value="إب">إب</option>
                     </select>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-lg font-black text-secondary mr-2 flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> نوع النشاط</label>
+                    <label className="text-lg font-black text-secondary flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> نوع النشاط</label>
                     <select value={vendorData.business_type} onChange={e => setVendorData({...vendorData, business_type: e.target.value})} className="w-full h-14 rounded-2xl border-none bg-gray-50 px-6 font-black text-lg outline-none shadow-inner">
                       <option value="furniture_store">معرض أثاث</option>
                       <option value="carpenter">ورشة نجارة</option>
@@ -331,7 +325,6 @@ export default function AdminVendors() {
                 </div>
               </TabsContent>
 
-              {/* PERFORMANCE TAB */}
               <TabsContent value="performance" className="space-y-10 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="space-y-3">
@@ -353,10 +346,11 @@ export default function AdminVendors() {
                 </div>
               </TabsContent>
 
-              {/* REVIEWS TAB */}
               <TabsContent value="reviews" className="space-y-8 mt-0">
                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-black text-secondary">آراء العملاء الموثقة</h3>
+                    <h3 className="text-xl font-black text-secondary flex items-center gap-2">
+                       <Quote className="w-5 h-5 text-primary" /> آراء العملاء الموثقة
+                    </h3>
                     <Button variant="outline" size="sm" className="rounded-xl font-bold" onClick={() => setVendorData(prev => ({...prev, reviews: [...prev.reviews, {name: 'عميل جديد', text: '', rating: 5, date: 'الآن', avatar: ''}]}))}>
                        <Plus className="w-4 h-4 ml-1" /> إضافة رأي يدوي
                     </Button>
@@ -390,7 +384,6 @@ export default function AdminVendors() {
                  </div>
               </TabsContent>
 
-              {/* GALLERY TAB */}
               <TabsContent value="gallery" className="space-y-8 mt-0 text-center">
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {vendorData.gallery.map((img, i) => (
@@ -411,8 +404,8 @@ export default function AdminVendors() {
             </div>
 
             <div className="p-10 bg-gray-50 border-t flex justify-end gap-6">
-              <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl px-12 h-16 font-black text-xl hover:bg-white transition-all">إلغاء الأمر</Button>
-              <Button onClick={handleAddVendor} className="rounded-xl px-20 h-16 font-black text-xl bg-secondary text-white shadow-2xl shadow-secondary/20 hover:-translate-y-1 transition-all">تفعيل حساب الشريك ونشره</Button>
+              <Button onClick={handleAddVendor} className="rounded-xl px-20 h-16 font-black text-xl bg-secondary text-white shadow-2xl shadow-secondary/20 hover:-translate-y-1 transition-all order-2">تفعيل حساب الشريك ونشره</Button>
+              <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl px-12 h-16 font-black text-xl hover:bg-white transition-all order-1">إلغاء الأمر</Button>
             </div>
           </Tabs>
         </DialogContent>
