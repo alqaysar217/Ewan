@@ -4,26 +4,24 @@
 import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, orderBy, deleteDoc, doc, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Search, 
   Plus, 
-  Edit3, 
   Trash2, 
-  Filter,
-  Layers,
-  Store,
-  Loader2,
+  Loader2, 
   AlertTriangle,
   Upload,
   Image as ImageIcon,
-  Info,
   Package,
   Settings,
-  Star
+  Star,
+  Layers,
+  CheckCircle2,
+  ChevronLeft
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -31,7 +29,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -59,7 +56,6 @@ export default function AdminProducts() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   
-  // Form State
   const [formData, setFormData] = useState({
     name_ar: '',
     description_ar: '',
@@ -90,29 +86,28 @@ export default function AdminProducts() {
 
       if (editingProduct) {
         await updateDoc(doc(db, 'products', editingProduct.id), data);
-        toast({ title: "تم التحديث", description: "تم تحديث بيانات المنتج بنجاح" });
+        toast({ title: "تم التحديث بنجاح" });
       } else {
         await addDoc(collection(db, 'products'), {
           ...data,
           created_at: serverTimestamp(),
-          vendor_id: 'admin'
+          vendor_id: 'admin_store'
         });
-        toast({ title: "تمت الإضافة", description: "تم إضافة منتج جديد للكتالوج" });
+        toast({ title: "تمت إضافة المنتج بنجاح" });
       }
       setIsDialogOpen(false);
       setEditingProduct(null);
-      setFormData({ name_ar: '', description_ar: '', price: '', category_id: 'living', status: 'approved', image_base64: '' });
     } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "فشل في حفظ البيانات" });
+      toast({ variant: "destructive", title: "فشل في الحفظ" });
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'products', id));
-      toast({ title: "تم الحذف", description: "تم حذف المنتج نهائياً من النظام" });
+      toast({ title: "تم حذف المنتج" });
     } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "لا يمكن حذف هذا المنتج" });
+      toast({ variant: "destructive", title: "خطأ في الحذف" });
     }
   };
 
@@ -130,11 +125,11 @@ export default function AdminProducts() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20 font-cairo" dir="rtl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-secondary">إدارة الكتالوج</h1>
-          <p className="text-muted-foreground font-bold mt-1">إدارة المنتجات، التعديل، والحذف مع معاينة فورية.</p>
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black text-secondary">إدارة الكتالوج</h1>
+          <p className="text-muted-foreground font-bold">تحكم كامل في المنتجات المعروضة في المتجر الذكي.</p>
         </div>
         <Button 
           onClick={() => {
@@ -142,82 +137,84 @@ export default function AdminProducts() {
             setFormData({name_ar: '', description_ar: '', price: '', category_id: 'living', status: 'approved', image_base64: ''});
             setIsDialogOpen(true);
           }}
-          className="rounded-xl h-12 px-8 font-black shadow-lg shadow-primary/20"
+          className="rounded-[15px] h-14 px-10 font-black bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/20"
         >
-          <Plus className="w-5 h-5 ml-2" /> إضافة منتج جديد
+          <Plus className="ml-2 w-6 h-6" /> إضافة قطعة جديدة
         </Button>
       </div>
 
-      <div className="relative w-full max-w-xl">
-        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <div className="relative w-full max-w-2xl group">
+        <div className="absolute inset-0 bg-primary/5 rounded-[20px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-primary transition-colors" />
         <Input 
-          placeholder="ابحث عن منتج..." 
+          placeholder="ابحث عن منتج بالاسم أو الفئة..." 
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          className="pr-12 h-14 bg-white border-none shadow-sm rounded-xl font-bold focus:ring-2 focus:ring-primary/20"
+          className="pr-14 h-16 bg-white border-none shadow-sm rounded-[20px] font-bold text-lg focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-          <p className="font-bold text-muted-foreground">جاري تحميل الكتالوج...</p>
+        <div className="flex flex-col items-center justify-center py-32 gap-6">
+          <Loader2 className="w-16 h-16 animate-spin text-primary" />
+          <p className="font-black text-muted-foreground text-xl">جاري تحميل الكتالوج...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {products?.filter(p => p.name_ar?.toLowerCase().includes(searchTerm.toLowerCase())).map((p: any) => (
-            <Card key={p.id} className="rounded-3xl border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group border border-transparent hover:border-primary/20">
-              <div className="relative aspect-square overflow-hidden bg-gray-50">
+            <Card key={p.id} className="rounded-[2.5rem] border-none shadow-sm hover:shadow-2xl transition-all overflow-hidden bg-white group border border-transparent hover:border-primary/20 flex flex-col">
+              <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
                 <Image 
-                  src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/600`} 
+                  src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
                   alt={p.name_ar} 
                   fill 
-                  className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                  className="object-cover group-hover:scale-110 transition-transform duration-1000" 
                 />
-                <div className="absolute top-4 right-4 flex gap-2">
+                <div className="absolute top-6 right-6">
                    <Badge className={cn(
-                     "font-black px-2 py-1 rounded-lg border-none shadow-lg",
-                     p.status === 'approved' ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
+                     "font-black px-4 py-1.5 rounded-xl border-none shadow-2xl backdrop-blur-md",
+                     p.status === 'approved' ? "bg-emerald-500/90 text-white" : "bg-amber-500/90 text-white"
                    )}>
-                     {p.status === 'approved' ? 'منشور' : 'مراجعة'}
+                     {p.status === 'approved' ? 'منشور الآن' : 'قيد المراجعة'}
                    </Badge>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                   <div className="flex w-full gap-2">
-                      <Button onClick={() => openEdit(p)} className="flex-1 rounded-xl bg-white text-secondary hover:bg-primary hover:text-white font-black">تعديل</Button>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                   <div className="flex w-full gap-3">
+                      <Button onClick={() => openEdit(p)} className="flex-1 rounded-[15px] h-14 bg-white text-secondary hover:bg-primary hover:text-white font-black text-lg transition-all">تعديل التفاصيل</Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="icon" className="rounded-xl"><Trash2 className="w-5 h-5" /></Button>
+                          <Button variant="destructive" size="icon" className="rounded-[15px] w-14 h-14 shadow-xl"><Trash2 className="w-6 h-6" /></Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="rounded-3xl">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="text-2xl font-black text-secondary flex items-center gap-3">
-                              <AlertTriangle className="text-destructive" /> حذف المنتج
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="font-bold">
-                              هل أنت متأكد من حذف "{p.name_ar}"؟ لا يمكن التراجع عن هذا الإجراء.
+                        <AlertDialogContent className="rounded-[30px] border-none p-10 font-cairo">
+                          <AlertDialogHeader className="space-y-4">
+                            <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto">
+                               <AlertTriangle className="w-10 h-10" />
+                            </div>
+                            <AlertDialogTitle className="text-3xl font-black text-secondary text-center">تأكيد الحذف النهائي</AlertDialogTitle>
+                            <AlertDialogDescription className="font-bold text-center text-lg leading-relaxed">
+                              هل أنت متأكد من رغبتك في حذف "{p.name_ar}"؟ لا يمكن التراجع عن هذا الإجراء وسيختفي المنتج من المتجر فوراً.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="rounded-xl">إلغاء</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(p.id)} className="rounded-xl bg-destructive text-white font-black">نعم، احذف</AlertDialogAction>
+                          <AlertDialogFooter className="flex-col sm:flex-row-reverse gap-4 mt-8">
+                            <AlertDialogAction onClick={() => handleDelete(p.id)} className="rounded-xl bg-destructive text-white font-black h-14 px-8 text-lg">نعم، احذف نهائياً</AlertDialogAction>
+                            <AlertDialogCancel className="rounded-xl h-14 px-8 font-black text-lg">إلغاء الأمر</AlertDialogCancel>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
                    </div>
                 </div>
               </div>
-              <CardContent className="p-5 space-y-3">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-black text-secondary line-clamp-1">{p.name_ar}</h4>
-                  <div className="flex items-center gap-1 text-amber-500 shrink-0">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    <span className="text-xs font-black">4.9</span>
+              <CardContent className="p-8 space-y-4 flex-1">
+                <div className="flex justify-between items-start gap-4">
+                  <h4 className="text-xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
+                  <div className="flex items-center gap-1.5 text-amber-500 shrink-0 bg-amber-50 px-3 py-1 rounded-lg">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span className="text-sm font-black">4.9</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                   <p className="text-lg font-black text-primary">{(p.price || 0).toLocaleString()} <span className="text-[10px]">ر.ي</span></p>
-                   <Badge variant="outline" className="text-[10px] font-bold border-primary/20 bg-primary/5">{p.category_id}</Badge>
+                <div className="flex items-center justify-between pt-2">
+                   <p className="text-2xl font-black text-primary">{(p.price || 0).toLocaleString()} <span className="text-xs">ر.ي</span></p>
+                   <Badge variant="outline" className="text-xs font-bold border-primary/20 bg-primary/5 px-3 py-1 rounded-lg">{p.category_id}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -227,93 +224,105 @@ export default function AdminProducts() {
 
       {/* Edit/Add Dialog with Internal Tabs */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-3xl border-none shadow-2xl">
+        <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden rounded-[35px] border-none shadow-2xl font-cairo">
           <Tabs defaultValue="basic" className="w-full">
-            <div className="bg-secondary p-6 pb-0">
-              <DialogHeader className="mb-6">
-                <DialogTitle className="text-2xl font-black text-white">{editingProduct ? 'تعديل المنتج' : 'منتج جديد'}</DialogTitle>
-                <DialogDescription className="text-gray-400 font-bold">إدارة تفاصيل المنتج، الصور، والإعدادات المتقدمة.</DialogDescription>
+            <div className="bg-secondary p-10 pb-0 text-white relative">
+              <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+              <DialogHeader className="mb-10 relative z-10">
+                <DialogTitle className="text-4xl font-black">{editingProduct ? 'تعديل بيانات المنتج' : 'إضافة قطعة جديدة للكتالوج'}</DialogTitle>
+                <DialogDescription className="text-gray-400 font-bold text-lg mt-2">إدارة شاملة لكافة تفاصيل المنتج والوسائط المرئية.</DialogDescription>
               </DialogHeader>
-              <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-14 p-0 gap-6">
-                <TabsTrigger value="basic" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
-                  <Package className="w-4 h-4" /> البيانات الأساسية
+              <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-16 p-0 gap-10">
+                <TabsTrigger value="basic" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-lg gap-3 transition-all">
+                  <Package className="w-6 h-6" /> البيانات الأساسية
                 </TabsTrigger>
-                <TabsTrigger value="media" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
-                  <ImageIcon className="w-4 h-4" /> الوسائط
+                <TabsTrigger value="media" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-lg gap-3 transition-all">
+                  <ImageIcon className="w-6 h-6" /> الوسائط والصور
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black gap-2">
-                  <Settings className="w-4 h-4" /> الإعدادات
+                <TabsTrigger value="settings" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-lg gap-3 transition-all">
+                  <Settings className="w-6 h-6" /> إعدادات العرض
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <div className="p-8 max-h-[60vh] overflow-y-auto">
-              <TabsContent value="basic" className="space-y-6 mt-0">
-                <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary">اسم المنتج (عربي)</label>
-                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} className="rounded-xl h-12" />
+            <div className="p-12 max-h-[65vh] overflow-y-auto bg-white">
+              <TabsContent value="basic" className="space-y-10 mt-0">
+                <div className="space-y-3">
+                  <label className="text-lg font-black text-secondary mr-2">اسم المنتج التجاري (عربي)</label>
+                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} placeholder="مثال: أريكة مخملية زرقاء فاخرة" className="rounded-2xl h-16 text-lg border-gray-100 bg-gray-50 focus:bg-white transition-all shadow-inner" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary">الوصف التفصيلي</label>
-                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} className="rounded-xl min-h-[120px]" />
+                <div className="space-y-3">
+                  <label className="text-lg font-black text-secondary mr-2">وصف تفصيلي للقطعة</label>
+                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} placeholder="تحدث عن خامات الخشب، نوع القماش، وجمالية التصميم..." className="rounded-2xl min-h-[180px] text-lg border-gray-100 bg-gray-50 focus:bg-white transition-all py-6 shadow-inner" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-black text-secondary">السعر</label>
-                    <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="rounded-xl h-12" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-lg font-black text-secondary mr-2">السعر (ر.ي)</label>
+                    <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="rounded-2xl h-16 text-lg border-gray-100 bg-gray-50 shadow-inner" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-black text-secondary">التصنيف</label>
-                    <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-12 rounded-xl border border-input bg-background px-3 font-bold">
+                  <div className="space-y-3">
+                    <label className="text-lg font-black text-secondary mr-2">الفئة / القسم</label>
+                    <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-16 rounded-2xl border border-gray-100 bg-gray-50 px-6 font-black text-lg outline-none focus:ring-2 focus:ring-primary/20 shadow-inner">
                       <option value="living">غرف معيشة</option>
                       <option value="bedroom">غرف نوم</option>
-                      <option value="dining">طعام</option>
-                      <option value="office">مكاتب</option>
+                      <option value="dining">طاولات طعام</option>
+                      <option value="office">أثاث مكتبي</option>
+                      <option value="majlis">مجالس تراثية</option>
                     </select>
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="media" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <label className="text-sm font-black text-secondary">صورة المنتج الرئيسية</label>
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-3xl p-10 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+              <TabsContent value="media" className="space-y-10 mt-0">
+                <div className="space-y-6">
+                  <label className="text-lg font-black text-secondary text-center block">صورة المنتج الرئيسية (سيتم تحويلها لبيانات نصية)</label>
+                  <div className="flex flex-col items-center justify-center border-4 border-dashed border-gray-100 rounded-[35px] p-16 bg-gray-50/50 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer relative group">
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                     {formData.image_base64 ? (
-                      <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl">
+                      <div className="relative w-full aspect-video rounded-[25px] overflow-hidden shadow-2xl group/img">
                         <Image src={formData.image_base64} alt="Preview" fill className="object-cover" />
-                        <Button variant="destructive" size="sm" className="absolute top-2 right-2 rounded-lg" onClick={(e) => { e.stopPropagation(); setFormData({...formData, image_base64: ''})}}>إزالة</Button>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                            <Button variant="destructive" size="lg" className="rounded-xl font-black gap-2 h-14 px-8" onClick={(e) => { e.stopPropagation(); setFormData({...formData, image_base64: ''})}}>
+                               <Trash2 className="w-5 h-5" /> إزالة واستبدال الصورة
+                            </Button>
+                        </div>
                       </div>
                     ) : (
-                      <div className="text-center space-y-2">
-                        <Upload className="w-12 h-12 text-primary mx-auto opacity-40" />
-                        <p className="font-black text-secondary">اسحب الصورة هنا أو انقر للرفع</p>
-                        <p className="text-xs text-muted-foreground">سيتم تحويل الصورة إلى نص وتخزينها في قاعدة البيانات</p>
+                      <div className="text-center space-y-6">
+                        <div className="w-24 h-24 bg-white rounded-[25px] flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                           <Upload className="w-10 h-10 text-primary" />
+                        </div>
+                        <div>
+                           <p className="text-2xl font-black text-secondary">اسحب الصورة هنا أو انقر للتصفح</p>
+                           <p className="text-muted-foreground font-bold mt-2">دقة عالية لضمان أفضل ظهور للعميل</p>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="settings" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                    <div className="space-y-1">
-                      <p className="font-black text-secondary">حالة النشر</p>
-                      <p className="text-xs text-muted-foreground">تحديد ما إذا كان المنتج سيظهر للعملاء أم لا</p>
+              <TabsContent value="settings" className="space-y-8 mt-0">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-8 bg-gray-50 rounded-[25px] border border-gray-100 hover:border-primary/20 transition-all">
+                    <div className="space-y-2">
+                      <p className="text-xl font-black text-secondary flex items-center gap-3">
+                         <CheckCircle2 className="w-6 h-6 text-primary" /> حالة النشر العامة
+                      </p>
+                      <p className="text-base text-muted-foreground font-medium">تحكم في ظهور هذا المنتج لزوار المنصة بشكل فوري.</p>
                     </div>
-                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="h-10 rounded-lg border px-3 font-bold">
-                      <option value="approved">منشور</option>
-                      <option value="pending">مسودة / مراجعة</option>
+                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="h-14 rounded-xl border border-gray-200 px-6 font-black bg-white shadow-sm outline-none focus:ring-2 focus:ring-primary/20">
+                      <option value="approved">منشور (مرئي للجميع)</option>
+                      <option value="pending">مسودة (للمراجعة فقط)</option>
                     </select>
                   </div>
                 </div>
               </TabsContent>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl px-8 h-12 font-bold">إلغاء</Button>
-              <Button onClick={handleSaveProduct} className="rounded-xl px-12 h-12 font-black shadow-lg shadow-primary/20">حفظ التغييرات</Button>
+            <div className="p-10 bg-gray-50 border-t flex justify-end gap-5">
+              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-xl px-10 h-16 font-black text-xl hover:bg-white">إلغاء</Button>
+              <Button onClick={handleSaveProduct} className="rounded-xl px-16 h-16 font-black text-xl bg-secondary text-white shadow-2xl shadow-secondary/20 hover:-translate-y-1 transition-all">حفظ التغييرات ونشرها</Button>
             </div>
           </Tabs>
         </DialogContent>
@@ -321,4 +330,3 @@ export default function AdminProducts() {
     </div>
   );
 }
-

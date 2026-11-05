@@ -4,34 +4,30 @@
 import { useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, where, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Search, 
   Plus, 
-  MoreVertical, 
-  ExternalLink, 
-  Store, 
-  ShieldCheck,
-  Ban,
-  Mail,
-  MapPin,
-  Filter,
-  CheckCircle2,
-  XCircle,
+  CheckCircle2, 
   Camera,
   Upload,
-  Clock,
   Star,
-  Users
+  Image as ImageIcon,
+  MapPin,
+  Store,
+  Clock,
+  Award,
+  ChevronLeft,
+  Mail,
+  Info
 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -50,7 +46,6 @@ export default function AdminVendors() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  // New Vendor Form State
   const [vendorData, setVendorData] = useState({
     business_name: '',
     business_type: 'furniture_store',
@@ -60,7 +55,8 @@ export default function AdminVendors() {
     logo_base64: '',
     cover_base64: '',
     average_rating: 5,
-    experience_years: '5'
+    experience_years: '5',
+    service_areas: ['صنعاء']
   });
 
   const handleImageUpload = (type: 'logo' | 'cover', e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,184 +72,225 @@ export default function AdminVendors() {
 
   const handleAddVendor = async () => {
     try {
+      if (!vendorData.business_name || !vendorData.email) {
+        toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء الحقول الأساسية" });
+        return;
+      }
       await addDoc(collection(db, 'vendors'), {
         ...vendorData,
         approval_status: 'approved',
+        average_rating: Number(vendorData.average_rating),
         created_at: serverTimestamp()
       });
-      toast({ title: "تمت الإضافة", description: "تم إضافة المتجر بنجاح" });
+      toast({ title: "تم تسجيل الشريك بنجاح" });
       setIsAddOpen(false);
-      setVendorData({ business_name: '', business_type: 'furniture_store', city: 'صنعاء', email: '', description: '', logo_base64: '', cover_base64: '', average_rating: 5, experience_years: '5' });
+      setVendorData({ business_name: '', business_type: 'furniture_store', city: 'صنعاء', email: '', description: '', logo_base64: '', cover_base64: '', average_rating: 5, experience_years: '5', service_areas: ['صنعاء'] });
     } catch (e) {
-      toast({ variant: "destructive", title: "خطأ", description: "فشل في إضافة المتجر" });
+      toast({ variant: "destructive", title: "خطأ", description: "فشل في تسجيل الشريك" });
     }
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-20 font-cairo" dir="rtl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-secondary">إدارة الشركاء</h1>
-          <p className="text-muted-foreground font-bold mt-1">تتبع المتاجر، النجارين، والمصممين المعتمدين.</p>
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black text-secondary">إدارة الشركاء</h1>
+          <p className="text-muted-foreground font-bold">إدارة المتاجر، النجارين، والمصممين المعتمدين في المنصة.</p>
         </div>
-        <Button onClick={() => setIsAddOpen(true)} className="rounded-xl h-12 px-8 font-black shadow-lg shadow-primary/20">
-          <Plus className="w-5 h-5 ml-2" /> إضافة شريك جديد
+        <Button onClick={() => setIsAddOpen(true)} className="rounded-[15px] h-14 px-10 font-black bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/20">
+          <Plus className="ml-2 w-6 h-6" /> إضافة شريك معتمد
         </Button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+        <div className="relative w-full max-w-xl group">
+          <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-primary transition-colors" />
           <Input 
-            placeholder="ابحث عن اسم أو مدينة..." 
+            placeholder="ابحث عن شريك باسم المتجر أو المدينة..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-12 h-14 bg-white border-none shadow-sm rounded-xl font-bold"
+            className="pr-14 h-16 bg-white border-none shadow-sm rounded-2xl font-bold text-lg"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto w-full lg:w-auto p-1 bg-gray-100 rounded-2xl">
-          {['all', 'furniture_store', 'carpenter', 'interior_designer'].map((f) => (
+        <div className="flex gap-3 overflow-x-auto w-full lg:w-auto p-2 bg-gray-100 rounded-[20px] shadow-inner">
+          {[
+            { id: 'all', name: 'الكل' },
+            { id: 'furniture_store', name: 'المتاجر' },
+            { id: 'carpenter', name: 'النجارين' },
+            { id: 'interior_designer', name: 'المصممين' }
+          ].map((f) => (
             <Button 
-              key={f}
-              variant={activeFilter === f ? 'default' : 'ghost'} 
-              size="sm" 
-              className="rounded-xl font-bold h-10 px-6 whitespace-nowrap"
-              onClick={() => setActiveFilter(f)}
+              key={f.id}
+              variant={activeFilter === f.id ? 'default' : 'ghost'} 
+              size="lg" 
+              className={cn(
+                "rounded-xl font-black h-12 px-8 whitespace-nowrap transition-all",
+                activeFilter === f.id ? "bg-secondary text-white shadow-lg" : "text-muted-foreground hover:text-secondary"
+              )}
+              onClick={() => setActiveFilter(f.id)}
             >
-              {f === 'all' ? 'الكل' : f === 'furniture_store' ? 'متاجر' : f === 'carpenter' ? 'نجارين' : 'مصممين'}
+              {f.name}
             </Button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {vendors?.filter(v => {
-          const matchSearch = v.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) || v.city?.toLowerCase().includes(searchTerm.toLowerCase());
-          const matchFilter = activeFilter === 'all' || v.business_type === activeFilter;
-          return matchSearch && matchFilter;
-        }).map((vendor: any) => (
-          <Card key={vendor.id} className="rounded-3xl border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white flex flex-col group">
-            <div className="relative h-40 w-full overflow-hidden">
-              <Image src={vendor.cover_base64 || `https://picsum.photos/seed/${vendor.id}/800/400`} alt={vendor.business_name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 right-4 flex items-center gap-3">
-                 <div className="w-14 h-14 bg-white p-1 rounded-xl shadow-2xl relative overflow-hidden shrink-0">
-                    <Image src={vendor.logo_base64 || `https://picsum.photos/seed/${vendor.id}-logo/200/200`} alt="Logo" fill className="object-cover" />
-                 </div>
-                 <div className="text-white">
-                    <h4 className="font-black text-lg flex items-center gap-1.5">{vendor.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
-                    <p className="text-[10px] font-bold opacity-80 uppercase tracking-widest">{vendor.city}</p>
-                 </div>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 gap-6">
+           <Loader2 className="w-16 h-16 animate-spin text-primary" />
+           <p className="font-black text-muted-foreground text-xl">جاري تحميل قائمة الشركاء...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {vendors?.filter(v => {
+            const matchSearch = v.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) || v.city?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchFilter = activeFilter === 'all' || v.business_type === activeFilter;
+            return matchSearch && matchFilter;
+          }).map((vendor: any) => (
+            <Card key={vendor.id} className="rounded-[2.5rem] border-none shadow-sm hover:shadow-2xl transition-all overflow-hidden bg-white flex flex-col group border border-transparent hover:border-primary/10">
+              <div className="relative h-48 w-full overflow-hidden">
+                <Image src={vendor.cover_base64 || `https://picsum.photos/seed/${vendor.id}/800/400`} alt={vendor.business_name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="absolute bottom-6 right-6 flex items-center gap-4">
+                   <div className="w-16 h-16 bg-white p-1 rounded-2xl shadow-2xl relative overflow-hidden shrink-0 border-2 border-white/20">
+                      <Image src={vendor.logo_base64 || `https://picsum.photos/seed/${vendor.id}-logo/200/200`} alt="Logo" fill className="object-cover" />
+                   </div>
+                   <div className="text-white">
+                      <h4 className="font-black text-xl flex items-center gap-2">{vendor.business_name} <CheckCircle2 className="w-5 h-5 text-primary fill-white" /></h4>
+                      <p className="text-xs font-bold opacity-80 uppercase tracking-widest flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" /> {vendor.city}
+                      </p>
+                   </div>
+                </div>
               </div>
-            </div>
-            <CardContent className="p-6 flex-1 flex flex-col space-y-6">
-               <p className="text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2">{vendor.description || 'لا يوجد وصف متاح لهذا الشريك حالياً.'}</p>
-               
-               <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-50 rounded-2xl text-center space-y-1">
-                     <p className="text-[10px] text-muted-foreground font-black uppercase">التقييم</p>
-                     <div className="flex items-center justify-center gap-1 text-amber-500 font-black">
-                        <Star className="w-4 h-4 fill-current" /> {vendor.average_rating || '5.0'}
-                     </div>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-2xl text-center space-y-1">
-                     <p className="text-[10px] text-muted-foreground font-black uppercase">النوع</p>
-                     <p className="text-xs font-black text-secondary">{vendor.business_type === 'carpenter' ? 'ورشة نجارة' : 'معرض أثاث'}</p>
-                  </div>
-               </div>
+              <CardContent className="p-10 flex-1 flex flex-col space-y-8">
+                 <p className="text-sm text-muted-foreground font-medium leading-loose line-clamp-3">{vendor.description || 'هذا الشريك يقدم خدمات ومنتجات عالية الجودة موثقة من قبل إيوان لضمان رضاكم.'}</p>
+                 
+                 <div className="grid grid-cols-2 gap-6">
+                    <div className="p-5 bg-gray-50 rounded-[20px] text-center space-y-1 shadow-inner border border-gray-100">
+                       <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider">التقييم العام</p>
+                       <div className="flex items-center justify-center gap-1.5 text-amber-500 font-black text-lg">
+                          <Star className="w-5 h-5 fill-current" /> {vendor.average_rating || '5.0'}
+                       </div>
+                    </div>
+                    <div className="p-5 bg-gray-50 rounded-[20px] text-center space-y-1 shadow-inner border border-gray-100">
+                       <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider">نوع الشريك</p>
+                       <p className="text-sm font-black text-secondary">{vendor.business_type === 'carpenter' ? 'ورشة تفصيل' : vendor.business_type === 'furniture_store' ? 'معرض أثاث' : 'مصمم ديكور'}</p>
+                    </div>
+                 </div>
 
-               <div className="flex gap-3 mt-auto pt-4 border-t">
-                  <Link href={`/vendors/${vendor.id}`} className="flex-1">
-                    <Button variant="outline" className="w-full rounded-xl h-11 border-border font-bold hover:bg-gray-50">معاينة</Button>
-                  </Link>
-                  <Button className="flex-1 rounded-xl h-11 bg-secondary text-white font-bold">إدارة</Button>
-               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                 <div className="flex gap-4 mt-auto pt-6 border-t border-gray-100">
+                    <Link href={`/vendors/${vendor.id}`} className="flex-1">
+                      <Button variant="outline" className="w-full rounded-xl h-14 border-gray-200 font-black text-lg hover:bg-gray-50 transition-all">معاينة المتجر</Button>
+                    </Link>
+                    <Button className="flex-1 rounded-xl h-14 bg-secondary text-white font-black text-lg shadow-xl shadow-secondary/10">إدارة الحساب</Button>
+                 </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {/* Add Vendor Dialog - Comprehensive Design */}
+      {/* Add Vendor Dialog - Premium Multi-Step Design */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl">
-          <div className="bg-secondary p-10 text-white relative">
-             <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 -translate-y-1/2 translate-x-1/2 rotate-45" />
-             <DialogHeader>
-                <DialogTitle className="text-3xl font-black">تسجيل شريك جديد</DialogTitle>
-                <DialogDescription className="text-gray-400 font-bold mt-2">أدخل كافة تفاصيل المتجر أو الورشة بعناية لضمان أفضل ظهور للعملاء.</DialogDescription>
+        <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden rounded-[3rem] border-none shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] font-cairo">
+          <div className="bg-secondary p-12 text-white relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 -translate-y-1/2 translate-x-1/2 rotate-45 rounded-full blur-3xl" />
+             <DialogHeader className="relative z-10">
+                <DialogTitle className="text-4xl font-black">تسجيل شريك استراتيجي</DialogTitle>
+                <DialogDescription className="text-gray-400 font-bold text-lg mt-3">أدخل تفاصيل الهوية التجارية للبدء في عرض المنتجات والخدمات للعملاء.</DialogDescription>
              </DialogHeader>
           </div>
           
-          <div className="p-10 max-h-[65vh] overflow-y-auto space-y-10 bg-white">
-             {/* Visual Assets */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-12 max-h-[65vh] overflow-y-auto space-y-12 bg-white">
+             {/* Visual Branding Section */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-4">
-                   <label className="text-sm font-black text-secondary flex items-center gap-2 mr-1">
-                      <ImageIcon className="w-4 h-4 text-primary" /> شعار المتجر (Logo)
+                   <label className="text-lg font-black text-secondary flex items-center gap-3 mr-1">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><ImageIcon className="w-4 h-4" /></div>
+                      شعار العلامة التجارية (Logo)
                    </label>
-                   <div className="relative aspect-square w-32 border-2 border-dashed border-gray-100 rounded-3xl overflow-hidden bg-gray-50 group hover:border-primary/40 transition-all">
-                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                   <div className="relative aspect-square w-40 border-4 border-dashed border-gray-50 rounded-[2.5rem] overflow-hidden bg-gray-50/50 group hover:border-primary/40 transition-all shadow-inner">
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                       {vendorData.logo_base64 ? (
                         <Image src={vendorData.logo_base64} alt="Logo" fill className="object-cover" />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center text-muted-foreground"><Upload className="w-6 h-6" /></div>
+                        <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground gap-2">
+                           <Upload className="w-8 h-8 opacity-20" />
+                           <span className="text-[10px] font-black uppercase">ارفع الشعار</span>
+                        </div>
                       )}
                    </div>
                 </div>
                 <div className="space-y-4">
-                   <label className="text-sm font-black text-secondary flex items-center gap-2 mr-1">
-                      <ImageIcon className="w-4 h-4 text-primary" /> صورة الغلاف (Banner)
+                   <label className="text-lg font-black text-secondary flex items-center gap-3 mr-1">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><ImageIcon className="w-4 h-4" /></div>
+                      صورة غلاف المتجر (Cover)
                    </label>
-                   <div className="relative aspect-video w-full border-2 border-dashed border-gray-100 rounded-3xl overflow-hidden bg-gray-50 group hover:border-primary/40 transition-all">
-                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                   <div className="relative aspect-video w-full border-4 border-dashed border-gray-50 rounded-[2.5rem] overflow-hidden bg-gray-50/50 group hover:border-primary/40 transition-all shadow-inner">
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                       {vendorData.cover_base64 ? (
                         <Image src={vendorData.cover_base64} alt="Cover" fill className="object-cover" />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center text-muted-foreground"><Upload className="w-8 h-8" /></div>
+                        <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground gap-2">
+                           <Upload className="w-10 h-10 opacity-20" />
+                           <span className="text-[10px] font-black uppercase">ارفع صورة الغلاف</span>
+                        </div>
                       )}
                    </div>
                 </div>
              </div>
 
-             {/* Basic Info */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                   <label className="text-sm font-black text-secondary mr-1">الاسم التجاري</label>
-                   <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="مثال: معرض النور للأثاث" className="rounded-xl h-14" />
+             {/* Detailed Info Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">اسم المتجر / الورشة</label>
+                   <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم الرسمي المعتمد" className="rounded-2xl h-16 text-lg bg-gray-50 border-gray-100 shadow-inner" />
                 </div>
-                <div className="space-y-2">
-                   <label className="text-sm font-black text-secondary mr-1">البريد الإلكتروني</label>
-                   <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="shop@ewan.ye" className="rounded-xl h-14" />
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">البريد الإلكتروني المهني</label>
+                   <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="professional@ewan.ye" className="rounded-2xl h-16 text-lg bg-gray-50 border-gray-100 shadow-inner" />
                 </div>
-                <div className="space-y-2">
-                   <label className="text-sm font-black text-secondary mr-1">المدينة المقر</label>
-                   <select value={vendorData.city} onChange={e => setVendorData({...vendorData, city: e.target.value})} className="w-full h-14 rounded-xl border px-4 font-bold bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none">
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">المقر الرئيسي (المدينة)</label>
+                   <select value={vendorData.city} onChange={e => setVendorData({...vendorData, city: e.target.value})} className="w-full h-16 rounded-2xl border border-gray-100 px-6 font-black text-lg bg-gray-50 outline-none focus:ring-2 focus:ring-primary/20 shadow-inner">
                       <option value="صنعاء">صنعاء</option>
                       <option value="عدن">عدن</option>
                       <option value="تعز">تعز</option>
-                      <option value="حضرموت">حضرموت</option>
+                      <option value="المكلا">المكلا</option>
                       <option value="إب">إب</option>
                    </select>
                 </div>
-                <div className="space-y-2">
-                   <label className="text-sm font-black text-secondary mr-1">نوع الشريك</label>
-                   <select value={vendorData.business_type} onChange={e => setVendorData({...vendorData, business_type: e.target.value})} className="w-full h-14 rounded-xl border px-4 font-bold bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none">
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">نوع النشاط التجاري</label>
+                   <select value={vendorData.business_type} onChange={e => setVendorData({...vendorData, business_type: e.target.value})} className="w-full h-16 rounded-2xl border border-gray-100 px-6 font-black text-lg bg-gray-50 outline-none focus:ring-2 focus:ring-primary/20 shadow-inner">
                       <option value="furniture_store">معرض أثاث جاهز</option>
-                      <option value="carpenter">ورشة نجارة / تفصيل</option>
+                      <option value="carpenter">ورشة نجارة وتفصيل</option>
                       <option value="interior_designer">مصمم ديكور داخلي</option>
                    </select>
                 </div>
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">سنوات الخبرة</label>
+                   <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} className="rounded-2xl h-16 text-lg bg-gray-50 border-gray-100 shadow-inner" />
+                </div>
+                <div className="space-y-3">
+                   <label className="text-lg font-black text-secondary mr-2">التقييم الأولي (5/5)</label>
+                   <Input type="number" max="5" min="1" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} className="rounded-2xl h-16 text-lg bg-gray-50 border-gray-100 shadow-inner" />
+                </div>
              </div>
 
-             <div className="space-y-2">
-                <label className="text-sm font-black text-secondary mr-1">وصف المتجر (الفقرة التعريفية)</label>
-                <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="تحدث عن تاريخ المتجر، جودة المنتجات، والضمان المقدم..." className="rounded-xl min-h-[120px] bg-gray-50 py-4" />
+             <div className="space-y-4">
+                <label className="text-lg font-black text-secondary flex items-center gap-3 mr-2">
+                   <Info className="w-6 h-6 text-primary" /> نبذة تعريفية كاملة (عن المتجر)
+                </label>
+                <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="اكتب تاريخ المتجر، جودة الخشب المستخدم، والضمانات التي يتم تقديمها للعملاء..." className="rounded-[25px] min-h-[220px] text-lg bg-gray-50 border-gray-100 py-8 px-8 leading-loose shadow-inner focus:bg-white transition-all" />
              </div>
           </div>
 
-          <div className="p-8 bg-gray-50 border-t flex justify-end gap-3">
-             <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl px-8 h-14 font-black">إلغاء</Button>
-             <Button onClick={handleAddVendor} className="rounded-xl px-14 h-14 font-black bg-secondary text-white shadow-2xl shadow-secondary/20">تفعيل حساب الشريك ونشره</Button>
+          <div className="p-12 bg-gray-50 border-t flex justify-end gap-6">
+             <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl px-12 h-16 font-black text-xl hover:bg-white">إلغاء الأمر</Button>
+             <Button onClick={handleAddVendor} className="rounded-xl px-20 h-16 font-black text-xl bg-secondary text-white shadow-[0_20px_40px_-10px_rgba(7,61,73,0.3)] hover:-translate-y-1 transition-all">تفعيل حساب الشريك ونشره</Button>
           </div>
         </DialogContent>
       </Dialog>
