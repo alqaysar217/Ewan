@@ -1,36 +1,22 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { 
   Filter, 
-  Heart, 
   ShoppingBag, 
-  Sparkles, 
   LayoutGrid, 
   List,
   Star,
-  ChevronDown,
-  Palette,
-  Layers,
-  CircleDollarSign,
-  Maximize2,
   Store,
   Loader2,
   Layout
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import {
   Accordion,
   AccordionContent,
@@ -48,11 +34,8 @@ export default function ShopPage() {
   const [maxPrice, setMaxPrice] = useState([1000000]);
   const db = useFirestore();
   
-  // جلب المنتجات الحقيقية
   const productsQuery = query(collection(db, 'products'), orderBy('created_at', 'desc'));
   const { data: products, loading: productsLoading } = useCollection(productsQuery);
-
-  // جلب المتاجر لعرض أسمائها
   const { data: vendors } = useCollection(collection(db, 'vendors'));
 
   const categories = [
@@ -65,7 +48,7 @@ export default function ShopPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-cairo" dir="rtl">
+    <div className="min-h-screen bg-[#F4F6F5] flex flex-col font-cairo" dir="rtl">
       <Header />
 
       <section className="relative py-12 md:py-16 bg-secondary overflow-hidden">
@@ -116,7 +99,7 @@ export default function ShopPage() {
                       <Slider defaultValue={[1000000]} max={2000000} step={10000} value={maxPrice} onValueChange={setMaxPrice} />
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-muted-foreground">0</span>
-                        <span className="text-sm font-black text-primary">حتى {maxPrice[0].toLocaleString()}</span>
+                        <span className="text-sm font-black text-primary">حتى {maxPrice[0].toLocaleString('en-US')}</span>
                       </div>
                     </div>
                   </AccordionContent>
@@ -141,7 +124,7 @@ export default function ShopPage() {
                     <Button variant="ghost" size="icon" onClick={() => setViewType('list')} className={cn("rounded-md", viewType === 'list' && "text-primary bg-primary/10")}>
                       <List className="w-5 h-5" />
                     </Button>
-                    <span className="text-sm font-bold text-muted-foreground mr-4">عرض {products?.length || 0} قطعة فاخرة</span>
+                    <span className="text-sm font-bold text-muted-foreground mr-4">عرض {(products?.length || 0).toLocaleString('en-US')} قطعة فاخرة</span>
                   </div>
                 </div>
 
@@ -149,62 +132,61 @@ export default function ShopPage() {
                   {products?.map((p: any) => {
                     const vendor = vendors?.find(v => v.id === p.vendor_id);
                     return (
-                      <div key={p.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                        <div className="relative aspect-square overflow-hidden bg-white/50">
+                      <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
+                        <div className="relative aspect-square overflow-hidden bg-gray-50">
                           <Image 
                             src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
                             alt={p.name_ar} 
                             fill 
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                           />
-                          <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
-                            <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="bg-white text-secondary font-black rounded-[10px] shadow-xl px-6 py-2">عرض التفاصيل</span>
-                            </div>
-                          </Link>
+                          {/* Blurry layer at bottom */}
+                          <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
+                          
+                          <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
                           <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                              {Number(p.discount) > 0 && (
-                               <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
-                                 {p.discount}% خصم
+                               <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                                 %{p.discount.toLocaleString('en-US')} خصم
                                </Badge>
                              )}
-                             <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[10px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
+                             <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[9px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
                                {p.in_stock ? 'متوفر' : 'غير متوفر'}
                              </Badge>
                           </div>
                         </div>
 
-                        <div className="p-5 flex flex-col flex-1 gap-4">
-                          <div className="flex justify-between items-start gap-2">
-                            <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
-                            <div className="flex items-center gap-1 text-amber-500 shrink-0">
-                              <Star className="w-3.5 h-3.5 fill-current" />
-                              <span className="text-xs font-black">{p.rating || '5.0'}</span>
+                        <div className="p-4 flex flex-col flex-1 gap-3">
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-base font-black text-secondary flex-1 leading-tight">{p.name_ar}</h4>
+                            <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
+                              <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
+                              <Star className="w-3 h-3 fill-current" />
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Store className="w-4 h-4 text-primary" />
-                            <span className="text-xs font-bold">{vendor?.business_name || 'إيوان المعتمد'}</span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <Layout className="w-4 h-4 text-primary" />
-                            <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0 uppercase">
-                              {p.category_id}
-                            </Badge>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Store className="w-4 h-4 text-primary" />
+                              <span className="text-xs font-bold">{vendor?.business_name || 'إيوان المعتمد'}</span>
+                            </div>
+                            <div className="w-fit">
+                              <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
+                                {p.category_id}
+                              </Badge>
+                            </div>
                           </div>
 
                           <div className="mt-auto pt-2 space-y-4">
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-xl font-black text-secondary">
-                                {(Number(p.price) || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-black text-secondary">
+                                {(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span>
                               </span>
                               {Number(p.old_price) > 0 && (
-                                <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()}</span>
+                                <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>
                               )}
                             </div>
-                            <Button className="w-full bg-secondary hover:bg-primary text-white font-black gap-2 h-11 rounded-[12px] transition-all shadow-sm">
+                            <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
                               <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                             </Button>
                           </div>

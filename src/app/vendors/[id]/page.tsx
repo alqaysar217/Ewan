@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useMemo } from 'react';
+import { use, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -17,8 +17,6 @@ import {
   Sparkles,
   Quote,
   Layout,
-  Hammer,
-  Palette,
   ShoppingBag,
   Loader2
 } from 'lucide-react';
@@ -40,10 +38,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   const { id } = use(params);
   const db = useFirestore();
   
-  // جلب بيانات المتجر
   const { data: vendorData, loading: vendorLoading } = useDoc(doc(db, 'vendors', id));
-
-  // جلب منتجات هذا المتجر حصراً
   const productsQuery = query(collection(db, 'products'), where('vendor_id', '==', id));
   const { data: vendorProducts, loading: productsLoading } = useCollection(productsQuery);
 
@@ -58,9 +53,9 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
     cover_url: vendorData?.cover_url || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
     logo_url: vendorData?.logo_url || 'https://picsum.photos/seed/v1/200/200',
     stats: [
-      { label: 'منتج متاح', value: vendorProducts?.length || vendorData?.available_products || '0', icon: Package },
-      { label: 'سنة خبرة', value: vendorData?.experience_years || '1', icon: Clock },
-      { label: 'تقييم عام', value: vendorData?.average_rating || '5.0', icon: Star },
+      { label: 'منتج متاح', value: (vendorProducts?.length || vendorData?.available_products || 0).toLocaleString('en-US'), icon: Package },
+      { label: 'سنة خبرة', value: (vendorData?.experience_years || 1).toLocaleString('en-US'), icon: Clock },
+      { label: 'تقييم عام', value: (vendorData?.average_rating || 5.0).toLocaleString('en-US'), icon: Star },
     ]
   };
 
@@ -74,11 +69,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-cairo" dir="rtl">
+    <div className="min-h-screen bg-[#F4F6F5] flex flex-col font-cairo" dir="rtl">
       <Header />
 
       <main className="flex-1">
-        {/* Premium Profile Header */}
         <section className="relative h-[55vh] w-full overflow-hidden">
           <Image 
             src={vendor.cover_url} 
@@ -108,7 +102,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="w-5 h-5 text-amber-500 fill-current" />
-                    {vendor.average_rating} <span className="opacity-60 text-sm">({vendor.reviewsCount} تقييم)</span>
+                    {vendor.average_rating.toLocaleString('en-US')} <span className="opacity-60 text-sm">({vendor.reviewsCount.toLocaleString('en-US')} تقييم)</span>
                   </div>
                 </div>
               </div>
@@ -174,13 +168,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   </>
                 )}
               </div>
-
-              <div className="p-10 bg-secondary text-white rounded-2xl relative overflow-hidden group shadow-2xl">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 -translate-y-1/2 translate-x-1/2 rotate-45 transition-transform group-hover:scale-110" />
-                 <Award className="w-12 h-12 text-primary mb-8" />
-                 <h4 className="text-2xl font-black mb-4">شريك إيوان الذهبي</h4>
-                 <p className="text-gray-400 text-sm font-medium leading-relaxed">تلتزم هذه المنشأة بأعلى معايير الجودة اليمنية وتقدم ضمانات صيانة حقيقية موثقة من إيوان.</p>
-              </div>
             </div>
 
             <div className="lg:col-span-3 space-y-12">
@@ -192,9 +179,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   <TabsTrigger value="reviews" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-lg px-10 transition-all gap-2">
                     <Quote className="w-5 h-5" /> الآراء
                   </TabsTrigger>
-                  <TabsTrigger value="gallery" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-lg px-10 transition-all gap-2">
-                    <Sparkles className="w-5 h-5" /> معرض الأعمال
-                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="products" className="animate-in fade-in duration-700">
@@ -204,49 +188,60 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                       <p className="font-bold text-muted-foreground">جاري عرض منتجات المتجر...</p>
                     </div>
                   ) : vendorProducts?.length === 0 ? (
-                    <div className="py-24 text-center space-y-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
+                    <div className="py-24 text-center space-y-4 bg-white rounded-2xl border-2 border-dashed border-gray-100">
                        <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto" />
                        <p className="text-lg font-black text-muted-foreground">لا توجد منتجات معروضة حالياً لهذا الشريك.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {vendorProducts?.map((p: any) => (
-                        <div key={p.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-                          <div className="relative aspect-square overflow-hidden bg-white/50">
-                            <Image src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} alt={p.name_ar} fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
-                            <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
-                              <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="bg-white text-secondary font-black rounded-[10px] shadow-xl px-6 py-2">التفاصيل</span>
-                              </div>
-                            </Link>
+                        <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
+                          <div className="relative aspect-square overflow-hidden bg-gray-50">
+                            <Image 
+                              src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
+                              alt={p.name_ar} 
+                              fill 
+                              className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                            />
+                            {/* Blurry layer at bottom */}
+                            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
+                            
+                            <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
                             {Number(p.discount) > 0 && (
                               <div className="absolute top-3 right-3 z-20">
-                                <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
-                                  {p.discount}% خصم
+                                <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                                  %{p.discount.toLocaleString('en-US')} خصم
                                 </Badge>
                               </div>
                             )}
                           </div>
-                          <div className="p-5 flex flex-col flex-1 gap-4">
-                            <div className="flex justify-between items-start gap-2">
-                              <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
-                              <div className="flex items-center gap-1 text-amber-500 shrink-0">
-                                <Star className="w-3.5 h-3.5 fill-current" />
-                                <span className="text-xs font-black">{p.rating || '5.0'}</span>
+                          <div className="p-4 flex flex-col flex-1 gap-3">
+                            <div className="flex justify-between items-start">
+                              <h4 className="text-base font-black text-secondary flex-1 leading-tight">{p.name_ar}</h4>
+                              <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
+                                <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
+                                <Star className="w-3 h-3 fill-current" />
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                               <Layout className="w-4 h-4 text-primary" />
-                               <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0 uppercase">
-                                 {p.category_id}
-                               </Badge>
+                            
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <Store className="w-4 h-4 text-primary" />
+                                <span className="text-xs font-bold">{vendor.business_name}</span>
+                              </div>
+                              <div className="w-fit">
+                                <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
+                                  {p.category_id}
+                                </Badge>
+                              </div>
                             </div>
+
                             <div className="mt-auto pt-2 space-y-4">
-                               <div className="flex items-baseline gap-2">
-                                  <span className="text-xl font-black text-primary">{(Number(p.price) || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span></span>
-                                  {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()}</span>}
+                               <div className="flex items-center gap-2">
+                                  <span className="text-lg font-black text-secondary">{(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
+                                  {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>}
                                </div>
-                               <Button className="w-full bg-secondary hover:bg-primary text-white font-black gap-2 h-11 rounded-[12px] transition-all shadow-sm">
+                               <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
                                   <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                                </Button>
                             </div>
@@ -260,7 +255,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                 <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
                    <div className="bg-primary/5 p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
                      <div className="text-center md:text-right">
-                       <h3 className="text-7xl font-black text-primary mb-2">{vendor.average_rating}</h3>
+                       <h3 className="text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
                        <div className="flex gap-2 justify-center md:justify-start text-amber-500 mb-2">
                          {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current w-8 h-8" />)}
                        </div>
@@ -293,22 +288,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                           </div>
                         </div>
                         <p className="text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20">"{rev.text}"</p>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="gallery" className="animate-in fade-in duration-700">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {(vendorData?.gallery || [1, 2, 3, 4, 5, 6, 7, 8]).map((img: any, i: number) => (
-                      <div key={i} className="relative aspect-[4/5] rounded-xl overflow-hidden bg-gray-50 group cursor-pointer shadow-md border-4 border-white">
-                        <Image src={typeof img === 'string' ? img : `https://picsum.photos/seed/gall-${i}-${id}/600/800`} alt="Portfolio" fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
-                          <p className="text-white font-black text-sm mb-1">مشروع إيوان المتكامل {i + 1}</p>
-                          <div className="flex items-center gap-2 text-primary text-[10px] font-black bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-md">
-                            <Sparkles className="w-3 h-3" /> تم الإنجاز في 2024
-                          </div>
-                        </div>
                       </div>
                     ))}
                   </div>

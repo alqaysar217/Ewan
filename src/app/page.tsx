@@ -34,7 +34,7 @@ import Footer from '@/components/Footer';
 
 export default function HomePage() {
   const featuredProducts = [
-    { id: 1, name: 'طقم ديوان حضرمي مطور', category: 'غرف معيشة', price: 450000, oldPrice: 540000, discount: 15, store: 'ورشة المكلا', rating: 4.9, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
+    { id: 1, name: 'طقم ديوان حضرمي مطور', category: 'غرف معيشة', price: 450000, oldPrice: 540000, discount: 15, store: 'ورشة إتقان', rating: 4.9, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
     { id: 2, name: 'سرير خشبي ملكي منحوت', category: 'غرف نوم', price: 280000, oldPrice: 310000, discount: 10, store: 'أثاث الخليج', rating: 4.8, img: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=600' },
     { id: 3, name: 'طاولة طعام دائرية مودرن', category: 'مطابخ', price: 120000, oldPrice: 150000, discount: 20, store: 'مودرن هوم', rating: 4.7, img: 'https://images.unsplash.com/photo-1577145000247-a737ad733c99?auto=format&fit=crop&q=80&w=600' },
     { id: 4, name: 'كرسي مكتب مريح', category: 'مكاتب', price: 45000, oldPrice: 60000, discount: 25, store: 'الرويشان للأثاث', rating: 4.5, img: 'https://images.unsplash.com/photo-1505797149-43b0ad766a0e?auto=format&fit=crop&q=80&w=600' }
@@ -198,44 +198,51 @@ export default function HomePage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group flex flex-col bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden bg-white/50">
-                    <Image src={product.img} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" data-ai-hint="furniture product" />
-                    <Link href={`/product/${product.id}`} className="absolute inset-0 z-10">
-                      <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                         <span className="bg-white text-secondary font-black rounded-[10px] shadow-xl px-6 py-2">عرض التفاصيل</span>
-                      </div>
-                    </Link>
+                <div key={product.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
+                  <div className="relative aspect-square overflow-hidden bg-gray-50">
+                    <Image 
+                      src={product.img} 
+                      alt={product.name} 
+                      fill 
+                      className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                    {/* Blurry layer at bottom */}
+                    <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
+                    
+                    <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
                     <div className="absolute top-3 right-3 z-20">
-                      <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
-                         {product.discount.toLocaleString('en-US')}% خصم
+                      <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                         %{product.discount.toLocaleString('en-US')} خصم
                       </Badge>
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col flex-1 gap-4">
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{product.name}</h4>
-                      <div className="flex items-center gap-1 text-amber-500 shrink-0">
-                        <Star className="w-3.5 h-3.5 fill-current" />
+                  <div className="p-4 flex flex-col flex-1 gap-3">
+                    <div className="flex justify-between items-start">
+                       <h4 className="text-base font-black text-secondary flex-1 leading-tight">{product.name}</h4>
+                       <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
                         <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
+                        <Star className="w-3 h-3 fill-current" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Store className="w-4 h-4 text-primary" />
-                      <span className="text-xs font-bold">{product.store}</span>
+                    
+                    <div className="space-y-2">
+                       <div className="flex items-center gap-1.5 text-muted-foreground">
+                         <Store className="w-4 h-4 text-primary" />
+                         <span className="text-xs font-bold">{product.store}</span>
+                       </div>
+                       <div className="w-fit">
+                         <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full">
+                           {product.category}
+                         </Badge>
+                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Layout className="w-4 h-4 text-primary" />
-                      <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0">
-                        {product.category}
-                      </Badge>
-                    </div>
+
                     <div className="mt-auto pt-2 space-y-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-xs font-bold">ر.ي</span></span>
-                        <span className="text-xs font-bold text-muted-foreground line-through">{product.oldPrice.toLocaleString('en-US')}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
+                        {product.oldPrice && <span className="text-xs font-bold text-muted-foreground line-through opacity-50">{product.oldPrice.toLocaleString('en-US')}</span>}
                       </div>
-                      <Button className="w-full bg-secondary hover:bg-primary text-white font-black gap-2 h-11 rounded-[12px] transition-all shadow-sm">
+                      <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
                         <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                       </Button>
                     </div>
