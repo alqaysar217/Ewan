@@ -28,7 +28,8 @@ import {
   Trash2,
   Package,
   Filter,
-  ArrowRight
+  ArrowRight,
+  Quote
 } from 'lucide-react';
 import {
   Dialog,
