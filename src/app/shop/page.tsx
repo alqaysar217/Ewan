@@ -40,6 +40,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { cn } from '@/lib/utils';
 
 export default function ShopPage() {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
