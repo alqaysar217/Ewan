@@ -39,7 +39,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
-import Link from 'next/link';
+import Link from 'link';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -132,15 +132,15 @@ export default function AdminVendors() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10 font-cairo" dir="rtl">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-10 font-cairo" dir="rtl">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <h1 className="text-3xl font-black text-secondary">إدارة الشركاء والمتاجر</h1>
           <p className="text-muted-foreground font-bold">التحكم في المتاجر، النجارين، والمصممين المعتمدين في المنصة.</p>
         </div>
-        <Button onClick={() => setIsAddOpen(true)} className="rounded-[12px] h-12 px-8 font-black bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
-          <Plus className="ml-2 w-5 h-5" /> إضافة شريك معتمد
-        </Button>
+        <button onClick={() => setIsAddOpen(true)} className="rounded-[12px] h-12 px-8 font-black bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2">
+          <Plus className="w-5 h-5" /> إضافة شريك معتمد
+        </button>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -154,25 +154,23 @@ export default function AdminVendors() {
             className="pr-12 h-14 bg-white border-none shadow-sm rounded-xl font-bold text-base"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto w-full lg:w-auto p-1.5 bg-gray-100 rounded-xl shadow-inner">
+        <div className="flex gap-2 overflow-x-auto w-full lg:w-auto p-1 bg-gray-100 rounded-xl shadow-inner">
           {[
             { id: 'all', name: 'الكل' },
             { id: 'furniture_store', name: 'المتاجر' },
             { id: 'carpenter', name: 'النجارين' },
             { id: 'interior_designer', name: 'المصممين' }
           ].map((f) => (
-            <Button 
+            <button 
               key={f.id}
-              variant={activeFilter === f.id ? 'default' : 'ghost'} 
-              size="sm" 
               className={cn(
-                "rounded-lg font-black h-10 px-6 whitespace-nowrap transition-all",
-                activeFilter === f.id ? "bg-secondary text-white shadow-md" : "text-muted-foreground hover:text-secondary"
+                "rounded-lg font-black h-10 px-6 whitespace-nowrap transition-all text-sm",
+                activeFilter === f.id ? "bg-white text-secondary shadow-md" : "text-muted-foreground hover:text-secondary"
               )}
               onClick={() => setActiveFilter(f.id)}
             >
               {f.name}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
@@ -183,7 +181,7 @@ export default function AdminVendors() {
            <p className="font-black text-muted-foreground text-lg">جاري تحميل قائمة الشركاء...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vendors?.filter(v => {
             const matchSearch = v.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) || v.city?.toLowerCase().includes(searchTerm.toLowerCase());
             const matchFilter = activeFilter === 'all' || v.business_type === activeFilter;
@@ -205,27 +203,27 @@ export default function AdminVendors() {
                    </div>
                 </div>
               </div>
-              <CardContent className="p-8 flex-1 flex flex-col space-y-6">
+              <CardContent className="p-6 flex-1 flex flex-col space-y-4">
                  <p className="text-xs text-muted-foreground font-medium leading-relaxed line-clamp-2">{vendor.description || 'هذا الشريك يقدم خدمات ومنتجات عالية الجودة موثقة من قبل إيوان لضمان رضاكم.'}</p>
                  
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-[15px] text-center space-y-1 shadow-inner border border-gray-100">
+                 <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gray-50 rounded-[15px] text-center space-y-1 shadow-inner border border-gray-100">
                        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">التقييم</p>
-                       <div className="flex items-center justify-center gap-1 text-amber-500 font-black text-base">
-                          <Star className="w-4 h-4 fill-current" /> {vendor.average_rating || '5.0'}
+                       <div className="flex items-center justify-center gap-1 text-amber-500 font-black text-sm">
+                          <Star className="w-3.5 h-3.5 fill-current" /> {vendor.average_rating || '5.0'}
                        </div>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-[15px] text-center space-y-1 shadow-inner border border-gray-100">
+                    <div className="p-3 bg-gray-50 rounded-[15px] text-center space-y-1 shadow-inner border border-gray-100">
                        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">النشاط</p>
-                       <p className="text-xs font-black text-secondary truncate">{vendor.business_type === 'carpenter' ? 'ورشة تفصيل' : vendor.business_type === 'furniture_store' ? 'معرض أثاث' : 'مصمم ديكور'}</p>
+                       <p className="text-[10px] font-black text-secondary truncate">{vendor.business_type === 'carpenter' ? 'ورشة تفصيل' : vendor.business_type === 'furniture_store' ? 'معرض أثاث' : 'مصمم ديكور'}</p>
                     </div>
                  </div>
 
-                 <div className="flex gap-3 mt-auto pt-4 border-t border-gray-100">
+                 <div className="flex gap-2 mt-auto pt-4 border-t border-gray-100">
                     <Link href={`/vendors/${vendor.id}`} className="flex-1">
-                      <Button variant="outline" className="w-full rounded-lg h-11 border-gray-200 font-black text-sm hover:bg-gray-50 transition-all">معاينة</Button>
+                      <Button variant="outline" className="w-full rounded-lg h-10 border-gray-200 font-black text-xs hover:bg-gray-50 transition-all">معاينة</Button>
                     </Link>
-                    <Button className="flex-1 rounded-lg h-11 bg-secondary text-white font-black text-sm shadow-md">إدارة</Button>
+                    <Button className="flex-1 rounded-lg h-10 bg-secondary text-white font-black text-xs shadow-md">إدارة</Button>
                  </div>
               </CardContent>
             </Card>
@@ -233,44 +231,59 @@ export default function AdminVendors() {
         </div>
       )}
 
-      {/* Add Vendor Dialog - Reversed Orientation & Optimized Height */}
+      {/* Add Vendor Dialog - Fixed RTL and Height */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl font-cairo" dir="rtl">
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-[2rem] border-none shadow-2xl font-cairo" dir="rtl">
           <Tabs defaultValue="branding" className="w-full">
-            <div className="bg-secondary p-8 pb-0 text-white relative">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 -translate-y-1/2 translate-x-1/2 rotate-45 rounded-full blur-3xl" />
-              <DialogHeader className="mb-6 relative z-10 text-right">
-                <DialogTitle className="text-3xl font-black">تسجيل شريك استراتيجي</DialogTitle>
-                <DialogDescription className="text-gray-400 font-bold text-base mt-2">قم بتقسيم بيانات الهوية التجارية والنشاط لضمان دقة العرض للعملاء.</DialogDescription>
+            <div className="bg-secondary p-6 pb-0 text-white relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 -translate-y-1/2 translate-x-1/2 rotate-45 rounded-full blur-3xl" />
+              <DialogHeader className="mb-4 relative z-10 text-right">
+                <DialogTitle className="text-2xl md:text-3xl font-black">تسجيل شريك استراتيجي</DialogTitle>
+                <DialogDescription className="text-gray-400 font-bold text-sm mt-1">قم بتقسيم بيانات الهوية التجارية والنشاط لضمان دقة العرض للعملاء.</DialogDescription>
               </DialogHeader>
 
-              <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-14 p-0 gap-6">
-                <TabsTrigger value="branding" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-base gap-2 transition-all">
+              <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-12 p-0 gap-4 overflow-x-auto no-scrollbar">
+                <TabsTrigger value="branding" className="rounded-none h-full border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2 transition-all">
                   <Store className="w-4 h-4" /> الهوية التجارية
                 </TabsTrigger>
-                <TabsTrigger value="performance" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-base gap-2 transition-all">
+                <TabsTrigger value="performance" className="rounded-none h-full border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2 transition-all">
                   <Award className="w-4 h-4" /> الأداء والخدمة
                 </TabsTrigger>
-                <TabsTrigger value="reviews" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-base gap-2 transition-all">
+                <TabsTrigger value="reviews" className="rounded-none h-full border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2 transition-all">
                   <Star className="w-4 h-4" /> الآراء
                 </TabsTrigger>
-                <TabsTrigger value="gallery" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-base gap-2 transition-all">
+                <TabsTrigger value="gallery" className="rounded-none h-full border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2 transition-all">
                   <ImageIcon className="w-4 h-4" /> معرض الأعمال
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <div className="p-10 max-h-[55vh] overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-200">
-              <TabsContent value="branding" className="space-y-8 mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                     <label className="text-base font-black text-secondary flex items-center gap-2">
+            <div className="p-8 max-h-[50vh] overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-gray-200 text-right">
+              <TabsContent value="branding" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                     <label className="text-sm font-black text-secondary flex items-center gap-2">
                         <ImageIcon className="w-4 h-4 text-primary" /> شعار المتجر (Logo)
                      </label>
-                     <div className="relative aspect-square w-24 border-4 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 hover:border-primary/40 transition-all cursor-pointer group">
+                     <div className="relative aspect-square w-20 border-2 border-dashed border-gray-100 rounded-xl overflow-hidden bg-gray-50 hover:border-primary/40 transition-all cursor-pointer group">
                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                         {vendorData.logo_base64 ? (
                           <Image src={vendorData.logo_base64} alt="Logo" fill className="object-cover" />
+                        ) : (
+                          <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground">
+                             <Upload className="w-4 h-4 opacity-30" />
+                          </div>
+                        )}
+                     </div>
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-sm font-black text-secondary flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4 text-primary" /> صورة الغلاف (Cover)
+                     </label>
+                     <div className="relative aspect-video w-full border-2 border-dashed border-gray-100 rounded-xl overflow-hidden bg-gray-50 hover:border-primary/40 transition-all cursor-pointer group">
+                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
+                        {vendorData.cover_base64 ? (
+                          <Image src={vendorData.cover_base64} alt="Cover" fill className="object-cover" />
                         ) : (
                           <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground">
                              <Upload className="w-5 h-5 opacity-30" />
@@ -278,35 +291,20 @@ export default function AdminVendors() {
                         )}
                      </div>
                   </div>
-                  <div className="space-y-3">
-                     <label className="text-base font-black text-secondary flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4 text-primary" /> صورة الغلاف (Cover)
-                     </label>
-                     <div className="relative aspect-video w-full border-4 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 hover:border-primary/40 transition-all cursor-pointer group">
-                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
-                        {vendorData.cover_base64 ? (
-                          <Image src={vendorData.cover_base64} alt="Cover" fill className="object-cover" />
-                        ) : (
-                          <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground">
-                             <Upload className="w-6 h-6 opacity-30" />
-                          </div>
-                        )}
-                     </div>
-                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Store className="w-4 h-4 text-primary" /> اسم المتجر / الورشة</label>
-                    <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم الرسمي للمنشأة" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Store className="w-4 h-4 text-primary" /> اسم المتجر / الورشة</label>
+                    <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم الرسمي للمنشأة" className="rounded-lg h-11 bg-gray-50 border-none shadow-inner" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> البريد الإلكتروني</label>
-                    <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="professional@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> البريد الإلكتروني</label>
+                    <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="professional@ewan.ye" className="rounded-lg h-11 bg-gray-50 border-none shadow-inner" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> المدينة المقر</label>
-                    <select value={vendorData.city} onChange={e => setVendorData({...vendorData, city: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold outline-none shadow-inner">
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> المدينة المقر</label>
+                    <select value={vendorData.city} onChange={e => setVendorData({...vendorData, city: e.target.value})} className="w-full h-11 rounded-lg border-none bg-gray-50 px-4 font-bold outline-none shadow-inner text-sm">
                       <option value="صنعاء">صنعاء</option>
                       <option value="عدن">عدن</option>
                       <option value="تعز">تعز</option>
@@ -314,9 +312,9 @@ export default function AdminVendors() {
                       <option value="إب">إب</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> نوع النشاط</label>
-                    <select value={vendorData.business_type} onChange={e => setVendorData({...vendorData, business_type: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold outline-none shadow-inner">
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> نوع النشاط</label>
+                    <select value={vendorData.business_type} onChange={e => setVendorData({...vendorData, business_type: e.target.value})} className="w-full h-11 rounded-lg border-none bg-gray-50 px-4 font-bold outline-none shadow-inner text-sm">
                       <option value="furniture_store">معرض أثاث</option>
                       <option value="carpenter">ورشة نجارة</option>
                       <option value="interior_designer">مصمم ديكور</option>
@@ -325,87 +323,87 @@ export default function AdminVendors() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="performance" className="space-y-8 mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> سنوات الخبرة</label>
-                    <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+              <TabsContent value="performance" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> سنوات الخبرة</label>
+                    <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} className="rounded-lg h-11 bg-gray-50 border-none shadow-inner" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Package className="w-4 h-4 text-primary" /> منتج متاح</label>
-                    <Input type="number" value={vendorData.available_products} onChange={e => setVendorData({...vendorData, available_products: e.target.value})} className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Package className="w-4 h-4 text-primary" /> منتج متاح</label>
+                    <Input type="number" value={vendorData.available_products} onChange={e => setVendorData({...vendorData, available_products: e.target.value})} className="rounded-lg h-11 bg-gray-50 border-none shadow-inner" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-base font-black text-secondary flex items-center gap-2"><Star className="w-4 h-4 text-primary" /> تقييم أولي</label>
-                    <Input type="number" max="5" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <div className="space-y-1">
+                    <label className="text-sm font-black text-secondary flex items-center gap-2"><Star className="w-4 h-4 text-primary" /> تقييم أولي</label>
+                    <Input type="number" max="5" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} className="rounded-lg h-11 bg-gray-50 border-none shadow-inner" />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-base font-black text-secondary flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> نبذة تعريفية كاملة</label>
-                  <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="تحدث عن جودة الأخشاب، الضمانات، وتاريخ الورشة..." className="rounded-2xl min-h-[120px] bg-gray-50 border-none shadow-inner py-4 px-4 text-base leading-relaxed" />
+                <div className="space-y-1">
+                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> نبذة تعريفية كاملة</label>
+                  <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="تحدث عن جودة الأخشاب، الضمانات، وتاريخ الورشة..." className="rounded-xl min-h-[100px] bg-gray-50 border-none shadow-inner py-3 px-4 text-sm leading-relaxed" />
                 </div>
               </TabsContent>
 
-              <TabsContent value="reviews" className="space-y-6 mt-0">
-                 <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-lg font-black text-secondary flex items-center gap-2">
-                       <Quote className="w-5 h-5 text-primary" /> آراء العملاء الموثقة
+              <TabsContent value="reviews" className="space-y-4 mt-0">
+                 <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-base font-black text-secondary flex items-center gap-2">
+                       <Quote className="w-4 h-4 text-primary" /> آراء العملاء الموثقة
                     </h3>
-                    <Button variant="outline" size="sm" className="rounded-lg font-bold" onClick={() => setVendorData(prev => ({...prev, reviews: [...prev.reviews, {name: 'عميل جديد', text: '', rating: 5, date: 'الآن', avatar: ''}]}))}>
-                       <Plus className="w-4 h-4 ml-1" /> إضافة رأي
+                    <Button variant="outline" size="sm" className="rounded-lg font-bold text-xs h-8" onClick={() => setVendorData(prev => ({...prev, reviews: [...prev.reviews, {name: 'عميل جديد', text: '', rating: 5, date: 'الآن', avatar: ''}]}))}>
+                       <Plus className="w-3 h-3 ml-1" /> إضافة رأي
                     </Button>
                  </div>
-                 <div className="grid grid-cols-1 gap-4">
+                 <div className="grid grid-cols-1 gap-3">
                     {vendorData.reviews.map((rev, i) => (
-                       <div key={i} className="p-5 bg-gray-50 rounded-2xl flex items-start gap-4 relative group border border-gray-100">
-                          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm">
-                             <User className="w-5 h-5 text-gray-300" />
+                       <div key={i} className="p-4 bg-gray-50 rounded-xl flex items-start gap-4 relative group border border-gray-100">
+                          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0 shadow-sm">
+                             <User className="w-4 h-4 text-gray-300" />
                           </div>
-                          <div className="flex-1 space-y-2">
+                          <div className="flex-1 space-y-1">
                              <Input value={rev.name} onChange={e => {
                                 const newRev = [...vendorData.reviews];
                                 newRev[i].name = e.target.value;
                                 setVendorData({...vendorData, reviews: newRev});
-                             }} placeholder="اسم العميل" className="bg-transparent border-b border-gray-200 h-8 rounded-none px-0 font-black text-sm" />
+                             }} placeholder="اسم العميل" className="bg-transparent border-b border-gray-200 h-8 rounded-none px-0 font-black text-xs" />
                              <Textarea value={rev.text} onChange={e => {
                                 const newRev = [...vendorData.reviews];
                                 newRev[i].text = e.target.value;
                                 setVendorData({...vendorData, reviews: newRev});
-                             }} placeholder="نص الرأي..." className="bg-transparent border-none min-h-[50px] p-0 focus:ring-0 text-sm" />
+                             }} placeholder="نص الرأي..." className="bg-transparent border-none min-h-[40px] p-0 focus:ring-0 text-xs" />
                           </div>
-                          <Button variant="ghost" size="icon" className="text-destructive absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => {
+                          <button onClick={() => {
                              const newRev = vendorData.reviews.filter((_, idx) => idx !== i);
                              setVendorData({...vendorData, reviews: newRev});
-                          }}>
-                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          }} className="text-destructive absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                        </div>
                     ))}
                  </div>
               </TabsContent>
 
-              <TabsContent value="gallery" className="space-y-6 mt-0 text-center">
-                 <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+              <TabsContent value="gallery" className="space-y-4 mt-0 text-center">
+                 <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                     {vendorData.gallery.map((img, i) => (
-                       <div key={i} className="relative aspect-[4/5] rounded-xl overflow-hidden shadow-md group">
+                       <div key={i} className="relative aspect-[4/5] rounded-lg overflow-hidden shadow-md group">
                           <Image src={img} alt="Work" fill className="object-cover" />
-                          <button onClick={() => setVendorData(prev => ({...prev, gallery: prev.gallery.filter((_, idx) => idx !== i)}))} className="absolute top-1 left-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => setVendorData(prev => ({ ...prev, gallery: prev.gallery.filter((_, idx) => idx !== i) }))} className="absolute top-1 left-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                              <Plus className="w-3 h-3 rotate-45" />
                           </button>
                        </div>
                     ))}
-                    <div className="relative aspect-[4/5] border-4 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-all cursor-pointer overflow-hidden">
+                    <div className="relative aspect-[4/5] border-2 border-dashed border-gray-100 rounded-lg flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition-all cursor-pointer overflow-hidden">
                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('gallery', e)} className="absolute inset-0 opacity-0 cursor-pointer" />
-                       <Sparkles className="w-8 h-8 text-primary opacity-20" />
-                       <span className="text-[10px] font-black text-muted-foreground uppercase">إضافة صورة</span>
+                       <Sparkles className="w-6 h-6 text-primary opacity-20" />
+                       <span className="text-[9px] font-black text-muted-foreground uppercase">إضافة صورة</span>
                     </div>
                  </div>
               </TabsContent>
             </div>
 
-            <div className="p-8 bg-gray-50 border-t flex justify-end gap-4">
-              <Button onClick={handleAddVendor} className="rounded-xl px-12 h-14 font-black text-lg bg-secondary text-white shadow-xl shadow-secondary/20 hover:-translate-y-1 transition-all">تفعيل حساب الشريك ونشره</Button>
-              <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-xl px-8 h-14 font-black text-lg hover:bg-white transition-all">إلغاء الأمر</Button>
+            <div className="p-6 bg-gray-50 border-t flex flex-row-reverse justify-start gap-3">
+              <Button onClick={handleAddVendor} className="rounded-lg px-8 h-12 font-black text-sm bg-secondary text-white shadow-xl shadow-secondary/20 hover:-translate-y-0.5 transition-all">تفعيل حساب الشريك ونشره</Button>
+              <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="rounded-lg px-6 h-12 font-black text-sm hover:bg-white transition-all">إلغاء الأمر</Button>
             </div>
           </Tabs>
         </DialogContent>
