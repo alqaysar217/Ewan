@@ -211,28 +211,44 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {vendorProducts?.map((p: any) => (
-                        <div key={p.id} className="group bg-white border border-border/40 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-700 flex flex-col h-full">
-                          <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+                        <div key={p.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                          <div className="relative aspect-square overflow-hidden bg-white/50">
                             <Image src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} alt={p.name_ar} fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
                             <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
-                              <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
-                                <Button className="w-full bg-white text-secondary font-black rounded-xl h-12 shadow-2xl">التفاصيل</Button>
+                              <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="bg-white text-secondary font-black rounded-[10px] shadow-xl px-6 py-2">التفاصيل</span>
                               </div>
                             </Link>
                             {Number(p.discount) > 0 && (
-                              <div className="absolute top-4 right-4">
-                                <Badge className="bg-secondary text-white font-black rounded-lg">خصم {p.discount}%</Badge>
+                              <div className="absolute top-3 right-3 z-20">
+                                <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
+                                  {p.discount}% خصم
+                                </Badge>
                               </div>
                             )}
                           </div>
-                          <div className="p-6 space-y-4">
-                            <h4 className="text-xl font-black text-secondary group-hover:text-primary transition-colors line-clamp-1">{p.name_ar}</h4>
-                            <div className="flex justify-between items-center">
-                               <p className="text-2xl font-black text-primary">{(Number(p.price) || 0).toLocaleString()} <span className="text-xs">ر.ي</span></p>
-                               <div className="flex text-amber-500 items-center gap-1">
-                                  <Star className="w-4 h-4 fill-current" />
-                                  <span className="text-sm font-black text-secondary">{p.rating || '5.0'}</span>
+                          <div className="p-5 flex flex-col flex-1 gap-4">
+                            <div className="flex justify-between items-start gap-2">
+                              <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
+                              <div className="flex items-center gap-1 text-amber-500 shrink-0">
+                                <Star className="w-3.5 h-3.5 fill-current" />
+                                <span className="text-xs font-black">{p.rating || '5.0'}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                               <Layout className="w-4 h-4 text-primary" />
+                               <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0 uppercase">
+                                 {p.category_id}
+                               </Badge>
+                            </div>
+                            <div className="mt-auto pt-2 space-y-4">
+                               <div className="flex items-baseline gap-2">
+                                  <span className="text-xl font-black text-primary">{(Number(p.price) || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span></span>
+                                  {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()}</span>}
                                </div>
+                               <Button className="w-full bg-secondary hover:bg-primary text-white font-black gap-2 h-11 rounded-[12px] transition-all shadow-sm">
+                                  <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                               </Button>
                             </div>
                           </div>
                         </div>

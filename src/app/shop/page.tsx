@@ -19,7 +19,8 @@ import {
   CircleDollarSign,
   Maximize2,
   Store,
-  Loader2
+  Loader2,
+  Layout
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -148,8 +149,8 @@ export default function ShopPage() {
                   {products?.map((p: any) => {
                     const vendor = vendors?.find(v => v.id === p.vendor_id);
                     return (
-                      <div key={p.id} className="group bg-white border border-border/50 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col h-full">
-                        <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+                      <div key={p.id} className="group bg-gray-50 border border-border/50 rounded-[15px] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+                        <div className="relative aspect-square overflow-hidden bg-white/50">
                           <Image 
                             src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
                             alt={p.name_ar} 
@@ -158,48 +159,53 @@ export default function ShopPage() {
                           />
                           <Link href={`/product/${p.id}`} className="absolute inset-0 z-10">
                             <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="bg-white text-secondary font-black rounded-lg shadow-xl px-8 py-3">عرض التفاصيل</span>
+                              <span className="bg-white text-secondary font-black rounded-[10px] shadow-xl px-6 py-2">عرض التفاصيل</span>
                             </div>
                           </Link>
-                          <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
-                             <Badge className={cn("font-black px-3 py-1 rounded-lg border-none shadow-lg", p.in_stock ? "bg-emerald-500/90" : "bg-destructive/90")}>
-                               {p.in_stock ? 'متوفر' : 'طلب مسبق'}
-                             </Badge>
+                          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                              {Number(p.discount) > 0 && (
-                               <Badge className="bg-secondary text-white font-black rounded-lg shadow-lg">خصم {p.discount}%</Badge>
+                               <Badge className="bg-secondary text-white font-black rounded-[10px] px-3 py-1.5 shadow-sm border-none">
+                                 {p.discount}% خصم
+                               </Badge>
                              )}
+                             <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[10px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
+                               {p.in_stock ? 'متوفر' : 'غير متوفر'}
+                             </Badge>
                           </div>
                         </div>
 
-                        <div className="p-6 space-y-4 flex-1 flex flex-col">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-primary flex items-center gap-1">
-                              <Store className="w-3.5 h-3.5" /> {vendor?.business_name || 'إيوان المعتمد'}
-                            </p>
-                            <div className="flex justify-between items-start gap-2">
-                              <h4 className="text-lg font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
-                              <div className="flex items-center gap-1 text-amber-500 shrink-0 bg-amber-50 px-2 py-0.5 rounded-lg">
-                                <Star className="w-3 h-3 fill-current" />
-                                <span className="text-xs font-black">{p.rating || '5.0'}</span>
-                              </div>
+                        <div className="p-5 flex flex-col flex-1 gap-4">
+                          <div className="flex justify-between items-start gap-2">
+                            <h4 className="text-base font-black text-secondary group-hover:text-primary transition-colors line-clamp-1 leading-tight">{p.name_ar}</h4>
+                            <div className="flex items-center gap-1 text-amber-500 shrink-0">
+                              <Star className="w-3.5 h-3.5 fill-current" />
+                              <span className="text-xs font-black">{p.rating || '5.0'}</span>
                             </div>
                           </div>
 
-                          <div className="flex gap-2">
-                            <Badge variant="outline" className="text-[10px] font-bold text-muted-foreground border-gray-100 bg-gray-50 uppercase">{p.category_id}</Badge>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Store className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-bold">{vendor?.business_name || 'إيوان المعتمد'}</span>
                           </div>
 
-                          <div className="mt-auto pt-4 border-t flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <span className="text-2xl font-black text-secondary">
-                                {(Number(p.price) || 0).toLocaleString()} <span className="text-sm font-bold">ر.ي</span>
+                          <div className="flex items-center gap-2">
+                            <Layout className="w-4 h-4 text-primary" />
+                            <Badge variant="outline" className="text-[10px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0 uppercase">
+                              {p.category_id}
+                            </Badge>
+                          </div>
+
+                          <div className="mt-auto pt-2 space-y-4">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xl font-black text-secondary">
+                                {(Number(p.price) || 0).toLocaleString()} <span className="text-xs font-bold">ر.ي</span>
                               </span>
                               {Number(p.old_price) > 0 && (
-                                <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()} ر.ي</span>
+                                <span className="text-xs text-muted-foreground line-through font-bold">{(Number(p.old_price)).toLocaleString()}</span>
                               )}
                             </div>
-                            <Button className="bg-secondary hover:bg-primary text-white font-black gap-2 h-11 px-4 rounded-xl transition-all shadow-lg shadow-secondary/10">
-                              <ShoppingBag className="w-4 h-4" />
+                            <Button className="w-full bg-secondary hover:bg-primary text-white font-black gap-2 h-11 rounded-[12px] transition-all shadow-sm">
+                              <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                             </Button>
                           </div>
                         </div>
