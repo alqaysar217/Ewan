@@ -18,7 +18,8 @@ import {
   Quote,
   Layout,
   ShoppingBag,
-  Loader2
+  Loader2,
+  Store
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
