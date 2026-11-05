@@ -183,14 +183,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                <span className="text-xl font-black text-secondary">إيوان</span>
             </div>
             <div className="hidden lg:flex items-center gap-4">
-               <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="rounded-xl text-gray-400 hover:text-primary"
-               >
-                 <Menu className="w-6 h-6" />
-               </Button>
                <h2 className="text-lg font-black text-secondary">
                  {navItems.find(i => i.href === pathname)?.label || 'لوحة التحكم'}
                </h2>
