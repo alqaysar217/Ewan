@@ -106,13 +106,40 @@ export default function HomePage() {
     { title: 'ضمان حقيقي', desc: 'ضمان يصل إلى 5 سنوات على جودة الخشب والنجارة.', icon: ShieldCheck }
   ];
 
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemFadeUp = {
+    hidden: { y: 60, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
+  };
+
+  const itemFadeRight = {
+    hidden: { x: 100, opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { duration: 1, ease: "easeOut" } }
+  };
+
+  const itemFadeLeft = {
+    hidden: { x: -100, opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { duration: 1, ease: "easeOut" } }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background" dir="rtl">
       <Header />
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-secondary">
+        <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-secondary scroll-mt-20">
           <div className="absolute inset-0 z-0">
             <Image 
               src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
@@ -127,9 +154,9 @@ export default function HomePage() {
           
           <div className="container relative z-20 px-4 md:px-8 mx-auto">
             <motion.div 
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              initial="hidden"
+              animate="visible"
+              variants={itemFadeRight}
               className="max-w-3xl space-y-8 py-16"
             >
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-accent/20 backdrop-blur-xl rounded-[15px] text-accent border-r-4 border-secondary shadow-xl shadow-accent/5 mx-auto lg:mx-0">
@@ -158,13 +185,13 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="pt-32 pb-12 bg-background relative overflow-hidden">
+        <section className="pt-32 pb-12 bg-background relative overflow-hidden scroll-mt-20">
           <div className="container px-4 md:px-8 mx-auto text-center relative z-10">
             <motion.div 
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={itemFadeUp}
               className="mb-20 space-y-5 text-center"
             >
               <div className="flex items-center justify-center gap-3">
@@ -176,14 +203,17 @@ export default function HomePage() {
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نجمع بين التكنولوجيا المتطورة وحرفية النجار اليمني لنقدم لك تجربة تأثيث لا تُنسى.</p>
             </motion.div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={containerVariants}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"
+            >
               {features.map((feature, i) => (
                 <motion.div 
                   key={i} 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  variants={itemFadeUp}
                   className="group relative p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
@@ -195,18 +225,18 @@ export default function HomePage() {
                   <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-right" />
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Featured Products Section */}
-        <section className="py-24 bg-background">
+        <section className="py-24 bg-background scroll-mt-20">
           <div className="container px-4 md:px-8 mx-auto">
             <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={itemFadeLeft}
               className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6 text-center md:text-right"
             >
               <div className="space-y-4">
@@ -233,14 +263,17 @@ export default function HomePage() {
                 <p className="font-black text-muted-foreground">لا توجد منتجات معروضة حالياً.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+              >
                 {featuredProducts.map((product, idx) => (
                   <motion.div 
                     key={product.id} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    variants={itemFadeUp}
                     className="bg-card rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40"
                   >
                     <div className="relative aspect-square overflow-hidden bg-muted/10">
@@ -298,22 +331,22 @@ export default function HomePage() {
                     </div>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
         </section>
 
         {/* Stores Section */}
-        <section className="py-24 bg-secondary relative overflow-hidden">
+        <section className="py-24 bg-secondary relative overflow-hidden scroll-mt-20">
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
           <div className="absolute top-0 right-0 w-1/3 h-full bg-accent/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={itemFadeUp}
               className="text-center mb-16 space-y-4"
             >
               <h2 className="text-4xl md:text-5xl font-black text-white">أبرز المتاجر المعتمدة</h2>
@@ -327,14 +360,17 @@ export default function HomePage() {
             ) : storesData?.length === 0 ? (
               <div className="py-20 text-center text-gray-400 font-bold">لا توجد متاجر معروضة حالياً.</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
                 {storesData?.map((store: any, i: number) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: i % 2 === 0 ? 50 : -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: i * 0.1 }}
+                    variants={i % 2 === 0 ? itemFadeRight : itemFadeLeft}
                   >
                     <Link 
                       href={`/vendors/${store.id}`}
@@ -396,13 +432,14 @@ export default function HomePage() {
                     </Link>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
             
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true }}
+              variants={itemFadeUp}
               className="mt-16 text-center"
             >
                <Link href="/vendors">
@@ -415,14 +452,14 @@ export default function HomePage() {
         </section>
 
         {/* Partners Section */}
-        <section className="py-28 bg-background border-y border-border/50">
+        <section className="py-28 bg-background border-y border-border/50 scroll-mt-20">
           <div className="container px-4 md:px-8 mx-auto">
             <div className="space-y-20">
               <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={itemFadeUp}
                 className="text-center space-y-4 max-w-2xl mx-auto"
               >
                 <div className="h-1 w-12 bg-accent mx-auto rounded-full mb-4"></div>
@@ -440,15 +477,16 @@ export default function HomePage() {
                 <div className="text-center text-muted-foreground font-bold">انضم إلينا كشريك نجاح اليوم.</div>
               ) : (
                 <motion.div 
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1 }}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={containerVariants}
                   className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700"
                 >
                   {partnersData?.map((partner: any, i: number) => (
                     <motion.div 
                       key={i} 
+                      variants={itemFadeUp}
                       whileHover={{ scale: 1.1 }}
                       className="relative w-32 h-14 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group"
                     >
@@ -467,7 +505,7 @@ export default function HomePage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-24 bg-secondary text-white relative overflow-hidden">
+        <section className="py-24 bg-secondary text-white relative overflow-hidden scroll-mt-20">
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
           <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
@@ -475,9 +513,10 @@ export default function HomePage() {
           
           <div className="container px-4 md:px-8 mx-auto relative z-10">
             <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={itemFadeUp}
               className="text-center mb-20 space-y-6"
             >
               <div className="w-20 h-20 bg-accent/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
@@ -494,14 +533,17 @@ export default function HomePage() {
             ) : testimonialsData?.length === 0 ? (
               <div className="text-center text-gray-400 font-bold">كن أول من يشاركنا تجربته مع إيوان.</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              >
                 {testimonialsData?.map((t: any, i: number) => (
                   <motion.div 
                     key={i} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    variants={itemFadeUp}
                     className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right"
                   >
                     <div className="flex gap-1 text-accent justify-start">
@@ -532,13 +574,14 @@ export default function HomePage() {
                     </div>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
 
             <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true }}
+              variants={itemFadeUp}
               className="mt-16 text-center"
             >
                <Link href="/reviews">
@@ -551,12 +594,13 @@ export default function HomePage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 md:py-24 bg-background">
+        <section className="py-20 md:py-24 bg-background scroll-mt-20">
           <div className="container px-4 md:px-8 max-w-4xl mx-auto">
             <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={itemFadeRight}
               className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6 text-center md:text-right"
             >
               <div className="space-y-3 md:space-y-4">
@@ -580,10 +624,10 @@ export default function HomePage() {
                <div className="text-center py-10 bg-muted/30 rounded-xl border-2 border-dashed">لا توجد أسئلة مضافة حالياً.</div>
             ) : (
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={itemFadeUp}
               >
                 <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
                   {faqsData?.map((item: any, i: number) => (
