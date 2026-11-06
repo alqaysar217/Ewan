@@ -8,9 +8,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-// زيادة مهلة المعالجة لـ Vercel (Next.js 15) لضمان عدم انقطاع الاتصال بالنموذج
-export const maxDuration = 60;
-
 const EwanAiChatInputSchema = z.object({
   message: z.string(),
   history: z.array(z.any()).optional(),
@@ -66,7 +63,7 @@ const ewanAiChatFlow = ai.defineFlow(
 2. الهوية اليمنية: شجع دائماً على استخدام قطع الأثاث الوطنية والنجارين المحليين مع لمسات تراثية (صنعاني، حضرمي).
 3. توليد البرومبت (Prompt): قم دائماً بإنشاء وصف تفصيلي واحترافي باللغة الإنجليزية في نهاية ردك بتنسيق: [PROMPT: نص البرومبت هنا].
    - يجب أن يكون البرومبت مفصلاً لمحركات توليد الصور (مثل Midjourney أو Stable Diffusion).
-   - يجب أن يصف تحويل الغرفة بناءً على "الصورة الأصلية المرفقة كمرجع" (Referencing the uploaded photo)، مع دمج النمط المختار (${contextData?.style})، والمساحة (${contextData?.area}m2)، والميزانية، وتنسيق الألوان المناسب، مع قطع الأثاث المحددة.
+   - يجب أن يصف تحويل الغرفة بناءً على "الصورة الأصلية المرفقة كمرجع" (Referencing the uploaded photo), مع دمج النمط المختار (${contextData?.style}), والمساحة (${contextData?.area}m2), والميزانية، وتنسيق الألوان المناسب، مع قطع الأثاث المحددة.
    - اجعل الوصف سينمائياً وبجودة 8K، مع ذكر الإضاءة والخامات.
 
 بيانات الغرفة الحالية للتحليل:
@@ -93,7 +90,7 @@ const ewanAiChatFlow = ai.defineFlow(
     try {
       // إعداد طلب الـ Fetch مع مهلة زمنية (Abort Controller)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 50000); // 50 ثانية مهلة
+      const timeoutId = setTimeout(() => controller.abort(), 55000); // 55 ثانية مهلة
 
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
