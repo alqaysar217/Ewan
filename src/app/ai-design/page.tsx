@@ -25,7 +25,9 @@ import {
   ChevronRight,
   Star,
   Image as ImageIcon,
-  Check
+  Check,
+  Box,
+  Scaling
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -95,6 +97,8 @@ export default function AIDesignStudio() {
   const [selectionMode, setSelectionMode] = useState<'auto' | 'manual'>('auto');
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [budgetRange, setBudgetRange] = useState({ min: '100000', max: '500000' });
+  const [roomStatus, setRoomStatus] = useState<string>('empty');
+  const [roomArea, setRoomArea] = useState<string>('20');
   const [searchQuery, setSearchQuery] = useState('');
 
   // جلب المنتجات للاختيار اليدوي
@@ -161,6 +165,8 @@ export default function AIDesignStudio() {
         selected_products: selectedProductIds,
         budget_min: Number(budgetRange.min),
         budget_max: Number(budgetRange.max),
+        room_status: roomStatus,
+        room_area: Number(roomArea),
         status: 'queued',
         created_at: serverTimestamp()
       };
@@ -421,62 +427,102 @@ export default function AIDesignStudio() {
                         </motion.div>
                       )}
 
-                      {/* Step 6: Budget & Summary */}
+                      {/* Step 6: Budget & Space Details */}
                       {step === 6 && (
                         <motion.div 
                           key="step6"
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="space-y-10"
+                          className="space-y-12"
                         >
                           <div className="text-center space-y-3">
-                            <h3 className="text-3xl font-black text-secondary">ميزانية العمل المقترحة</h3>
-                            <p className="text-muted-foreground font-bold">حدد نطاق الميزانية الذي تفكر فيه لتنفيذ هذا التصميم.</p>
+                            <h3 className="text-3xl font-black text-secondary">تفاصيل التنفيذ والميزانية</h3>
+                            <p className="text-muted-foreground font-bold">ساعدنا في فهم أبعاد مساحتك وميزانيتك المتوقعة للبدء.</p>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                             <div className="space-y-3">
-                                <Label className="font-black text-secondary">الميزانية الدنيا (ر.ي)</Label>
-                                <Input 
-                                  type="number" 
-                                  value={budgetRange.min} 
-                                  onChange={e => setBudgetRange({...budgetRange, min: e.target.value})}
-                                  className="h-14 rounded-2xl bg-gray-50 border-none font-black text-lg"
-                                />
-                             </div>
-                             <div className="space-y-3">
-                                <Label className="font-black text-secondary">الميزانية القصوى (ر.ي)</Label>
-                                <Input 
-                                  type="number" 
-                                  value={budgetRange.max} 
-                                  onChange={e => setBudgetRange({...budgetRange, max: e.target.value})}
-                                  className="h-14 rounded-2xl bg-gray-50 border-none font-black text-lg"
-                                />
-                             </div>
-                          </div>
+                          <div className="max-w-3xl mx-auto space-y-10">
+                            {/* حقول المساحة والحالة */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                               <div className="space-y-3">
+                                  <Label className="font-black text-secondary flex items-center gap-2">
+                                     <Box className="w-4 h-4 text-primary" /> حالة الغرفة الحالية
+                                  </Label>
+                                  <select 
+                                    value={roomStatus} 
+                                    onChange={e => setRoomStatus(e.target.value)}
+                                    className="w-full h-14 rounded-2xl bg-gray-50 border-none px-4 font-bold text-sm outline-none shadow-inner"
+                                  >
+                                    <option value="empty">فارغة تماماً</option>
+                                    <option value="partially_furnished">مؤثثة جزئياً (تحتاج تكملة)</option>
+                                    <option value="fully_furnished">مؤثثة (تريد إعادة تصميم)</option>
+                                  </select>
+                               </div>
+                               <div className="space-y-3">
+                                  <Label className="font-black text-secondary flex items-center gap-2">
+                                     <Scaling className="w-4 h-4 text-primary" /> المساحة التقريبية (م²)
+                                  </Label>
+                                  <Input 
+                                    type="number" 
+                                    value={roomArea} 
+                                    onChange={e => setRoomArea(e.target.value)}
+                                    placeholder="مثال: 25"
+                                    className="h-14 rounded-2xl bg-gray-50 border-none font-black text-lg"
+                                  />
+                               </div>
+                            </div>
 
-                          <div className="p-8 bg-primary/5 rounded-[30px] border border-primary/10 space-y-6">
-                             <h4 className="font-black text-secondary flex items-center gap-2">
-                                <Info className="w-5 h-5 text-primary" /> ملخص طلبك الذكي
-                             </h4>
-                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
-                                <div>
-                                   <p className="text-muted-foreground font-bold mb-1">نوع الغرفة</p>
-                                   <p className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</p>
-                                </div>
-                                <div>
-                                   <p className="text-muted-foreground font-bold mb-1">النمط المختار</p>
-                                   <p className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</p>
-                                </div>
-                                <div>
-                                   <p className="text-muted-foreground font-bold mb-1">طريقة الاختيار</p>
-                                   <p className="font-black text-secondary">{selectionMode === 'auto' ? 'تلقائي (AI)' : 'يدوي'}</p>
-                                </div>
-                                <div>
-                                   <p className="text-muted-foreground font-bold mb-1">القطع المختارة</p>
-                                   <p className="font-black text-secondary">{selectionMode === 'manual' ? `${selectedProductIds.length} قطعة` : 'حسب اقتراح AI'}</p>
-                                </div>
-                             </div>
+                            <Separator />
+
+                            {/* حقول الميزانية */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                               <div className="space-y-3">
+                                  <Label className="font-black text-secondary flex items-center gap-2">
+                                     <Wallet className="w-4 h-4 text-primary" /> الميزانية الدنيا (ر.ي)
+                                  </Label>
+                                  <Input 
+                                    type="number" 
+                                    value={budgetRange.min} 
+                                    onChange={e => setBudgetRange({...budgetRange, min: e.target.value})}
+                                    className="h-14 rounded-2xl bg-gray-50 border-none font-black text-lg"
+                                  />
+                               </div>
+                               <div className="space-y-3">
+                                  <Label className="font-black text-secondary flex items-center gap-2">
+                                     <Wallet className="w-4 h-4 text-primary" /> الميزانية القصوى (ر.ي)
+                                  </Label>
+                                  <Input 
+                                    type="number" 
+                                    value={budgetRange.max} 
+                                    onChange={e => setBudgetRange({...budgetRange, max: e.target.value})}
+                                    className="h-14 rounded-2xl bg-gray-50 border-none font-black text-lg"
+                                  />
+                               </div>
+                            </div>
+
+                            {/* Summary Box */}
+                            <div className="p-8 bg-primary/5 rounded-[30px] border border-primary/10 space-y-6">
+                               <h4 className="font-black text-secondary flex items-center gap-2">
+                                  <Info className="w-5 h-5 text-primary" /> ملخص طلبك الذكي
+                               </h4>
+                               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+                                  <div>
+                                     <p className="text-muted-foreground font-bold mb-1">نوع الغرفة</p>
+                                     <p className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</p>
+                                  </div>
+                                  <div>
+                                     <p className="text-muted-foreground font-bold mb-1">المساحة</p>
+                                     <p className="font-black text-secondary">{roomArea} م²</p>
+                                  </div>
+                                  <div>
+                                     <p className="text-muted-foreground font-bold mb-1">النمط المختار</p>
+                                     <p className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</p>
+                                  </div>
+                                  <div>
+                                     <p className="text-muted-foreground font-bold mb-1">طريقة الاختيار</p>
+                                     <p className="font-black text-secondary">{selectionMode === 'auto' ? 'تلقائي (AI)' : 'يدوي'}</p>
+                                  </div>
+                               </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}
