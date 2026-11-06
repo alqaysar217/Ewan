@@ -10,9 +10,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@//components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle, Info } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -37,6 +37,16 @@ export default function LoginPage() {
       
       const userSnap = await getDoc(doc(db, 'users', uid));
       const role = userSnap.data()?.role;
+
+      if (!userSnap.exists()) {
+        toast({
+          variant: "destructive",
+          title: "خطأ في قاعدة البيانات",
+          description: "حسابك موجود ولكن سجلك في Firestore مفقود. يرجى مراجعة الإرشادات بالأسفل.",
+        });
+        setLoading(false);
+        return;
+      }
 
       toast({
         title: "تم تسجيل الدخول بنجاح",
@@ -73,7 +83,7 @@ export default function LoginPage() {
       navigator.clipboard.writeText(user.uid);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast({ title: "تم نسخ المعرف (UID)", description: "تم النسخ بنجاح." });
+      toast({ title: "تم نسخ المعرف (UID)", description: "يمكنك الآن استخدامه في Firebase Console." });
     }
   };
 
@@ -102,15 +112,21 @@ export default function LoginPage() {
 
         <CardContent className="px-8 pb-8">
           {user && !userData && (
-            <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
-              <div className="flex items-center gap-2 text-amber-600 font-black text-xs">
-                <Info className="w-4 h-4" /> تنبيه الصلاحيات
+            <div className="mb-8 p-5 bg-amber-50 border border-amber-200 rounded-2xl space-y-4 shadow-sm animate-in zoom-in duration-300">
+              <div className="flex items-center gap-2 text-amber-600 font-black text-sm">
+                <AlertTriangle className="w-5 h-5" /> استعادة الوصول
               </div>
-              <p className="text-[11px] font-bold text-amber-700 leading-relaxed text-right">أنت مسجل الدخول، لكن بريدك غير معرف كمسؤول في قاعدة البيانات.</p>
-              <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-100">
-                <code className="text-[10px] font-mono text-secondary truncate max-w-[200px]">{user.uid}</code>
-                <Button size="sm" variant="ghost" className="h-8 px-2 text-primary" onClick={copyUid}>
-                  {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              <p className="text-[12px] font-bold text-amber-700 leading-relaxed text-right">
+                أنت مسجل في نظام الحماية ولكن بياناتك في Firestore غير موجودة. 
+                انسخ الـ UID وأنشئ مستنداً جديداً في مجموعة <code className="bg-amber-100 px-1 rounded">users</code> لتعود مديراً.
+              </p>
+              <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-100 shadow-inner">
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-[9px] text-gray-400 font-bold uppercase mb-0.5">Your Recovery UID</span>
+                  <code className="text-[11px] font-mono text-secondary truncate max-w-[180px]">{user.uid}</code>
+                </div>
+                <Button size="sm" variant="ghost" className="h-10 w-10 p-0 text-primary hover:bg-primary/5 rounded-lg" onClick={copyUid}>
+                  {copied ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
                 </Button>
               </div>
             </div>
