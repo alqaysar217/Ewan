@@ -486,14 +486,14 @@ export default function HomePage() {
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.2 }}
                   variants={containerVariants}
-                  className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+                  className="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-8 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700"
                 >
                   {partnersData?.map((partner: any, i: number) => (
                     <motion.div 
                       key={i} 
                       variants={itemFadeUp}
                       whileHover={{ scale: 1.1 }}
-                      className="relative w-32 h-14 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group"
+                      className="relative w-full h-10 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group"
                     >
                       <Image 
                         src={partner.logo_url} 
