@@ -18,7 +18,8 @@ import {
   Quote,
   ChevronRight,
   Sparkles,
-  Loader2
+  Loader2,
+  HelpCircle
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
@@ -38,7 +39,7 @@ import { useMemo } from 'react';
 export default function HomePage() {
   const db = useFirestore();
 
-  // جلب أحدث المنتجات المضافة (للمعاينة الفورية في هذا الإصدار)
+  // جلب أحدث المنتجات المضافة
   const productsQuery = useMemo(() => query(
     collection(db, 'products'),
     orderBy('created_at', 'desc'),
@@ -56,6 +57,30 @@ export default function HomePage() {
   // جلب كافة المتاجر لربط الأسماء
   const allVendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
   const { data: allVendors } = useCollection(allVendorsQuery);
+
+  // جلب شركاء النجاح الحقيقيين
+  const partnersQuery = useMemo(() => query(
+    collection(db, 'partners'),
+    orderBy('created_at', 'desc'),
+    limit(12)
+  ), [db]);
+  const { data: partnersData, loading: partnersLoading } = useCollection(partnersQuery);
+
+  // جلب آراء العملاء الحقيقية
+  const testimonialsQuery = useMemo(() => query(
+    collection(db, 'testimonials'),
+    orderBy('created_at', 'desc'),
+    limit(3)
+  ), [db]);
+  const { data: testimonialsData, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+
+  // جلب الأسئلة الشائعة الحقيقية
+  const faqsQuery = useMemo(() => query(
+    collection(db, 'faqs'),
+    orderBy('created_at', 'desc'),
+    limit(5)
+  ), [db]);
+  const { data: faqsData, loading: faqsLoading } = useCollection(faqsQuery);
 
   const featuredProducts = useMemo(() => {
     if (!productsData || productsData.length === 0) return [];
@@ -84,39 +109,6 @@ export default function HomePage() {
     { title: 'جودة وطنية', desc: 'أفخر الصناعات اليدوية اليمنية بأيدي أمهر النجارين.', icon: Hammer, color: 'text-secondary', bg: 'bg-secondary/10' },
     { title: 'توصيل سريع', desc: 'توصيل وتركيب احترافي لكافة المدن الكبرى.', icon: Truck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { title: 'ضمان حقيقي', desc: 'ضمان يصل إلى 5 سنوات على جودة الخشب والنجارة.', icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-50' }
-  ];
-
-  const partners = [
-    { name: 'IKEA Global', logo: 'https://picsum.photos/seed/p1/200/200' },
-    { name: 'Gulf Furniture', logo: 'https://picsum.photos/seed/p2/200/200' },
-    { name: 'Yemen Wood', logo: 'https://picsum.photos/seed/p3/200/200' },
-    { name: 'Modern Living', logo: 'https://picsum.photos/seed/p4/200/200' },
-    { name: 'Royal Decor', logo: 'https://picsum.photos/seed/p5/200/200' },
-    { name: 'Elite Stores', logo: 'https://picsum.photos/seed/p6/200/200' }
-  ];
-
-  const testimonials = [
-    { 
-      name: 'محمد القاضي', 
-      role: 'عميل من صنعاء', 
-      text: 'تجربة التصميم بالذكاء الاصطناعي كانت مذهلة، ساعدتني كثيراً في اختيار اللون المناسب لمجلسي الجديد وبكل سهولة.', 
-      rating: 4.9,
-      avatar: 'https://picsum.photos/seed/user1/100/100'
-    },
-    { 
-      name: 'سارة باوزير', 
-      role: 'عميلة من المكلا', 
-      text: 'جودة الخشب في الطقم الحضرمي الذي طلبته تفوقت على توقعاتي، والتوصيل كان في الموعد تماماً وبكل احترافية.', 
-      rating: 5.0,
-      avatar: 'https://picsum.photos/seed/user2/100/100'
-    },
-    { 
-      name: 'أحمد علي', 
-      role: 'عميل من عدن', 
-      text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة جداً.', 
-      rating: 4.8,
-      avatar: 'https://picsum.photos/seed/user3/100/100'
-    }
   ];
 
   return (
@@ -384,18 +376,26 @@ export default function HomePage() {
                 </p>
               </div>
               
-              <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-                {partners.map((partner, i) => (
-                  <div key={i} className="relative w-32 h-14 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group">
-                    <Image 
-                      src={partner.logo} 
-                      alt={partner.name} 
-                      fill 
-                      className="object-contain opacity-70 group-hover:opacity-100 transition-opacity" 
-                    />
-                  </div>
-                ))}
-              </div>
+              {partnersLoading ? (
+                <div className="flex justify-center py-10">
+                   <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                </div>
+              ) : partnersData?.length === 0 ? (
+                <div className="text-center text-muted-foreground font-bold">انضم إلينا كشريك نجاح اليوم.</div>
+              ) : (
+                <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                  {partnersData?.map((partner: any, i: number) => (
+                    <div key={i} className="relative w-32 h-14 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group">
+                      <Image 
+                        src={partner.logo_url} 
+                        alt={partner.name} 
+                        fill 
+                        className="object-contain opacity-70 group-hover:opacity-100 transition-opacity" 
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -416,39 +416,46 @@ export default function HomePage() {
               <p className="text-gray-400 text-lg max-w-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((t, i) => (
-                <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full">
-                  <div className="flex gap-1 text-amber-500">
-                    {Array.from({ length: 5 }).map((_, starIdx) => (
-                      <Star key={starIdx} className={cn("w-4 h-4", starIdx >= Math.floor(t.rating) ? "fill-none" : "fill-current")} />
-                    ))}
-                  </div>
-                  
-                  <div className="relative flex-1">
-                    <Quote className="absolute -top-4 -right-4 w-10 h-10 text-primary opacity-20" />
-                    <p className="text-lg font-medium leading-relaxed text-right relative z-10 italic">
-                      "{t.text}"
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-4 pt-6 border-t border-white/10">
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-primary/20 shrink-0">
-                      <Image 
-                        src={t.avatar} 
-                        alt={t.name} 
-                        fill 
-                        className="object-cover" 
-                      />
+            {testimonialsLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              </div>
+            ) : testimonialsData?.length === 0 ? (
+              <div className="text-center text-gray-400 font-bold">كن أول من يشاركنا تجربته مع إيوان.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {testimonialsData?.map((t: any, i: number) => (
+                  <div key={i} className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right">
+                    <div className="flex gap-1 text-amber-500 justify-start">
+                      {Array.from({ length: 5 }).map((_, starIdx) => (
+                        <Star key={starIdx} className={cn("w-4 h-4", starIdx >= (t.rating || 5) ? "fill-none" : "fill-current")} />
+                      ))}
                     </div>
-                    <div className="text-right">
-                      <h4 className="font-black text-white text-base">{t.name}</h4>
-                      <p className="text-xs text-primary font-bold mt-0.5">{t.role}</p>
+                    
+                    <div className="relative flex-1">
+                      <Quote className="absolute -top-4 -right-4 w-10 h-10 text-primary opacity-20" />
+                      <p className="text-lg font-medium leading-relaxed text-right relative z-10 italic">
+                        "{t.text}"
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 pt-6 border-t border-white/10">
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-primary/20 shrink-0 bg-white/10">
+                        {t.avatar_url ? (
+                          <Image src={t.avatar_url} alt={t.name} fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-black text-primary text-xl">{t.name?.charAt(0)}</div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <h4 className="font-black text-white text-base">{t.name}</h4>
+                        <p className="text-xs text-primary font-bold mt-0.5">{t.role || 'عميل إيوان'}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             <div className="mt-16 text-center">
                <Link href="/reviews">
@@ -477,22 +484,26 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
-              {[
-                { q: "كيف يعمل التصميم بالذكاء الاصطناعي؟", a: "ببساطة، ترفع صورة لغرفتك الحالية، تختار الطراز المفضل (مودرن، كلاسيك..)، وتحدد ميزانيتك. سيقوم نظامنا بتحليل المساحة واقتراح قطع أثاث حقيقية متوفرة في متجرنا تناسب مساحتك." },
-                { q: "هل المنتجات المعروضة حقيقية ومتوفرة؟", a: "نعم، كافة قطع الأثاث التي يقترحها الذكاء الاصطناعي هي منتجات حقيقية مسجلة من قبل التجار والنجارين في اليمن، ويمكنك طلبها مباشرة عبر المنصة." },
-                { q: "هل توجد خدمة توصيل للمدن اليمنية؟", a: "نعم، نوفر خدمة التوصيل والتركيب في معظم المدن الكبرى (صنعاء، عدن، تعز، حضرموت) بالتنسيق مع شبكة التجار المعتمدين لدينا." }
-              ].map((item, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
-                  <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
-                    {item.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed text-[13px] md:text-[15px] pb-4 md:pb-6 text-right">
-                    {item.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            {faqsLoading ? (
+               <div className="flex justify-center py-10">
+                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
+               </div>
+            ) : faqsData?.length === 0 ? (
+               <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed">لا توجد أسئلة مضافة حالياً.</div>
+            ) : (
+              <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
+                {faqsData?.map((item: any, i: number) => (
+                  <AccordionItem key={i} value={`item-${i}`} className="bg-gray-50 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
+                    <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground leading-relaxed text-[13px] md:text-[15px] pb-4 md:pb-6 text-right">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
           </div>
         </section>
       </main>
@@ -501,3 +512,4 @@ export default function HomePage() {
     </div>
   );
 }
+
