@@ -107,7 +107,6 @@ export default function HomePage() {
     { title: 'ضمان حقيقي', desc: 'ضمان يصل إلى 5 سنوات على جودة الخشب والنجارة.', icon: ShieldCheck }
   ];
 
-  // هدوء وبساطة في الحركات لتجنب مشاكل الأداء والمساحات الجانبية
   const fadeInVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -405,7 +404,7 @@ export default function HomePage() {
                         <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
                           <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
                             <MapPin className="w-3.5 h-3.5 text-accent" />
-                            {store.city}
+                            {store.service_areas && store.service_areas.length > 0 ? store.service_areas[0] : store.city || 'اليمن'}
                           </div>
                           <Button variant="outline" size="sm" className="h-9 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
                             تصفح المتجر 

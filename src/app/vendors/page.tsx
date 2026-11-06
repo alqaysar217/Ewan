@@ -241,7 +241,7 @@ export default function StoresPage() {
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                              <MapPin className="w-4 h-4" />
                           </div>
-                          {store.city}
+                          {store.service_areas && store.service_areas.length > 0 ? store.service_areas[0] : store.city || 'اليمن'}
                         </div>
                         <Button variant="ghost" size="sm" className="h-11 font-black text-primary hover:bg-primary/5 transition-all rounded-xl gap-2 group/btn">
                           زيارة المعرض 
