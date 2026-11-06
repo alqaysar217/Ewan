@@ -25,7 +25,7 @@ import {
   Layers,
   ChevronRight,
   Star,
-  Image as ImageIcon,
+  ImageIcon,
   Check,
   Box,
   Scaling,
