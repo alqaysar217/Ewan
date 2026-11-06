@@ -33,7 +33,9 @@ import {
   FileText,
   Quote,
   RefreshCcw,
-  AlertTriangle
+  AlertTriangle,
+  Copy,
+  ClipboardCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -98,6 +100,7 @@ export default function AIDesignStudio() {
   const [isSaving, setIsSaving] = useState(false);
   const [aiResult, setAiResult] = useState<{text: string, prompt?: string} | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const totalSteps = 6;
   const { user } = useUser();
   const db = useFirestore();
@@ -133,6 +136,17 @@ export default function AIDesignStudio() {
         setStep(2);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast({ title: "تم النسخ بنجاح", description: "يمكنك الآن لصق البرومبت في محرك الصور." });
+      setTimeout(() => setCopied(false), 3000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
     }
   };
 
@@ -235,6 +249,7 @@ export default function AIDesignStudio() {
     setAiResult(null);
     setError(null);
     setSelectedProductIds([]);
+    setCopied(false);
   };
 
   return (
@@ -242,15 +257,15 @@ export default function AIDesignStudio() {
       <Header />
       <main className="flex-1 py-4 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto space-y-4 md:space-y-8">
+          <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
             
             {step <= totalSteps && (
-              <div className="space-y-2 md:space-y-4">
+              <div className="space-y-2 md:space-y-3">
                 <div className="flex justify-between items-center text-[10px] md:text-sm font-black text-secondary">
                   <span>المرحلة {step} من {totalSteps}</span>
                   <span>{Math.round((step / totalSteps) * 100)}% مكتمل</span>
                 </div>
-                <Progress value={(step / totalSteps) * 100} className="h-1 md:h-2 rounded-full" />
+                <Progress value={(step / totalSteps) * 100} className="h-1 md:h-1.5 rounded-full" />
               </div>
             )}
 
@@ -290,18 +305,18 @@ export default function AIDesignStudio() {
               </AnimatePresence>
 
               <CardContent className="p-0">
-                <div className="min-h-[400px] md:min-h-[600px] flex flex-col">
-                  <div className="flex-1 p-4 md:p-12 overflow-y-auto">
+                <div className="min-h-[400px] md:min-h-[550px] flex flex-col">
+                  <div className="flex-1 p-4 md:p-10 overflow-y-auto">
                     <AnimatePresence mode="wait">
                       {step === 1 && (
-                        <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 md:space-y-10">
-                          <div className="text-center space-y-2">
+                        <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4 md:space-y-8">
+                          <div className="text-center space-y-1 md:space-y-2">
                             <h3 className="text-lg md:text-3xl font-black text-secondary">ابدأ بتحميل صورة غرفتك</h3>
-                            <p className="text-[10px] md:text-muted-foreground font-bold">التقط صورة واضحة لغرفتك الحالية ليتمكن الذكاء الاصطناعي من تحليلها.</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">التقط صورة واضحة لغرفتك الحالية ليتمكن الذكاء الاصطناعي من تحليلها.</p>
                           </div>
-                          <div onClick={() => fileInputRef.current?.click()} className="group relative border-2 md:border-4 border-dashed border-gray-100 rounded-[20px] md:rounded-[30px] p-8 md:p-24 text-center hover:border-primary/40 transition-all cursor-pointer bg-gray-50/50 flex flex-col items-center justify-center gap-4 md:gap-6">
+                          <div onClick={() => fileInputRef.current?.click()} className="group relative border-2 md:border-4 border-dashed border-gray-100 rounded-[20px] md:rounded-[30px] p-6 md:p-20 text-center hover:border-primary/40 transition-all cursor-pointer bg-gray-50/50 flex flex-col items-center justify-center gap-4 md:gap-6">
                              {originalImage ? (
-                               <div className="relative w-full aspect-video rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
+                               <div className="relative w-full max-w-lg aspect-video rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
                                   <Image src={originalImage} alt="Preview" fill className="object-cover" />
                                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                      <p className="text-white font-black text-sm">تغيير الصورة</p>
@@ -309,11 +324,11 @@ export default function AIDesignStudio() {
                                </div>
                              ) : (
                                <>
-                                 <div className="w-12 h-12 md:w-24 md:h-24 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                   <Camera className="w-6 h-6 md:w-12 md:h-12" />
+                                 <div className="w-12 h-12 md:w-20 md:h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                   <Camera className="w-6 h-6 md:w-10 md:h-10" />
                                  </div>
                                  <div className="space-y-1">
-                                   <p className="text-base md:text-2xl font-black text-secondary">انقر للاختيار أو سحب الصورة</p>
+                                   <p className="text-base md:text-xl font-black text-secondary">انقر للاختيار أو سحب الصورة</p>
                                    <p className="text-[10px] md:text-sm text-muted-foreground font-bold">يدعم JPG, PNG (بحد أقصى 5 ميجابايت)</p>
                                  </div>
                                </>
@@ -324,15 +339,15 @@ export default function AIDesignStudio() {
                       )}
                       
                       {step === 2 && (
-                        <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-10">
-                          <div className="text-center space-y-2">
+                        <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
+                          <div className="text-center space-y-1 md:space-y-2">
                             <h3 className="text-lg md:text-3xl font-black text-secondary">ما نوع هذه المساحة؟</h3>
-                            <p className="text-[10px] md:text-muted-foreground font-bold">اختر نوع الغرفة التي ترغب في إعادة تصميمها.</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">اختر نوع الغرفة التي ترغب في إعادة تصميمها.</p>
                           </div>
                           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                             {ROOM_TYPES.map((type) => (
-                              <div key={type.id} onClick={() => setRoomType(type.id)} className={cn("p-4 md:p-8 rounded-[15px] md:rounded-[24px] border-2 transition-all cursor-pointer flex flex-col items-center gap-3 md:gap-4 text-center group", roomType === type.id ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-50 bg-gray-50/30 hover:border-gray-200")}>
-                                <type.icon className={cn("w-6 h-6 md:w-10 md:h-10 transition-colors", roomType === type.id ? "text-primary" : "text-gray-400 group-hover:text-secondary")} />
+                              <div key={type.id} onClick={() => setRoomType(type.id)} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 transition-all cursor-pointer flex flex-col items-center gap-3 md:gap-4 text-center group", roomType === type.id ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-50 bg-gray-50/30 hover:border-gray-200")}>
+                                <type.icon className={cn("w-6 h-6 md:w-8 md:h-8 transition-colors", roomType === type.id ? "text-primary" : "text-gray-400 group-hover:text-secondary")} />
                                 <span className={cn("font-black text-[10px] md:text-sm", roomType === type.id ? "text-primary" : "text-secondary")}>{type.name}</span>
                                 {roomType === type.id && <div className="w-4 h-4 md:w-5 md:h-5 bg-primary rounded-full flex items-center justify-center"><Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" /></div>}
                               </div>
@@ -342,19 +357,19 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 3 && (
-                        <motion.div key="step3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-10">
-                          <div className="text-center space-y-2">
+                        <motion.div key="step3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
+                          <div className="text-center space-y-1 md:space-y-2">
                             <h3 className="text-lg md:text-3xl font-black text-secondary">اختر نمطك المفضل</h3>
-                            <p className="text-[10px] md:text-muted-foreground font-bold">سيعتمد الذكاء الاصطناعي على هذا النمط في توليد الألوان والأثاث.</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">سيعتمد الذكاء الاصطناعي على هذا النمط في توليد الألوان والأثاث.</p>
                           </div>
                           <div className="grid grid-cols-2 gap-3 md:gap-6">
                             {DESIGN_STYLES.map((style) => (
-                              <div key={style.id} onClick={() => setSelectedStyle(style.id)} className={cn("relative h-28 md:h-48 rounded-[15px] md:rounded-[24px] overflow-hidden cursor-pointer group transition-all", selectedStyle === style.id ? "ring-4 ring-primary shadow-xl" : "opacity-70 hover:opacity-100")}>
+                              <div key={style.id} onClick={() => setSelectedStyle(style.id)} className={cn("relative h-28 md:h-40 rounded-[15px] md:rounded-[24px] overflow-hidden cursor-pointer group transition-all", selectedStyle === style.id ? "ring-4 ring-primary shadow-xl" : "opacity-70 hover:opacity-100")}>
                                 <Image src={style.img} alt={style.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                <div className="absolute bottom-3 right-3 left-3 md:bottom-6 md:right-6 md:left-6 flex justify-between items-center text-white">
-                                  <span className="text-[10px] md:text-xl font-black">{style.name}</span>
-                                  {selectedStyle === style.id && <div className="w-5 h-5 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-3 h-3 md:w-5 md:h-5" /></div>}
+                                <div className="absolute bottom-3 right-3 left-3 md:bottom-5 md:right-5 md:left-5 flex justify-between items-center text-white">
+                                  <span className="text-[10px] md:text-lg font-black">{style.name}</span>
+                                  {selectedStyle === style.id && <div className="w-5 h-5 md:w-7 md:h-7 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-3 h-3 md:w-4 md:h-4 text-white" /></div>}
                                 </div>
                               </div>
                             ))}
@@ -363,15 +378,15 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 4 && (
-                        <motion.div key="step4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-10">
-                          <div className="text-center space-y-2">
+                        <motion.div key="step4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
+                          <div className="text-center space-y-1 md:space-y-2">
                             <h3 className="text-lg md:text-3xl font-black text-secondary">طريقة اختيار القطع</h3>
-                            <p className="text-[10px] md:text-muted-foreground font-bold">هل تريد أن يقترح النظام قطعاً تلقائياً أم ترغب باختيارها من المتجر؟</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">هل تريد أن يقترح النظام قطعاً تلقائياً أم ترغب باختيارها من المتجر؟</p>
                           </div>
                           <div className="flex flex-col gap-4 md:gap-6 max-w-lg mx-auto">
-                            <div onClick={() => setSelectionMode('auto')} className={cn("p-4 md:p-8 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'auto' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
-                               <div className={cn("w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'auto' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
-                                  <Sparkles className="w-6 h-6 md:w-8 md:h-8" />
+                            <div onClick={() => setSelectionMode('auto')} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'auto' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
+                               <div className={cn("w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'auto' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
+                                  <Sparkles className="w-6 h-6 md:w-7 md:h-7" />
                                </div>
                                <div>
                                   <h4 className="font-black text-[11px] md:text-lg text-secondary">اقتراحات تلقائية ذكية</h4>
@@ -379,9 +394,9 @@ export default function AIDesignStudio() {
                                </div>
                                {selectionMode === 'auto' && <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-primary mr-auto" />}
                             </div>
-                            <div onClick={() => setSelectionMode('manual')} className={cn("p-4 md:p-8 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'manual' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
-                               <div className={cn("w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'manual' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
-                                  <ShoppingBag className="w-6 h-6 md:w-8 md:h-8" />
+                            <div onClick={() => setSelectionMode('manual')} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'manual' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
+                               <div className={cn("w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'manual' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
+                                  <ShoppingBag className="w-6 h-6 md:w-7 md:h-7" />
                                </div>
                                <div>
                                   <h4 className="font-black text-[11px] md:text-lg text-secondary">اختيار يدوي من الكتالوج</h4>
@@ -398,7 +413,7 @@ export default function AIDesignStudio() {
                           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
                             <div>
                                <h3 className="text-lg md:text-2xl font-black text-secondary">اختر قطعك المفضلة</h3>
-                               <p className="text-[9px] md:text-muted-foreground font-bold">حدد المنتجات التي تريد تضمينها في التصميم.</p>
+                               <p className="text-[9px] md:text-sm text-muted-foreground font-bold">حدد المنتجات التي تريد تضمينها في التصميم.</p>
                             </div>
                             <div className="relative w-full md:w-80 group">
                               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -430,38 +445,38 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 6 && (
-                        <motion.div key="step6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 md:space-y-12">
-                          <div className="text-center space-y-2">
+                        <motion.div key="step6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-10">
+                          <div className="text-center space-y-1 md:space-y-2">
                             <h3 className="text-lg md:text-3xl font-black text-secondary">تفاصيل التنفيذ والميزانية</h3>
-                            <p className="text-[10px] md:text-muted-foreground font-bold">ساعدنا في فهم أبعاد مساحتك وميزانيتك المتوقعة.</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">ساعدنا في فهم أبعاد مساحتك وميزانيتك المتوقعة.</p>
                           </div>
-                          <div className="max-w-3xl mx-auto space-y-6 md:space-y-10">
+                          <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                               <div className="space-y-2 md:space-y-3">
+                               <div className="space-y-2">
                                   <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Box className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> حالة الغرفة الحالية</Label>
-                                  <select value={roomStatus} onChange={e => setRoomStatus(e.target.value)} className="w-full h-11 md:h-14 rounded-xl md:rounded-2xl bg-gray-50 border-none px-4 font-bold text-[11px] md:text-sm outline-none shadow-inner">
+                                  <select value={roomStatus} onChange={e => setRoomStatus(e.target.value)} className="w-full h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none px-4 font-bold text-[11px] md:text-sm outline-none shadow-inner">
                                     <option value="empty">فارغة تماماً</option>
                                     <option value="partially_furnished">مؤثثة جزئياً</option>
                                     <option value="fully_furnished">مؤثثة بالكامل</option>
                                   </select>
                                </div>
-                               <div className="space-y-2 md:space-y-3">
+                               <div className="space-y-2">
                                   <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Scaling className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> المساحة (م²)</Label>
-                                  <Input type="number" value={roomArea} onChange={e => setRoomArea(e.target.value)} placeholder="مثال: 25" className="h-11 md:h-14 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
+                                  <Input type="number" value={roomArea} onChange={e => setRoomArea(e.target.value)} placeholder="مثال: 25" className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
                                </div>
                             </div>
                             <Separator />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                               <div className="space-y-2 md:space-y-3">
+                               <div className="space-y-2">
                                   <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Wallet className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> الميزانية الدنيا (ر.ي)</Label>
-                                  <Input type="number" value={budgetRange.min} onChange={e => setBudgetRange({...budgetRange, min: e.target.value})} className="h-11 md:h-14 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
+                                  <Input type="number" value={budgetRange.min} onChange={e => setBudgetRange({...budgetRange, min: e.target.value})} className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
                                </div>
-                               <div className="space-y-2 md:space-y-3">
+                               <div className="space-y-2">
                                   <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Wallet className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> الميزانية القصوى (ر.ي)</Label>
-                                  <Input type="number" value={budgetRange.max} onChange={e => setBudgetRange({...budgetRange, max: e.target.value})} className="h-11 md:h-14 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
+                                  <Input type="number" value={budgetRange.max} onChange={e => setBudgetRange({...budgetRange, max: e.target.value})} className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
                                </div>
                             </div>
-                            <div className="p-4 md:p-8 bg-primary/5 rounded-[20px] md:rounded-[30px] border border-primary/10 space-y-4 md:space-y-6">
+                            <div className="p-4 md:p-6 bg-primary/5 rounded-[20px] md:rounded-[30px] border border-primary/10 space-y-4 md:space-y-6">
                                <h4 className="font-black text-[11px] md:text-base text-secondary flex items-center gap-2"><Info className="w-4 h-4 md:w-5 md:h-5 text-primary" /> ملخص طلبك الذكي</h4>
                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[9px] md:text-sm">
                                   <div>
@@ -487,76 +502,86 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 7 && aiResult && (
-                        <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 md:space-y-12">
-                           <div className="text-center space-y-2 md:space-y-4">
-                              <div className="w-12 h-12 md:w-20 md:h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                                 <CheckCircle2 className="w-8 h-8 md:w-12 md:h-12" />
+                        <motion.div key="result" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 md:space-y-10">
+                           <div className="text-center space-y-2">
+                              <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                                 <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10" />
                               </div>
-                              <div className="space-y-1 md:space-y-2">
-                                <h3 className="text-lg md:text-3xl font-black text-secondary">اكتمل تقرير التصميم</h3>
-                                <p className="text-[10px] md:text-muted-foreground font-bold italic">إليك الرؤية الفنية المقترحة لمساحتك الجديدة.</p>
-                              </div>
+                              <h3 className="text-lg md:text-2xl font-black text-secondary">اكتمل تحليل التصميم بنجاح</h3>
                            </div>
 
                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
-                              <div className="space-y-6 md:space-y-8">
-                                 <div className="p-6 md:p-8 bg-primary/5 rounded-[20px] md:rounded-[30px] border border-primary/10 relative shadow-sm">
-                                    <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/10" />
-                                    <h4 className="font-black text-[11px] md:text-base text-primary flex items-center gap-2 mb-4 md:mb-6">
-                                      <Bot className="w-5 h-5 md:w-6 md:h-6" /> توصيات المصمم الذكي
+                              <div className="space-y-6">
+                                 <div className="p-6 md:p-10 bg-white border border-border/50 rounded-[20px] md:rounded-[30px] shadow-sm relative">
+                                    <Quote className="absolute top-6 left-6 w-8 h-8 text-primary/10" />
+                                    <h4 className="font-black text-[11px] md:text-lg text-primary flex items-center gap-2 mb-4 md:mb-6 border-r-4 border-primary pr-3">
+                                      توصيات المصمم الذكي
                                     </h4>
-                                    <div className="text-muted-foreground leading-relaxed md:leading-loose font-medium text-[13px] md:text-lg text-justify space-y-4 whitespace-pre-wrap">
+                                    <div className="text-muted-foreground leading-relaxed md:leading-loose font-medium text-sm md:text-lg whitespace-pre-wrap">
                                        {aiResult.text}
                                     </div>
                                  </div>
                                  
                                  {aiResult.prompt && (
-                                   <div className="p-6 md:p-8 bg-amber-50 rounded-[20px] md:rounded-[30px] border border-amber-100 space-y-3 md:space-y-4 shadow-inner">
-                                      <h5 className="text-[9px] md:text-[10px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
-                                         <ImageIcon className="w-3.5 h-3.5 md:w-4 md:h-4" /> وصف التخيل البصري (Visual Prompt)
-                                      </h5>
-                                      <p className="text-[9px] md:text-xs font-mono text-amber-800 leading-relaxed bg-white/50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-amber-200 select-all cursor-pointer">
+                                   <div className="p-6 md:p-8 bg-secondary text-white rounded-[20px] md:rounded-[30px] shadow-2xl relative overflow-hidden group">
+                                      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rotate-45 -translate-y-12 translate-x-12" />
+                                      <div className="flex items-center justify-between mb-4 md:mb-6">
+                                        <h5 className="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest flex items-center gap-2">
+                                           <ImageIcon className="w-4 h-4" /> Visual Generation Prompt
+                                        </h5>
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          onClick={() => copyToClipboard(aiResult.prompt!)}
+                                          className="text-white hover:bg-white/10 rounded-lg h-9 gap-2 font-bold text-xs"
+                                        >
+                                          {copied ? <ClipboardCheck className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                                          {copied ? 'تم النسخ' : 'نسخ النص'}
+                                        </Button>
+                                      </div>
+                                      <div className="bg-white/5 p-4 md:p-6 rounded-xl border border-white/10 select-all cursor-text font-mono text-[10px] md:text-xs leading-relaxed text-gray-300">
                                          {aiResult.prompt}
-                                      </p>
+                                      </div>
+                                      <p className="text-[9px] md:text-[10px] text-gray-500 mt-4 italic">استخدم هذا النص في برامج توليد الصور (Midjourney, DALL-E) للحصول على تصور بصري دقيق.</p>
                                    </div>
                                  )}
                               </div>
 
-                              <div className="space-y-6 md:space-y-8">
-                                 <div className="relative aspect-video rounded-[20px] md:rounded-[30px] overflow-hidden shadow-xl border-4 md:border-8 border-white group ring-1 ring-black/5">
+                              <div className="space-y-6">
+                                 <div className="relative aspect-video rounded-[20px] md:rounded-[30px] overflow-hidden shadow-xl border-4 border-white">
                                     <Image src={originalImage!} alt="Original Room" fill className="object-cover" />
-                                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase">الصورة الأصلية</div>
+                                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">المرجع الأصلي</div>
                                  </div>
                                  
                                  <Card className="rounded-[20px] md:rounded-[30px] border-none bg-gray-50 overflow-hidden shadow-inner">
-                                    <CardContent className="p-6 md:p-10 space-y-6 md:space-y-8">
-                                      <h4 className="font-black text-[11px] md:text-base text-secondary flex items-center gap-2 border-b pb-4 md:pb-6"><FileText className="w-5 h-5 md:w-6 md:h-6 text-primary" /> ملخص البيانات</h4>
-                                      <div className="grid grid-cols-1 gap-3 md:gap-4 text-[11px] md:text-sm">
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-black/5">
+                                    <CardContent className="p-6 md:p-8 space-y-6">
+                                      <h4 className="font-black text-sm md:text-lg text-secondary flex items-center gap-2 border-b pb-4"><FileText className="w-4 h-4 md:w-5 md:h-5 text-primary" /> ملخص البيانات</h4>
+                                      <div className="grid grid-cols-1 gap-3 md:gap-4 text-xs md:text-base">
+                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
                                             <span className="font-bold text-muted-foreground">نوع المساحة:</span> 
                                             <span className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-black/5">
+                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
                                             <span className="font-bold text-muted-foreground">المساحة:</span> 
                                             <span className="font-black text-secondary">{roomArea} م²</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">النمط:</span> 
+                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground">النمط المختار:</span> 
                                             <span className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">الميزانية:</span> 
+                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground">الميزانية المقدرة:</span> 
                                             <span className="font-black text-primary">{(Number(budgetRange.max)).toLocaleString()} ر.ي</span>
                                          </div>
                                       </div>
-                                      <div className="pt-4 md:pt-6 space-y-3 md:space-y-4">
+                                      <div className="pt-4 space-y-3">
                                          <Link href="/shop" className="block w-full">
-                                            <Button className="w-full h-12 md:h-16 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-xl shadow-secondary/10 text-sm md:text-lg gap-2">
-                                               تسوق القطع المقترحة <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
+                                            <Button className="w-full h-12 md:h-14 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-xl text-sm md:text-lg gap-2">
+                                               تسوق القطع المقترحة <ShoppingBag className="w-4 h-4" />
                                             </Button>
                                          </Link>
-                                         <Button variant="ghost" onClick={handleReset} className="w-full font-black text-[10px] md:text-sm text-muted-foreground gap-2 h-10 md:h-14 rounded-xl md:rounded-2xl border-2 border-dashed border-gray-200">
-                                            <RefreshCcw className="w-4 h-4 md:w-5 md:h-5" /> بدء تصميم آخر
+                                         <Button variant="ghost" onClick={handleReset} className="w-full font-black text-xs md:text-sm text-muted-foreground gap-2 h-10 md:h-12 rounded-xl md:rounded-2xl border-2 border-dashed border-gray-200">
+                                            <RefreshCcw className="w-3.5 h-3.5" /> بدء تصميم آخر
                                          </Button>
                                       </div>
                                     </CardContent>
@@ -569,16 +594,16 @@ export default function AIDesignStudio() {
                   </div>
                   
                   {step <= totalSteps && (
-                    <div className="p-4 md:p-10 bg-gray-50/50 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="p-4 md:p-8 bg-gray-50/50 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="flex gap-3 w-full sm:w-auto order-2 sm:order-1">
-                         <Button variant="ghost" onClick={handleBack} disabled={step === 1 || isSaving} className="flex-1 sm:flex-none rounded-xl md:rounded-2xl h-11 md:h-14 px-6 md:px-10 font-black text-[11px] md:text-sm gap-2"><ArrowRight className="w-4 h-4 md:w-5 md:h-5" /> المرحلة السابقة</Button>
+                         <Button variant="ghost" onClick={handleBack} disabled={step === 1 || isSaving} className="flex-1 sm:flex-none rounded-xl md:rounded-2xl h-11 md:h-12 px-6 md:px-8 font-black text-[11px] md:text-sm gap-2"><ArrowRight className="w-4 h-4" /> السابقة</Button>
                       </div>
                       <div className="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
                          {step < totalSteps ? (
-                           <Button onClick={handleNext} disabled={isSaving} className="flex-1 sm:min-w-[200px] h-11 md:h-14 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-lg gap-2">المتابعة <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" /></Button>
+                           <Button onClick={handleNext} disabled={isSaving} className="flex-1 sm:min-w-[180px] h-11 md:h-12 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-base gap-2">المتابعة <ArrowLeft className="w-4 h-4" /></Button>
                          ) : (
-                           <Button onClick={handleSubmitRequest} disabled={isSaving} className="flex-1 sm:min-w-[200px] h-11 md:h-14 bg-primary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-lg gap-2">
-                             {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>توليد التصميم الآن <Sparkles className="w-4 h-4 md:w-5 md:h-5" /></>}
+                           <Button onClick={handleSubmitRequest} disabled={isSaving} className="flex-1 sm:min-w-[180px] h-11 md:h-12 bg-primary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-base gap-2">
+                             {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>توليد التصميم الآن <Sparkles className="w-4 h-4" /></>}
                            </Button>
                          )}
                       </div>
@@ -589,11 +614,11 @@ export default function AIDesignStudio() {
             </Card>
             
             {step <= totalSteps && (
-              <div className="p-4 md:p-8 bg-white border border-border/50 rounded-[20px] md:rounded-[24px] flex items-start gap-4 md:gap-5 shadow-sm">
-                 <div className="w-8 h-8 md:w-12 md:h-12 bg-amber-50 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0"><Info className="w-4 h-4 md:w-6 md:h-6 text-amber-600" /></div>
-                 <p className="text-[10px] md:text-sm lg:text-base text-muted-foreground font-medium leading-relaxed">
-                   <span className="font-black text-secondary block mb-0.5 md:mb-1 text-[11px] md:text-sm">ملاحظة تقنية حول "إيوان AI":</span> 
-                   يستخدم نظامنا نموذج (Gemma 2) لتحليل المعطيات وتقديم توصيات فنية دقيقة لدمج الأثاث الوطني مع التصاميم العالمية. يتم حفظ طلبك ليتم مراجعته من قبل الحرفيين عند الرغبة.
+              <div className="p-4 md:p-6 bg-white border border-border/50 rounded-[20px] md:rounded-[24px] flex items-start gap-3 md:gap-4 shadow-sm">
+                 <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-50 rounded-xl flex items-center justify-center shrink-0"><Info className="w-4 h-4 md:w-5 md:h-5 text-amber-600" /></div>
+                 <p className="text-[10px] md:text-sm text-muted-foreground font-medium leading-relaxed">
+                   <span className="font-black text-secondary block mb-0.5 text-[11px] md:text-sm">ملاحظة تقنية:</span> 
+                   يستخدم "إيوان AI" نموذج Gemma 2 المتقدم لتحليل البيانات الوصفية وتقديم توصيات دقيقة لدمج الأثاث الوطني مع التصاميم الحديثة. يتم حفظ طلبك للرجوع إليه عند التنفيذ.
                  </p>
               </div>
             )}

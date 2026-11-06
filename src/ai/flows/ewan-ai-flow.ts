@@ -2,6 +2,7 @@
 /**
  * @fileOverview Ewan AI Design Assistant Flow.
  * محرك الذكاء الاصطناعي لمنصة إيوان، يعتمد على نموذج Gemma 2 المتاح مجاناً عبر OpenRouter.
+ * تم تحسينه لتوليد نصوص نظيفة وبرومبت إنجليزي دقيق وتفصيلي.
  */
 
 import { ai } from '@/ai/genkit';
@@ -32,7 +33,7 @@ export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutp
     return await ewanAiChatFlow(input);
   } catch (error: any) {
     console.error("Ewan AI Flow Error:", error);
-    return { text: "❌ أعتذر، واجهت مشكلة في الاتصال بمركز التصميم الذكي حالياً." };
+    return { text: "أعتذر، واجهت مشكلة في الاتصال بمركز التصميم الذكي حالياً." };
   }
 }
 
@@ -47,19 +48,22 @@ const ewanAiChatFlow = ai.defineFlow(
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      return { text: "⚠️ عذراً، مفتاح تشغيل الذكاء الاصطناعي (API Key) غير موجود في الإعدادات." };
+      return { text: "عذراً، مفتاح تشغيل الذكاء الاصطناعي غير موجود في الإعدادات." };
     }
 
     const systemContent = `أنت "إيوان AI"، الخبير الذكي الرائد في التصميم الداخلي وتنسيق الأثاث لمنصة إيوان اليمنية.
 
 هويتك:
 - خبير في دمج الطرازات العالمية (مودرن، كلاسيك) مع اللمسات التراثية اليمنية العريقة.
-- وظيفتك تحليل مساحات العملاء وتقديم نصائح احترافية لتوزيع الأثاث.
+- وظيفتك تحليل مساحات العملاء وتقديم نصائح احترافية لتوزيع الأثاث بناءً على معطيات دقيقة.
 
-قواعد الرد:
-1. الهوية اليمنية: شجع دائماً على استخدام قطع الأثاث الوطنية والنجارين المحليين مع لمسات تراثية (صنعاني، حضرمي).
-2. توليد البرومبت (Prompt): قم دائماً بإنشاء وصف تفصيلي باللغة الإنجليزية في نهاية ردك بتنسيق: [PROMPT: وصف الصورة بالإنجليزية هنا]. اجعل الوصف احترافياً لبرامج توليد الصور.
-3. التفاعل: كن ودوداً وملهماً وقدم حلولاً عملية للمساحة المحددة.
+قواعد الرد الصارمة:
+1. اللغة والتنسيق: الرد النصي بالعربية، يجب أن يكون بأسلوب فقرات واضحة ومرتبة. يمنع منعاً باتاً استخدام أي رموز تنسيق مثل النجوم (***) أو المربعات (###) أو الخطوط (---) أو الأشرطة (||). نريد نصاً نقياً فقط.
+2. الهوية اليمنية: شجع دائماً على استخدام قطع الأثاث الوطنية والنجارين المحليين مع لمسات تراثية (صنعاني، حضرمي).
+3. توليد البرومبت (Prompt): قم دائماً بإنشاء وصف تفصيلي واحترافي باللغة الإنجليزية في نهاية ردك بتنسيق: [PROMPT: نص البرومبت هنا].
+   - يجب أن يكون البرومبت مفصلاً لمحركات توليد الصور (مثل Midjourney أو Stable Diffusion).
+   - يجب أن يصف تحويل الغرفة بناءً على "الصورة الأصلية المرفقة كمرجع" (Referencing the uploaded photo)، مع دمج النمط المختار (${contextData?.style})، والمساحة (${contextData?.area}m2)، والميزانية، وتنسيق الألوان المناسب، مع قطع الأثاث المحددة.
+   - اجعل الوصف سينمائياً وبجودة 8K، مع ذكر الإضاءة والخامات.
 
 بيانات الغرفة الحالية للتحليل:
 - النوع: ${contextData?.roomType || 'غير محدد'}
@@ -80,7 +84,6 @@ const ewanAiChatFlow = ai.defineFlow(
       });
     }
 
-    // إرسال الرسالة كنص فقط لضمان التوافق مع Gemma 2
     apiMessages.push({ role: 'user', content: message });
 
     try {
@@ -100,19 +103,22 @@ const ewanAiChatFlow = ai.defineFlow(
       });
 
       const data = await response.json();
-      const fullText = data.choices?.[0]?.message?.content || "";
+      let fullContent = data.choices?.[0]?.message?.content || "";
       
-      let text = fullText;
+      // استخراج البرومبت وتنظيف النص
       let imagePrompt = "";
-      const promptMatch = fullText.match(/\[PROMPT: (.*?)\]/i);
+      const promptMatch = fullContent.match(/\[PROMPT: (.*?)\]/is);
       if (promptMatch) {
-        imagePrompt = promptMatch[1];
-        text = fullText.replace(/\[PROMPT: (.*?)\]/i, "").trim();
+        imagePrompt = promptMatch[1].replace(/[\*#_~`>\|]/g, '').trim();
+        fullContent = fullContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
       }
 
-      return { text, imagePrompt };
+      // تنظيف النص النهائي من أي رموز تنسيق متبقية
+      const cleanText = fullContent.replace(/[\*#_~`>\|]/g, '').trim();
+
+      return { text: cleanText, imagePrompt };
     } catch (error: any) {
-      return { text: "🌐 عذراً، واجهت صعوبة في معالجة طلبك، تأكد من اتصال الإنترنت." };
+      return { text: "عذراً، واجهت صعوبة في معالجة طلبك، تأكد من اتصال الإنترنت." };
     }
   }
 );
