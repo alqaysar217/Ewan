@@ -8,15 +8,12 @@ import {
   Users, 
   Store, 
   TrendingUp, 
-  Activity,
   Package,
   Loader2,
   Star,
   ShoppingBag,
   PieChart as PieIcon,
-  Smile,
-  Hammer,
-  Palette
+  Smile
 } from 'lucide-react';
 import { 
   Bar, 
@@ -32,7 +29,6 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 export default function AdminOverview() {
@@ -59,28 +55,28 @@ export default function AdminOverview() {
 
     return [
       { 
-        label: 'Total Users', 
+        label: 'إجمالي المستخدمين', 
         value: totalUsers.toLocaleString('en-US'), 
         icon: Users, 
         color: 'text-blue-600', 
         bg: 'bg-blue-50' 
       },
       { 
-        label: 'Stores & Pros', 
+        label: 'المتاجر والمهنيين', 
         value: totalVendors.toLocaleString('en-US'), 
         icon: Store, 
         color: 'text-emerald-600', 
         bg: 'bg-emerald-50' 
       },
       { 
-        label: 'Live Products', 
+        label: 'المنتجات المعروضة', 
         value: totalProducts.toLocaleString('en-US'), 
         icon: Package, 
         color: 'text-amber-600', 
         bg: 'bg-amber-50' 
       },
       { 
-        label: 'Revenue (YER)', 
+        label: 'إجمالي الأرباح (ر.ي)', 
         value: totalRevenue.toLocaleString('en-US'), 
         icon: TrendingUp, 
         color: 'text-primary', 
@@ -89,16 +85,16 @@ export default function AdminOverview() {
     ];
   }, [users, vendors, products, orders]);
 
-  // بيانات مبيعات افتراضية (بما أنه لا توجد مبيعات حقيقية بعد)
+  // بيانات مبيعات افتراضية (للنمو)
   const salesChartData = useMemo(() => {
     return [
-      { name: 'Sat', sales: 120000 },
-      { name: 'Sun', sales: 150000 },
-      { name: 'Mon', sales: 110000 },
-      { name: 'Tue', sales: 240000 },
-      { name: 'Wed', sales: 190000 },
-      { name: 'Thu', sales: 320000 },
-      { name: 'Fri', sales: 450000 },
+      { name: 'السبت', sales: 120000 },
+      { name: 'الأحد', sales: 150000 },
+      { name: 'الاثنين', sales: 110000 },
+      { name: 'الثلاثاء', sales: 240000 },
+      { name: 'الأربعاء', sales: 190000 },
+      { name: 'الخميس', sales: 320000 },
+      { name: 'الجمعة', sales: 450000 },
     ];
   }, []);
 
@@ -116,9 +112,9 @@ export default function AdminOverview() {
       }
     });
     return [
-      { name: 'Furniture Stores', value: counts.furniture_store, color: '#168899' },
-      { name: 'Carpenters', value: counts.carpenter, color: '#073D49' },
-      { name: 'Interior Designers', value: counts.interior_designer, color: '#F59E0B' },
+      { name: 'معارض أثاث', value: counts.furniture_store, color: '#168899' },
+      { name: 'نجارين', value: counts.carpenter, color: '#073D49' },
+      { name: 'مصممين', value: counts.interior_designer, color: '#F59E0B' },
     ].filter(item => item.value > 0);
   }, [vendors]);
 
@@ -140,7 +136,7 @@ export default function AdminOverview() {
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-6 font-cairo" dir="rtl">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="font-black text-muted-foreground text-lg">Analyzing System Data...</p>
+        <p className="font-black text-muted-foreground text-lg">جاري تحليل بيانات النظام...</p>
       </div>
     );
   }
@@ -156,7 +152,7 @@ export default function AdminOverview() {
                 <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner", stat.bg, stat.color)}>
                   <stat.icon className="w-7 h-7" />
                 </div>
-                <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-wider bg-gray-50 text-gray-400 border-none">Active</Badge>
+                <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-wider bg-gray-50 text-gray-400 border-none">مباشر</Badge>
               </div>
               <div className="space-y-1 text-right">
                 <p className="text-xs font-bold text-muted-foreground">{stat.label}</p>
@@ -172,9 +168,9 @@ export default function AdminOverview() {
         <Card className="lg:col-span-2 rounded-[2.5rem] border-none shadow-sm bg-white overflow-hidden">
           <CardHeader className="px-10 pt-10 pb-0">
              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl font-black text-secondary">Sales Growth Trend</CardTitle>
-                  <p className="text-sm text-muted-foreground font-bold mt-1">Default weekly activity projection (YER)</p>
+                <div className="text-right">
+                  <CardTitle className="text-2xl font-black text-secondary">توجه نمو المبيعات</CardTitle>
+                  <p className="text-sm text-muted-foreground font-bold mt-1">توقعات النشاط الأسبوعي الافتراضية (ر.ي)</p>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary">
                   <TrendingUp className="w-6 h-6" />
@@ -203,7 +199,7 @@ export default function AdminOverview() {
                       textAlign: 'right',
                       padding: '15px'
                     }}
-                    formatter={(value: any) => [value.toLocaleString('en-US') + ' YER', 'Sales']}
+                    formatter={(value: any) => [value.toLocaleString('en-US') + ' ر.ي', 'المبيعات']}
                   />
                   <Bar dataKey="sales" radius={[10, 10, 10, 10]} barSize={45}>
                     {salesChartData.map((entry, index) => (
@@ -219,18 +215,18 @@ export default function AdminOverview() {
         {/* Satisfaction Metric */}
         <Card className="rounded-[2.5rem] border-none shadow-sm bg-secondary text-white overflow-hidden relative">
            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16" />
-           <CardContent className="p-10 flex flex-col h-full justify-between relative z-10">
+           <CardContent className="p-10 flex flex-col h-full justify-between relative z-10 text-right">
               <div className="space-y-4">
                  <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center">
                     <Smile className="w-10 h-10 text-primary" />
                  </div>
-                 <h3 className="text-2xl font-black">Customer Trust Score</h3>
-                 <p className="text-white/60 text-sm font-medium leading-relaxed">Overall satisfaction based on vendor ratings and successful deliveries.</p>
+                 <h3 className="text-2xl font-black">مؤشر ثقة العملاء</h3>
+                 <p className="text-white/60 text-sm font-medium leading-relaxed">الرضا العام بناءً على تقييمات المتاجر والعمليات الناجحة.</p>
               </div>
               <div className="mt-8 space-y-2">
                  <div className="flex justify-between items-end">
                     <span className="text-5xl font-black text-primary">{Math.round(satisfactionRate)}%</span>
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Excellent</span>
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">ممتاز</span>
                  </div>
                  <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-primary rounded-full" style={{ width: `${satisfactionRate}%` }} />
@@ -245,7 +241,7 @@ export default function AdminOverview() {
         <Card className="rounded-[2.5rem] border-none shadow-sm bg-white overflow-hidden">
            <CardHeader className="px-10 pt-10 pb-0 text-right">
               <CardTitle className="text-xl font-black text-secondary flex items-center justify-end gap-3">
-                 Experience Distribution <PieIcon className="w-5 h-5 text-primary" />
+                 توزيع الخبرات في المنصة <PieIcon className="w-5 h-5 text-primary" />
               </CardTitle>
            </CardHeader>
            <CardContent className="p-10">
@@ -266,7 +262,7 @@ export default function AdminOverview() {
                       ))}
                     </Pie>
                     <RechartsTooltip 
-                       contentStyle={{ borderRadius: '15px', border: 'none', shadow: 'xl' }}
+                       contentStyle={{ borderRadius: '15px', border: 'none', shadow: 'xl', textAlign: 'right' }}
                     />
                     <Legend verticalAlign="bottom" align="center" iconType="circle" />
                   </PieChart>
@@ -282,9 +278,9 @@ export default function AdminOverview() {
                <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
                   <Star className="w-6 h-6 fill-current" />
                </div>
-               <div>
-                 <h3 className="text-2xl font-black text-secondary">Elite Partners</h3>
-                 <p className="text-sm text-muted-foreground font-bold">Most trusted vendors based on real customer feedback.</p>
+               <div className="text-right">
+                 <h3 className="text-2xl font-black text-secondary">شركاء النخبة</h3>
+                 <p className="text-sm text-muted-foreground font-bold">أكثر المتاجر موثوقية بناءً على آراء العملاء الحقيقية.</p>
                </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -313,7 +309,7 @@ export default function AdminOverview() {
               )) : (
                 <div className="col-span-full py-20 text-center flex flex-col items-center gap-4 opacity-30">
                    <Store className="w-16 h-16 text-gray-300" />
-                   <p className="text-sm font-bold italic">No partner data available.</p>
+                   <p className="text-sm font-bold italic">لا توجد بيانات لشركاء حالياً.</p>
                 </div>
               )}
             </div>
@@ -327,7 +323,7 @@ export default function AdminOverview() {
             <TrendingUp className="w-5 h-5" />
          </div>
          <p className="text-[12px] text-muted-foreground font-bold leading-relaxed italic text-center">
-           All data is securely fetched and analyzed in real-time from the Ewan Cloud Infrastructure.
+           يتم جلب وتحليل كافة البيانات بأمان وبشكل فوري من البنية السحابية لإيوان.
          </p>
       </div>
     </div>
