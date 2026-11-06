@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -97,12 +96,10 @@ export default function AdminProducts() {
     approval_status: 'approved',
     image_base64: '',
     gallery: [] as string[],
-    technical_specs: '',
     material: '',
     dimensions: '',
     fabric: '',
     warranty: '',
-    reviews: [] as any[]
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -266,28 +263,101 @@ export default function AdminProducts() {
             </div>
             <div className="p-8 max-h-[50vh] overflow-y-auto bg-white text-right">
               <TabsContent value="basic" className="space-y-6 mt-0">
-                <div className="grid grid-cols-2 gap-6">
-                  <select value={formData.vendor_id} onChange={e => setFormData({...formData, vendor_id: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-black text-sm outline-none shadow-inner">
-                    <option value="">اختر المتجر...</option>
-                    {vendors?.map(v => <option key={v.id} value={v.id}>{v.business_name}</option>)}
-                  </select>
-                  <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} placeholder="اسم المنتج" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary mr-1">المتجر أو المعرض</label>
+                    <select value={formData.vendor_id} onChange={e => setFormData({...formData, vendor_id: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-black text-sm outline-none shadow-inner">
+                      <option value="">اختر المتجر...</option>
+                      {vendors?.map(v => <option key={v.id} value={v.id}>{v.business_name}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary mr-1">اسم المنتج بالعربية</label>
+                    <Input value={formData.name_ar} onChange={e => setFormData({...formData, name_ar: e.target.value})} placeholder="مثال: طقم كنب تركي فاخر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-secondary mr-1">وصف المنتج</label>
+                  <Textarea value={formData.description_ar} onChange={e => setFormData({...formData, description_ar: e.target.value})} placeholder="اكتب وصفاً جذاباً للمنتج..." className="rounded-xl min-h-[100px] bg-gray-50 border-none shadow-inner" />
                 </div>
               </TabsContent>
               <TabsContent value="pricing" className="space-y-6 mt-0">
-                <div className="grid grid-cols-2 gap-6">
-                  <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="السعر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
-                  <Input type="number" value={formData.old_price} onChange={e => setFormData({...formData, old_price: e.target.value})} placeholder="السعر قبل الخصم (اختياري)" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary mr-1">السعر الحالي (ر.ي)</label>
+                    <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="السعر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary mr-1">السعر قبل الخصم (ر.ي)</label>
+                    <Input type="number" value={formData.old_price} onChange={e => setFormData({...formData, old_price: e.target.value})} placeholder="اختياري" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                      <label className="text-xs font-black text-secondary mr-1">حالة التوفر</label>
+                      <select value={formData.in_stock ? 'true' : 'false'} onChange={e => setFormData({...formData, in_stock: e.target.value === 'true'})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-black text-sm outline-none shadow-inner">
+                        <option value="true">متوفر في المخزون</option>
+                        <option value="false">نفذت الكمية</option>
+                      </select>
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-xs font-black text-secondary mr-1">التصنيف</label>
+                      <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-black text-sm outline-none shadow-inner">
+                        <option value="living">غرف معيشة</option>
+                        <option value="bedroom">غرف نوم</option>
+                        <option value="kitchen">مطابخ</option>
+                        <option value="office">مكاتب</option>
+                        <option value="majlis">مجالس عربية</option>
+                      </select>
+                   </div>
                 </div>
               </TabsContent>
               <TabsContent value="media" className="space-y-6 mt-0">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="relative aspect-square border-2 border-dashed border-gray-100 rounded-2xl flex items-center justify-center bg-gray-50 cursor-pointer">
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload('main', e)} className="absolute inset-0 opacity-0 z-10" />
-                    {formData.image_base64 ? <Image src={formData.image_base64} alt="Main" fill className="object-cover rounded-xl" /> : <Upload className="w-10 h-10 opacity-30" />}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-sm font-black text-secondary">الصورة الأساسية</label>
+                    <div className="relative aspect-square border-2 border-dashed border-gray-100 rounded-2xl flex items-center justify-center bg-gray-50 cursor-pointer overflow-hidden group hover:border-primary/40 transition-all">
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload('main', e)} className="absolute inset-0 opacity-0 z-10" />
+                      {formData.image_base64 ? <Image src={formData.image_base64} alt="Main" fill className="object-cover" /> : <Upload className="w-10 h-10 opacity-30 group-hover:scale-110 transition-transform" />}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-sm font-black text-secondary">معرض الصور ({formData.gallery.length})</label>
+                    <div className="grid grid-cols-3 gap-3">
+                       {formData.gallery.map((img, i) => (
+                         <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-sm group">
+                            <Image src={img} alt="Gallery" fill className="object-cover" />
+                            <button onClick={() => setFormData(prev => ({ ...prev, gallery: prev.gallery.filter((_, idx) => idx !== i) }))} className="absolute top-1 left-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-3 h-3" /></button>
+                         </div>
+                       ))}
+                       <div className="relative aspect-square border-2 border-dashed border-gray-100 rounded-xl flex items-center justify-center bg-gray-50 cursor-pointer hover:bg-primary/5 transition-all">
+                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload('gallery', e)} className="absolute inset-0 opacity-0" />
+                          <Plus className="w-6 h-6 opacity-30" />
+                       </div>
+                    </div>
                   </div>
                 </div>
-              </change>
+              </TabsContent>
+              <TabsContent value="specs" className="space-y-6 mt-0">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                       <label className="text-xs font-black text-secondary mr-1">المادة الخام (خشب، معدن...)</label>
+                       <Input value={formData.material} onChange={e => setFormData({...formData, material: e.target.value})} placeholder="مثال: خشب زان طبيعي" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-black text-secondary mr-1">الأبعاد (طول x عرض x ارتفاع)</label>
+                       <Input value={formData.dimensions} onChange={e => setFormData({...formData, dimensions: e.target.value})} placeholder="مثال: 200x180x90 سم" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-black text-secondary mr-1">نوع القماش / التنجيد</label>
+                       <Input value={formData.fabric} onChange={e => setFormData({...formData, fabric: e.target.value})} placeholder="مثال: مخمل تركي فاخر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-black text-secondary mr-1">فترة الضمان</label>
+                       <Input value={formData.warranty} onChange={e => setFormData({...formData, warranty: e.target.value})} placeholder="مثال: 5 سنوات ضد عيوب التصنيع" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                    </div>
+                 </div>
+              </TabsContent>
             </div>
             <div className="p-8 bg-gray-50 border-t flex flex-row-reverse justify-start gap-4">
               <Button onClick={handleSaveProduct} disabled={isSaving} className="rounded-xl px-12 h-14 font-black bg-secondary text-white min-w-[180px]">
