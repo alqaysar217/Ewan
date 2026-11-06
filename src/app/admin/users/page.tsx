@@ -21,7 +21,9 @@ import {
   Lock,
   Camera,
   Upload,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import {
   Dialog,
@@ -109,8 +111,18 @@ export default function AdminUsers() {
     }
 
     setIsSaving(true);
+    
+    // إذا كان مديراً، نمنحه كافة الصلاحيات تلقائياً
+    const finalPermissions = userData.role === 'admin' ? {
+      can_read: true,
+      can_write: true,
+      can_edit: true,
+      can_delete: true
+    } : userData.permissions;
+
     const finalData = {
       ...userData,
+      permissions: finalPermissions,
       updated_at: serverTimestamp(),
       is_active: true
     };
@@ -118,13 +130,13 @@ export default function AdminUsers() {
     try {
       if (editingUser) {
         await updateDoc(doc(db, 'users', editingUser.id), finalData);
-        toast({ title: "تم تحديث الصلاحيات بنجاح" });
+        toast({ title: "تم تحديث البيانات بنجاح" });
       } else {
         await addDoc(collection(db, 'users'), {
           ...finalData,
           created_at: new Date().toISOString()
         });
-        toast({ title: "تمت إضافة الموظف بنجاح" });
+        toast({ title: "تمت إضافة المستخدم بنجاح" });
       }
       setIsDialogOpen(false);
       resetForm();
@@ -161,8 +173,9 @@ export default function AdminUsers() {
   };
 
   const filteredUsers = users?.filter(u => 
-    u.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    (u.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    u.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (u.role === 'admin' || u.role === 'staff')
   );
 
   return (
@@ -170,12 +183,12 @@ export default function AdminUsers() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <h1 className="text-3xl font-black text-secondary flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-primary" /> إدارة مستخدمي النظام
+            <ShieldCheck className="w-8 h-8 text-primary" /> إدارة طاقم النظام
           </h1>
-          <p className="text-muted-foreground font-bold">تحكم في هوية وصلاحيات الموظفين والمدراء.</p>
+          <p className="text-muted-foreground font-bold">إدارة حسابات المدراء والموظفين وتعيين صلاحياتهم.</p>
         </div>
         <button onClick={() => { resetForm(); setIsDialogOpen(true); }} className="rounded-xl h-14 px-8 font-black bg-primary text-white shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform hover:-translate-y-1">
-          <UserPlus className="w-5 h-5 ml-2" /> إضافة موظف جديد
+          <UserPlus className="w-5 h-5 ml-2" /> إضافة حساب جديد
         </button>
       </div>
 
@@ -206,22 +219,24 @@ export default function AdminUsers() {
                    </div>
                    
                    <div className="flex-1 text-center md:text-right space-y-1">
-                      <h3 className="font-black text-lg text-secondary">{u.full_name}</h3>
+                      <h3 className="font-black text-lg text-secondary flex items-center justify-center md:justify-start gap-2">
+                        {u.full_name}
+                        {u.role === 'admin' && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                      </h3>
                       <div className="flex items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground font-bold">
                          <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> {u.email}</span>
                          <Badge className={cn(
                            "font-black text-[10px] px-2 py-0.5 rounded-lg border-none shadow-sm",
-                           u.role === 'admin' ? "bg-secondary text-white" : 
-                           u.role === 'staff' ? "bg-primary/20 text-primary" : "bg-gray-100 text-gray-400"
+                           u.role === 'admin' ? "bg-secondary text-white" : "bg-primary/20 text-primary"
                          )}>
-                           {u.role === 'admin' ? 'مدير نظام' : u.role === 'staff' ? 'موظف' : 'عميل'}
+                           {u.role === 'admin' ? 'مدير نظام' : 'موظف'}
                          </Badge>
                       </div>
                    </div>
 
                    <div className="flex flex-wrap items-center justify-center gap-4 px-6 md:border-r border-gray-100">
                       <div className="flex flex-col items-center gap-1">
-                         <p className="text-[9px] font-black text-muted-foreground uppercase">الصلاحيات</p>
+                         <p className="text-[9px] font-black text-muted-foreground uppercase">الصلاحيات الممنوحة</p>
                          <div className="flex gap-1.5">
                             {[
                               { key: 'can_read', label: 'قراءة' },
@@ -230,8 +245,8 @@ export default function AdminUsers() {
                               { key: 'can_delete', label: 'حذف' }
                             ].map((p) => (
                               <div key={p.key} className={cn(
-                                "w-2 h-2 rounded-full",
-                                u.permissions?.[p.key] ? "bg-emerald-500" : "bg-gray-200"
+                                "w-2.5 h-2.5 rounded-full",
+                                u.permissions?.[p.key] ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-gray-200"
                               )} title={p.label} />
                             ))}
                          </div>
@@ -249,8 +264,8 @@ export default function AdminUsers() {
                             </Button>
                          </DropdownMenuTrigger>
                          <DropdownMenuContent className="font-cairo" align="end">
-                            <DropdownMenuItem className="text-right font-bold">تعطيل الحساب</DropdownMenuItem>
-                            <DropdownMenuItem className="text-right font-bold text-destructive">حذف المستخدم</DropdownMenuItem>
+                            <DropdownMenuItem className="text-right font-bold">تعطيل الحساب مؤقتاً</DropdownMenuItem>
+                            <DropdownMenuItem className="text-right font-bold text-destructive">حذف الحساب نهائياً</DropdownMenuItem>
                          </DropdownMenuContent>
                       </DropdownMenu>
                    </div>
@@ -267,7 +282,7 @@ export default function AdminUsers() {
              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16" />
              <DialogHeader className="text-right relative z-10">
                <DialogTitle className="text-2xl font-black">{editingUser ? 'تحديث بيانات المستخدم' : 'إنشاء حساب إداري'}</DialogTitle>
-               <DialogDescription className="text-gray-400 font-bold mt-1">عين الدور والصلاحيات والمظهر الشخصي لهذا الحساب.</DialogDescription>
+               <DialogDescription className="text-gray-400 font-bold mt-1">عين الدور والصلاحيات المناسبة لهذا الحساب.</DialogDescription>
              </DialogHeader>
           </div>
           
@@ -293,7 +308,6 @@ export default function AdminUsers() {
                   </button>
                 )}
               </div>
-              <p className="text-[10px] font-bold text-muted-foreground">يفضل استخدام صورة مربعة واضحة</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -317,42 +331,50 @@ export default function AdminUsers() {
                   <select 
                     value={userData.role} 
                     onChange={e => setUserData({...userData, role: e.target.value as any})}
-                    className="w-full h-12 rounded-xl bg-gray-50 border-none px-4 font-bold text-sm outline-none shadow-inner"
+                    className="w-full h-12 rounded-xl bg-gray-50 border-none px-4 font-bold text-sm outline-none shadow-inner focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="admin">مدير نظام (كامل الصلاحيات)</option>
                     <option value="staff">موظف (صلاحيات محدودة)</option>
-                    <option value="customer">عميل عادي</option>
                   </select>
                </div>
             </div>
 
-            <div className="space-y-4">
-               <label className="text-sm font-black text-secondary flex items-center gap-2">الصلاحيات الممنوحة</label>
-               <div className="grid grid-cols-2 gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                  {[
-                    { id: 'can_read', label: 'عرض البيانات (قراءة)' },
-                    { id: 'can_write', label: 'إضافة بيانات جديدة' },
-                    { id: 'can_edit', label: 'تعديل البيانات الحالية' },
-                    { id: 'can_delete', label: 'حذف البيانات' }
-                  ].map((p) => (
-                    <div key={p.id} className="flex items-center gap-3">
-                       <Checkbox 
-                        id={p.id} 
-                        checked={(userData.permissions as any)[p.id]} 
-                        onCheckedChange={(checked) => setUserData({
-                          ...userData, 
-                          permissions: {...userData.permissions, [p.id]: !!checked}
-                        })}
-                       />
-                       <label htmlFor={p.id} className="text-sm font-bold text-secondary cursor-pointer">{p.label}</label>
-                    </div>
-                  ))}
-               </div>
-               <p className="text-[10px] text-muted-foreground font-medium">* ملاحظة: المدير يملك كافة الصلاحيات تلقائياً بغض النظر عن الاختيارات أعلاه.</p>
-            </div>
+            {userData.role === 'staff' ? (
+              <div className="space-y-4 animate-in slide-in-from-top-4 duration-300">
+                 <label className="text-sm font-black text-secondary flex items-center gap-2">الصلاحيات الممنوحة للموظف</label>
+                 <div className="grid grid-cols-2 gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                    {[
+                      { id: 'can_read', label: 'عرض البيانات (قراءة)' },
+                      { id: 'can_write', label: 'إضافة بيانات جديدة' },
+                      { id: 'can_edit', label: 'تعديل البيانات الحالية' },
+                      { id: 'can_delete', label: 'حذف البيانات' }
+                    ].map((p) => (
+                      <div key={p.id} className="flex items-center gap-3">
+                         <Checkbox 
+                          id={p.id} 
+                          checked={(userData.permissions as any)[p.id]} 
+                          onCheckedChange={(checked) => setUserData({
+                            ...userData, 
+                            permissions: {...userData.permissions, [p.id]: !!checked}
+                          })}
+                         />
+                         <label htmlFor={p.id} className="text-sm font-bold text-secondary cursor-pointer">{p.label}</label>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+            ) : (
+              <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 flex items-start gap-4 animate-in slide-in-from-top-4 duration-300">
+                <AlertCircle className="w-6 h-6 text-primary shrink-0" />
+                <div className="space-y-1">
+                  <p className="font-black text-primary text-sm">حساب مدير النظام</p>
+                  <p className="text-xs font-bold text-muted-foreground leading-relaxed">بصفتك مديراً للنظام، ستحصل تلقائياً على كافة صلاحيات القراءة والكتابة والتعديل والحذف عبر جميع واجهات المنصة دون الحاجة لضبطها يدوياً.</p>
+                </div>
+              </div>
+            )}
 
             <Button onClick={handleSaveUser} disabled={isSaving} className="w-full h-14 rounded-xl bg-secondary text-white font-black text-lg shadow-xl shadow-secondary/10 transition-all hover:-translate-y-1">
-              {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (editingUser ? 'حفظ التعديلات' : 'تفعيل الحساب')}
+              {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (editingUser ? 'تحديث بيانات الحساب' : 'تفعيل الحساب الآن')}
             </Button>
           </div>
         </DialogContent>
@@ -360,4 +382,3 @@ export default function AdminUsers() {
     </div>
   );
 }
-
