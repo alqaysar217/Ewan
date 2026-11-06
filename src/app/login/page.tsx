@@ -1,12 +1,13 @@
+
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +26,6 @@ export default function LoginPage() {
   const db = useFirestore();
   const router = useRouter();
 
-  // جلب بيانات المستخدم الحالية للتحقق من الصلاحيات مع تثبيت المرجع
   const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData } = useDoc(userDocRef);
 
@@ -33,15 +33,28 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      
+      // جلب بيانات الدور مباشرة بعد الدخول للتوجه الصحيح
+      const userSnap = await getDoc(doc(db, 'users', uid));
+      const role = userSnap.data()?.role;
+
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحباً بك مجدداً في إيوان",
       });
-      router.push('/');
+
+      if (role === 'admin' || role === 'staff') {
+        router.push('/admin');
+      } else if (role === 'vendor') {
+        router.push('/vendor/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error: any) {
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
-      if (error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
       }
       toast({
@@ -59,21 +72,15 @@ export default function LoginPage() {
       navigator.clipboard.writeText(user.uid);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast({ title: "تم نسخ المعرف (UID)", description: "يمكنك الآن استخدامه في Firebase Console" });
+      toast({ title: "تم نسخ المعرف (UID)", description: "تم النسخ بنجاح." });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4" dir="rtl">
-      {/* Decorative Background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23073D49' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
       
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
       <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-xl relative z-10">
-        <div className="absolute inset-0 border border-white/60 rounded-[2.5rem] pointer-events-none" />
-        
         <CardHeader className="space-y-6 text-center pt-12 pb-8">
           <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-xl shadow-2xl shadow-primary/20 bg-white p-3 flex items-center justify-center border border-gray-50">
             <Image 
@@ -93,7 +100,6 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="px-8 pb-8">
-          {/* مساعدة للمسؤول في حال عدم وجود صلاحيات */}
           {user && !userData && (
             <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-2xl space-y-3">
               <p className="text-[11px] font-bold text-primary leading-relaxed text-center">أنت مسجل الدخول، لكن حسابك غير مفعل كمسؤول في قاعدة البيانات.</p>
@@ -103,7 +109,6 @@ export default function LoginPage() {
                   {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-[9px] text-muted-foreground text-center">انسخ الـ UID أعلاه وضعه كـ Document ID في مجموعة users بالكونسول.</p>
             </div>
           )}
 
@@ -130,7 +135,6 @@ export default function LoginPage() {
                   <Lock className="w-4 h-4 text-primary" />
                   كلمة المرور
                 </Label>
-                <button type="button" className="text-xs font-bold text-primary hover:underline">نسيت؟</button>
               </div>
               <Input 
                 id="password" 
@@ -165,13 +169,6 @@ export default function LoginPage() {
             <Link href="/register" className="text-sm font-black text-primary hover:underline flex items-center justify-center gap-2">
                <UserPlus className="w-4 h-4" /> إنشاء حساب جديد للمعاينة
             </Link>
-            <Link href="/" className="text-sm font-black text-muted-foreground hover:text-primary transition-all flex items-center justify-center gap-2 group">
-               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-               العودة للصفحة الرئيسية
-            </Link>
-          </div>
-          <div className="text-[10px] text-gray-300 font-bold uppercase tracking-widest text-center">
-            إيوان © نظام إدارة متطور
           </div>
         </CardFooter>
       </Card>

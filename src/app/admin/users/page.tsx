@@ -2,8 +2,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, updateDoc, doc, serverTimestamp, orderBy, addDoc } from 'firebase/firestore';
+import { useCollection, useFirestore, useFirebaseApp } from '@/firebase';
+import { collection, query, updateDoc, doc, serverTimestamp, orderBy, setDoc } from 'firebase/firestore';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { firebaseConfig } from '@/firebase/config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -66,6 +69,7 @@ const compressImage = (base64Str: string, maxWidth = 400): Promise<string> => {
 
 export default function AdminUsers() {
   const db = useFirestore();
+  const mainApp = useFirebaseApp();
   
   const usersQuery = useMemo(() => query(collection(db, 'users'), orderBy('created_at', 'desc')), [db]);
   const { data: users, loading } = useCollection(usersQuery);
@@ -105,43 +109,62 @@ export default function AdminUsers() {
 
   const handleSaveUser = async () => {
     if (isSaving) return;
-    if (!userData.full_name || !userData.email) {
-      toast({ variant: "destructive", title: "بيانات ناقصة" });
+    if (!userData.full_name || !userData.email || (!editingUser && !userData.password)) {
+      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى التأكد من كتابة الاسم والبريد وكلمة المرور." });
       return;
     }
 
     setIsSaving(true);
     
-    // إذا كان مديراً، نمنحه كافة الصلاحيات تلقائياً
-    const finalPermissions = userData.role === 'admin' ? {
-      can_read: true,
-      can_write: true,
-      can_edit: true,
-      can_delete: true
-    } : userData.permissions;
-
-    const finalData = {
-      ...userData,
-      permissions: finalPermissions,
-      updated_at: serverTimestamp(),
-      is_active: true
-    };
-
     try {
-      if (editingUser) {
-        await updateDoc(doc(db, 'users', editingUser.id), finalData);
-        toast({ title: "تم تحديث البيانات بنجاح" });
-      } else {
-        await addDoc(collection(db, 'users'), {
-          ...finalData,
-          created_at: new Date().toISOString()
-        });
-        toast({ title: "تمت إضافة المستخدم بنجاح" });
+      let userId = editingUser?.id;
+
+      // إذا كان مستخدماً جديداً، نقوم بإنشاء حساب في Firebase Auth أولاً
+      if (!editingUser) {
+        // نستخدم تطبيقاً ثانوياً لإنشاء الحساب دون تسجيل خروج المدير الحالي
+        const secondaryApp = getApps().find(a => a.name === 'secondary') || initializeApp(firebaseConfig, 'secondary');
+        const secondaryAuth = getAuth(secondaryApp);
+        
+        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, userData.email, userData.password);
+        userId = userCredential.user.uid;
+        
+        // تسجيل الخروج من التطبيق الثانوي فوراً
+        await signOut(secondaryAuth);
       }
+
+      const finalPermissions = userData.role === 'admin' ? {
+        can_read: true,
+        can_write: true,
+        can_edit: true,
+        can_delete: true
+      } : userData.permissions;
+
+      const finalData = {
+        full_name: userData.full_name,
+        email: userData.email,
+        role: userData.role,
+        avatar_url: userData.avatar_url,
+        permissions: finalPermissions,
+        updated_at: serverTimestamp(),
+        is_active: true
+      };
+
+      // حفظ أو تحديث البيانات في Firestore باستخدام الـ UID الحقيقي
+      await setDoc(doc(db, 'users', userId), {
+        ...finalData,
+        created_at: editingUser ? editingUser.created_at : new Date().toISOString()
+      }, { merge: true });
+
+      toast({ title: editingUser ? "تم تحديث البيانات" : "تم تفعيل الحساب بنجاح", description: "يمكن الآن تسجيل الدخول بهذا الحساب." });
       setIsDialogOpen(false);
       resetForm();
-    } catch (e) {
-      toast({ variant: "destructive", title: "خطأ في العملية" });
+    } catch (e: any) {
+      console.error(e);
+      let msg = "حدث خطأ غير متوقع.";
+      if (e.code === 'auth/email-already-in-use') msg = "هذا البريد الإلكتروني مسجل مسبقاً.";
+      if (e.code === 'auth/weak-password') msg = "كلمة المرور ضعيفة جداً.";
+      
+      toast({ variant: "destructive", title: "فشل في إنشاء الحساب", description: msg });
     } finally {
       setIsSaving(false);
     }
@@ -164,7 +187,7 @@ export default function AdminUsers() {
     setUserData({
       full_name: user.full_name || '',
       email: user.email || '',
-      password: user.password || '',
+      password: '', // لا نعرض كلمة المرور القديمة للأمان
       avatar_url: user.avatar_url || '',
       role: user.role || 'staff',
       permissions: user.permissions || initialPermissions
@@ -287,7 +310,6 @@ export default function AdminUsers() {
           </div>
           
           <div className="p-8 space-y-8 bg-white max-h-[70vh] overflow-y-auto">
-            {/* Avatar Upload */}
             <div className="flex flex-col items-center gap-4">
               <label className="text-sm font-black text-secondary">صورة الموظف</label>
               <div className="relative group cursor-pointer">
@@ -317,14 +339,14 @@ export default function AdminUsers() {
                </div>
                <div className="space-y-2">
                   <label className="text-sm font-black text-secondary flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> البريد الإلكتروني</label>
-                  <Input value={userData.email} onChange={e => setUserData({...userData, email: e.target.value})} placeholder="staff@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <Input value={userData.email} onChange={e => setUserData({...userData, email: e.target.value})} placeholder="staff@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" disabled={!!editingUser} />
                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">
                   <label className="text-sm font-black text-secondary flex items-center gap-2"><Lock className="w-4 h-4 text-primary" /> كلمة المرور</label>
-                  <Input type="password" value={userData.password} onChange={e => setUserData({...userData, password: e.target.value})} placeholder="••••••••" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <Input type="password" value={userData.password} onChange={e => setUserData({...userData, password: e.target.value})} placeholder={editingUser ? "اتركها فارغة لعدم التغيير" : "••••••••"} className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
                </div>
                <div className="space-y-2">
                   <label className="text-sm font-black text-secondary flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> نوع الحساب (الدور)</label>
