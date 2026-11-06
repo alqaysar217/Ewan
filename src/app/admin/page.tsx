@@ -23,7 +23,6 @@ import { Badge } from '@/components/ui/badge';
 export default function AdminOverview() {
   const db = useFirestore();
   
-  // Memoize query references to prevent infinite re-renders
   const usersQuery = useMemo(() => collection(db, 'users'), [db]);
   const vendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
   const productsQuery = useMemo(() => collection(db, 'products'), [db]);
@@ -36,7 +35,6 @@ export default function AdminOverview() {
 
   const isLoading = usersLoading || vendorsLoading || productsLoading || ordersLoading;
 
-  // معالجة الإحصائيات الأربع الرئيسية
   const stats = useMemo(() => {
     const totalUsers = users?.length || 0;
     const totalVendors = vendors?.length || 0;
@@ -44,14 +42,37 @@ export default function AdminOverview() {
     const totalRevenue = orders?.reduce((acc, order: any) => acc + (Number(order.total) || 0), 0) || 0;
 
     return [
-      { label: 'إجمالي المستخدمين', value: totalUsers.toLocaleString('ar-YE'), icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-      { label: 'المتاجر والمهنيين', value: totalVendors.toLocaleString('ar-YE'), icon: Store, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-      { label: 'المنتجات المسجلة', value: totalProducts.toLocaleString('ar-YE'), icon: Package, color: 'text-amber-600', bg: 'bg-amber-50' },
-      { label: 'إجمالي الأرباح', value: totalRevenue.toLocaleString('ar-YE') + ' ر.ي', icon: TrendingUp, color: 'text-primary', bg: 'bg-primary/10' },
+      { 
+        label: 'إجمالي المستخدمين', 
+        value: totalUsers.toLocaleString('en-US'), 
+        icon: Users, 
+        color: 'text-blue-600', 
+        bg: 'bg-blue-50' 
+      },
+      { 
+        label: 'المتاجر والمهنيين', 
+        value: totalVendors.toLocaleString('en-US'), 
+        icon: Store, 
+        color: 'text-emerald-600', 
+        bg: 'bg-emerald-50' 
+      },
+      { 
+        label: 'المنتجات المسجلة', 
+        value: totalProducts.toLocaleString('en-US'), 
+        icon: Package, 
+        color: 'text-amber-600', 
+        bg: 'bg-amber-50' 
+      },
+      { 
+        label: 'إجمالي الأرباح', 
+        value: totalRevenue.toLocaleString('en-US') + ' ر.ي', 
+        icon: TrendingUp, 
+        color: 'text-primary', 
+        bg: 'bg-primary/10' 
+      },
     ];
   }, [users, vendors, products, orders]);
 
-  // معالجة بيانات الرسم البياني (توزيع المبيعات حسب أيام الأسبوع)
   const chartData = useMemo(() => {
     const daysAr = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
     const salesByDay = daysAr.map(day => ({ name: day, sales: 0 }));
@@ -59,13 +80,10 @@ export default function AdminOverview() {
     if (orders && orders.length > 0) {
       orders.forEach((order: any) => {
         let date: Date;
-        // التعامل مع تاريخ Firestore Timestamp أو سلسلة نصية
         if (order.created_at?.toDate) {
           date = order.created_at.toDate();
         } else if (order.created_at) {
           date = new Date(order.created_at);
-        } else if (order.updated_at?.toDate) {
-          date = order.updated_at.toDate();
         } else {
           date = new Date();
         }
@@ -77,46 +95,43 @@ export default function AdminOverview() {
       });
     }
     
-    // إعادة ترتيب البيانات لتبدأ من السبت
     const saturday = salesByDay.pop();
     if (saturday) salesByDay.unshift(saturday);
     
     return salesByDay;
   }, [orders]);
 
-  // استخراج أفضل المتاجر أداءً (بناءً على التقييم حالياً)
   const topVendors = useMemo(() => {
     if (!vendors) return [];
     return [...vendors]
       .sort((a: any, b: any) => (b.average_rating || 0) - (a.average_rating || 0))
-      .slice(0, 4);
+      .slice(0, 5);
   }, [vendors]);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-6 font-cairo" dir="rtl">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="font-black text-muted-foreground text-lg">جاري تحليل بيانات المنصة الحقيقية...</p>
+        <p className="font-black text-muted-foreground text-lg">جاري تحليل البيانات...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 font-cairo" dir="rtl">
-      {/* شبكة الإحصائيات */}
+    <div className="space-y-10 animate-in fade-in duration-500 font-cairo" dir="rtl">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <Card key={i} className="rounded-3xl border-none shadow-sm hover:shadow-md transition-all overflow-hidden bg-white group">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.bg, stat.color)}>
-                  <stat.icon className="w-6 h-6" />
+          <Card key={i} className="rounded-[2rem] border-none shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden bg-white group border border-transparent hover:border-primary/10">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner", stat.bg, stat.color)}>
+                  <stat.icon className="w-7 h-7" />
                 </div>
-                <Badge variant="outline" className="text-[9px] font-black text-muted-foreground/50 border-muted/20">بيانات مباشرة</Badge>
+                <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-wider bg-gray-50 text-gray-400 border-none">Live</Badge>
               </div>
-              <div>
+              <div className="space-y-1">
                 <p className="text-xs font-bold text-muted-foreground">{stat.label}</p>
-                <h3 className="text-2xl font-black text-secondary mt-1">{stat.value}</h3>
+                <h3 className="text-3xl font-black text-secondary tracking-tight">{stat.value}</h3>
               </div>
             </CardContent>
           </Card>
@@ -124,38 +139,41 @@ export default function AdminOverview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* الرسم البياني للمبيعات */}
-        <Card className="lg:col-span-2 rounded-3xl border-none shadow-sm bg-white overflow-hidden">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between mb-8">
+        <Card className="lg:col-span-2 rounded-[2.5rem] border-none shadow-sm bg-white overflow-hidden">
+          <CardContent className="p-10">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h3 className="text-xl font-black text-secondary">نشاط المبيعات الأسبوعي</h3>
-                <p className="text-xs text-muted-foreground font-bold">توزيع قيمة الطلبات المؤكدة عبر أيام الأسبوع</p>
+                <h3 className="text-2xl font-black text-secondary">النشاط التجاري الأسبوعي</h3>
+                <p className="text-sm text-muted-foreground font-bold mt-1">توزيع قيمة المبيعات الحقيقية بالريال اليمني</p>
               </div>
-              <Activity className="text-primary w-6 h-6 opacity-20" />
+              <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center">
+                <Activity className="text-primary w-6 h-6" />
+              </div>
             </div>
-            <div className="h-[320px] w-full">
+            <div className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <XAxis 
                     dataKey="name" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{ fontSize: 12, fontWeight: 'bold', fill: '#94a3b8' }} 
+                    tick={{ fontSize: 13, fontWeight: 'bold', fill: '#64748b' }} 
+                    dy={15}
                   />
                   <YAxis hide />
                   <Tooltip 
-                    cursor={{ fill: 'rgba(22, 136, 153, 0.05)' }}
+                    cursor={{ fill: 'rgba(22, 136, 153, 0.03)' }}
                     contentStyle={{ 
-                      borderRadius: '15px', 
+                      borderRadius: '20px', 
                       border: 'none', 
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', 
+                      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', 
                       fontFamily: 'inherit',
-                      textAlign: 'right'
+                      textAlign: 'right',
+                      padding: '15px'
                     }}
-                    formatter={(value: any) => [value.toLocaleString() + ' ر.ي', 'قيمة المبيعات']}
+                    formatter={(value: any) => [value.toLocaleString('en-US') + ' ر.ي', 'المبيعات']}
                   />
-                  <Bar dataKey="sales" radius={[10, 10, 0, 0]} barSize={45}>
+                  <Bar dataKey="sales" radius={[12, 12, 12, 12]} barSize={50}>
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#168899' : '#073D49'} fillOpacity={0.9} />
                     ))}
@@ -166,50 +184,48 @@ export default function AdminOverview() {
           </CardContent>
         </Card>
 
-        {/* أفضل المتاجر والمهنيين */}
-        <Card className="rounded-3xl border-none shadow-sm bg-white overflow-hidden">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-secondary">الأعلى تقييماً</h3>
-              <Link href="/admin/vendors" className="text-[10px] font-black text-primary hover:underline transition-all">إدارة الشركاء</Link>
+        <Card className="rounded-[2.5rem] border-none shadow-sm bg-white overflow-hidden">
+          <CardContent className="p-10">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-black text-secondary">الأكثر تميزاً</h3>
+              <Link href="/admin/vendors" className="text-xs font-black text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary hover:text-white transition-all">الكل</Link>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-8">
               {topVendors.length > 0 ? topVendors.map((v: any, i: number) => (
-                <div key={i} className="flex items-center gap-4 group">
-                  <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
+                <div key={i} className="flex items-center gap-5 group cursor-default">
+                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 shrink-0">
                     <Image 
-                      src={v.logo_url || `https://picsum.photos/seed/${v.id}/100/100`} 
+                      src={v.logo_url || `https://picsum.photos/seed/${v.id}/150/150`} 
                       alt={v.business_name} 
                       fill 
                       className="object-cover group-hover:scale-110 transition-transform duration-500" 
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-black text-secondary truncate">{v.business_name}</p>
-                    <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                      <ShoppingBag className="w-3 h-3" /> {v.city}
-                    </p>
+                    <p className="text-base font-black text-secondary truncate">{v.business_name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <ShoppingBag className="w-3.5 h-3.5 text-primary opacity-60" />
+                      <span className="text-xs text-muted-foreground font-bold">{v.city}</span>
+                    </div>
                   </div>
-                  <div className="text-amber-500 flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
-                    <Star className="w-3 h-3 fill-current" />
-                    <span className="text-xs font-black">{(v.average_rating || 5.0).toLocaleString('en-US')}</span>
+                  <div className="text-amber-500 flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-xl">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span className="text-sm font-black">{(v.average_rating || 5.0).toLocaleString('en-US')}</span>
                   </div>
                 </div>
               )) : (
-                <div className="py-12 text-center flex flex-col items-center gap-3">
-                   <Store className="w-10 h-10 text-gray-100" />
-                   <p className="text-xs text-muted-foreground font-bold italic">لا توجد بيانات متاجر بعد.</p>
+                <div className="py-20 text-center flex flex-col items-center gap-4 opacity-30">
+                   <Store className="w-16 h-16 text-gray-300" />
+                   <p className="text-sm font-bold italic">لا توجد بيانات شركاء.</p>
                 </div>
               )}
             </div>
             
-            {topVendors.length > 0 && (
-              <div className="mt-8 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed text-center">
-                  يتم تحديث هذه القائمة تلقائياً بناءً على تقييمات العملاء الحقيقية.
-                </p>
-              </div>
-            )}
+            <div className="mt-10 p-6 bg-secondary/5 rounded-3xl border border-dashed border-secondary/10">
+              <p className="text-[11px] text-muted-foreground font-bold leading-relaxed text-center italic">
+                * يتم تحديث هذه البيانات ديناميكياً بناءً على تقييمات العملاء والأرقام المسجلة في النظام.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
