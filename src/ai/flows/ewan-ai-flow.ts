@@ -30,6 +30,7 @@ export type EwanAiChatOutput = z.infer<typeof EwanAiChatOutputSchema>;
 
 /**
  * دالة استدعاء الذكاء الاصطناعي (Server Action)
+ * يتم تصدير الدوال غير المتزامنة فقط هنا لضمان توافق Next.js 15
  */
 export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutput> {
   try {
@@ -94,7 +95,7 @@ const ewanAiChatFlow = ai.defineFlow(
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'X-Title': 'Ewan Furniture AI',
+          'X-Title': 'Ewan AI Studio',
           'HTTP-Referer': 'https://ewan-furniture.vercel.app',
         },
         body: JSON.stringify({
@@ -110,17 +111,18 @@ const ewanAiChatFlow = ai.defineFlow(
       }
 
       const data = await response.json();
-      let fullContent = data.choices?.[0]?.message?.content || "";
+      let rawContent = data.choices?.[0]?.message?.content || "";
       
+      // استخراج البرومبت الإنجليزي
       let imagePrompt = "";
-      const promptMatch = fullContent.match(/\[PROMPT: (.*?)\]/is);
+      const promptMatch = rawContent.match(/\[PROMPT: (.*?)\]/is);
       if (promptMatch) {
         imagePrompt = promptMatch[1].replace(/[\*#_~`>\|]/g, '').trim();
-        fullContent = fullContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
+        rawContent = rawContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
       }
 
       // تنظيف النص من أي رموز ماركداون زائدة لضمان عرض نظيف
-      const cleanText = fullContent.replace(/[\*#_~`>\|]/g, '').trim();
+      const cleanText = rawContent.replace(/[\*#_~`>\|]/g, '').trim();
       
       return { text: cleanText, imagePrompt };
     } catch (error: any) {
