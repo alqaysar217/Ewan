@@ -159,9 +159,9 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-[400px] p-0 border-l border-border/50 flex flex-col font-cairo" dir="rtl">
               <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white relative">
-                <SheetTitle className="text-right text-white flex items-center justify-between">
-                  <span className="text-xl font-black">سلة المشتريات</span>
+                <SheetTitle className="text-right text-white flex items-center gap-3">
                   <ShoppingBag className="w-5 h-5 text-accent" />
+                  <span className="text-xl font-black">سلة المشتريات</span>
                 </SheetTitle>
                 <SheetClose className="absolute left-4 top-6 text-white opacity-70 hover:opacity-100 transition-opacity">
                    <X className="w-6 h-6" />
