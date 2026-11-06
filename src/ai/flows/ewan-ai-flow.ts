@@ -2,7 +2,7 @@
 /**
  * @fileOverview Ewan AI Design Assistant Flow.
  * محرك الذكاء الاصطناعي لمنصة إيوان، يعتمد على نموذج Gemma 2 المتاح عبر OpenRouter.
- * تم تحسينه للعمل في بيئة Vercel مع معالجة أخطاء تفصيلية.
+ * تم تحسينه للعمل في بيئة Vercel مع معالجة أخطاء تفصيلية وتوفير مخرجات عربية نقية.
  */
 
 import { ai } from '@/ai/genkit';
@@ -33,13 +33,13 @@ export type EwanAiChatOutput = z.infer<typeof EwanAiChatOutputSchema>;
  */
 export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutput> {
   try {
-    console.log("Ewan AI: Starting request for message:", input.message);
+    console.log("Ewan AI: Request received for:", input.message);
     const result = await ewanAiChatFlow(input);
     return result;
   } catch (error: any) {
     console.error("CRITICAL: Ewan AI Server Action Crash:", error);
     return { 
-      text: `⚠️ فشل الخادم في معالجة الطلب: ${error.message || 'خطأ غير معروف'}. يرجى التحقق من سجلات Vercel ومفتاح API.` 
+      text: `⚠️ فشل الخادم في معالجة الطلب: ${error.message || 'خطأ غير معروف'}. يرجى التحقق من متغيرات البيئة ورصيد OpenRouter.` 
     };
   }
 }
@@ -55,19 +55,19 @@ const ewanAiChatFlow = ai.defineFlow(
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      console.error("Ewan AI: OPENROUTER_API_KEY is missing from environment variables.");
-      return { text: "⚠️ مفتاح البرمجة (API Key) غير موجود في إعدادات Vercel. يرجى إضافته باسم OPENROUTER_API_KEY." };
+      console.error("Ewan AI: API KEY MISSING");
+      return { text: "⚠️ مفتاح البرمجة (OPENROUTER_API_KEY) غير موجود في إعدادات النشر." };
     }
 
     const systemContent = `أنت "إيوان AI"، الخبير الذكي في التصميم الداخلي لمنصة إيوان اليمنية.
-هويتك: خبير في دمج الطرازات المودرن مع اللمسات التراثية اليمنية.
+هويتك: خبير في دمج الطرازات المودرن مع اللمسات التراثية اليمنية العريقة.
 
 قواعد الرد:
-1. الرد بالعربية بأسلوب فقرات نظيفة. يمنع تماماً استخدام رموز مثل (***) أو (###) أو (---).
-2. قم دائماً بإنشاء وصف تفصيلي بالإنجليزية في نهاية ردك بتنسيق: [PROMPT: نص البرومبت هنا].
-3. اجعل البرومبت مخصصاً لمحركات الصور، يصف الغرفة بناءً على المساحة (${contextData?.area}m2) والنمط (${contextData?.style}).
+1. الرد باللغة العربية بأسلوب فقرات واضحة ومهنية. يمنع تماماً استخدام رموز التنسيق مثل (***) أو (###) أو (---).
+2. قدم نصائح عملية بناءً على المساحة (${contextData?.area}m2) والنمط (${contextData?.style}).
+3. في نهاية الرد، قم دائماً بإنشاء وصف تفصيلي بالإنجليزية مخصص لمحركات الصور بتنسيق: [PROMPT: نص البرومبت هنا].
 
-بيانات الغرفة:
+بيانات الغرفة الحالية:
 - النوع: ${contextData?.roomType || 'غير محدد'}
 - المساحة: ${contextData?.area || 'غير محدد'} م²
 - النمط: ${contextData?.style || 'غير محدد'}
@@ -89,7 +89,6 @@ const ewanAiChatFlow = ai.defineFlow(
     apiMessages.push({ role: 'user', content: message });
 
     try {
-      // استخدام fetch بسيط مع إعدادات متوافقة مع Vercel
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -103,12 +102,10 @@ const ewanAiChatFlow = ai.defineFlow(
           messages: apiMessages,
           temperature: 0.7,
         }),
-        // عدم وضع timeout طويل هنا، نعتمد على مهلة Vercel
       });
 
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));
-        console.error("OpenRouter API Error Response:", errJson);
         throw new Error(errJson.error?.message || `HTTP ${response.status}`);
       }
 
@@ -122,13 +119,13 @@ const ewanAiChatFlow = ai.defineFlow(
         fullContent = fullContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
       }
 
+      // تنظيف النص من أي رموز ماركداون زائدة لضمان عرض نظيف
       const cleanText = fullContent.replace(/[\*#_~`>\|]/g, '').trim();
-      console.log("Ewan AI: Request completed successfully.");
       
       return { text: cleanText, imagePrompt };
     } catch (error: any) {
-      console.error("Ewan AI: Fetch Exception:", error.message);
-      throw error; // سيتم التقاطه في ewanAiChat
+      console.error("Ewan AI Fetch Exception:", error.message);
+      throw error;
     }
   }
 );

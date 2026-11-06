@@ -21,13 +21,13 @@ import {
   ImageIcon,
   Check,
   Box,
-  Scaling,
   Bot,
   FileText,
   Quote,
   RefreshCcw,
   Copy,
-  ClipboardCheck
+  ClipboardCheck,
+  LayoutGrid
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -42,8 +42,9 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ewanAiChat } from '@/ai/flows/ewan-ai-flow';
+import { Badge } from '@/components/ui/badge';
 
-// هذه الإعدادات تطلب من Vercel زيادة مهلة التنفيذ لـ 60 ثانية لهذه الصفحة
+// تفعيل زيادة مهلة التنفيذ لـ Vercel Next.js 15
 export const maxDuration = 60;
 
 const ROOM_TYPES = [
@@ -53,10 +54,6 @@ const ROOM_TYPES = [
   { id: 'majlis', name: 'مجلس عربي', icon: Palette },
   { id: 'office', name: 'مكتب منزلي', icon: Ruler }
 ];
-
-const LayoutGrid = Layout; // كاختصار للأيقونة
-
-function Layout() { return <Layers className="w-full h-full" />; }
 
 const DESIGN_STYLES = [
   { id: 'modern', name: 'مودرن حديث', img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=400' },
@@ -111,19 +108,10 @@ export default function AIDesignStudio() {
   const [selectionMode, setSelectionMode] = useState<'auto' | 'manual'>('auto');
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [budgetRange, setBudgetRange] = useState({ min: '100000', max: '500000' });
-  const [roomStatus, setRoomStatus] = useState<string>('empty');
   const [roomArea, setRoomArea] = useState<string>('20');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const productsColl = useMemo(() => collection(db, 'products'), [db]);
-  const { data: allProducts, loading: productsLoading } = useCollection(productsColl);
-
-  const filteredProducts = useMemo(() => {
-    if (!allProducts) return [];
-    return allProducts.filter(p => 
-      p.name_ar?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [allProducts, searchQuery]);
+  const { data: allProducts } = useCollection(productsColl);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -206,7 +194,6 @@ export default function AIDesignStudio() {
         selected_products: selectedProductIds,
         budget_min: Number(budgetRange.min),
         budget_max: Number(budgetRange.max),
-        room_status: roomStatus,
         room_area: Number(roomArea),
         status: 'completed',
         ai_recommendation: aiResponse.text,
@@ -219,11 +206,11 @@ export default function AIDesignStudio() {
       toast({ title: "اكتمل تحليل التصميم!" });
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "حدث خطأ في الاتصال بالذكاء الاصطناعي.");
+      setError(err.message || "انتهت مهلة الطلب، يرجى المحاولة لاحقاً.");
       toast({ 
         variant: "destructive", 
         title: "فشل المعالجة", 
-        description: "انتهت مهلة الطلب أو هناك مشكلة في المفتاح." 
+        description: "تعذر الحصول على رد من الخبير الذكي حالياً." 
       });
     } finally {
       setIsSaving(false);
@@ -274,7 +261,7 @@ export default function AIDesignStudio() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-xl md:text-2xl font-black text-secondary">يتم الآن التحليل الذكي...</h3>
-                      <p className="text-xs md:text-sm text-muted-foreground font-bold animate-pulse">قد يستغرق هذا دقيقة واحدة بناءً على ضغط السيرفر.</p>
+                      <p className="text-xs md:text-sm text-muted-foreground font-bold animate-pulse">يستغرق التصميم حوالي 30-60 ثانية.</p>
                     </div>
                   </motion.div>
                 )}
@@ -379,7 +366,7 @@ export default function AIDesignStudio() {
                              <Badge variant="outline" className="text-[9px] font-bold">{selectedProductIds.length} مختار</Badge>
                           </div>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-                            {filteredProducts.slice(0, 8).map(product => (
+                            {allProducts?.slice(0, 8).map(product => (
                               <div key={product.id} onClick={() => toggleProductSelection(product.id)} className={cn("relative aspect-[3/4] rounded-lg overflow-hidden border-2 cursor-pointer", selectedProductIds.includes(product.id) ? "border-primary" : "border-transparent")}>
                                 <Image src={product.image_base64 || `https://picsum.photos/seed/${product.id}/600/800`} alt="Product" fill className="object-cover" />
                                 {selectedProductIds.includes(product.id) && (
@@ -459,5 +446,3 @@ export default function AIDesignStudio() {
     </div>
   );
 }
-
-function LayoutGridIcon() { return <Layers className="w-full h-full" />; }

@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, where, addDoc, serverTimestamp, deleteDoc, doc, updateDoc, or } from 'firebase/firestore';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,8 +58,6 @@ import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 const compressImage = (base64Str: string, maxWidth = 1000, maxHeight = 800): Promise<string> => {
   return new Promise((resolve) => {
@@ -149,58 +147,46 @@ export default function AdminProfessionals() {
 
   const handleSavePro = async () => {
     if (isSaving) return;
-    if (!proData.business_name || !proData.email) {
-      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء الاسم والبريد الإلكتروني." });
-      return;
-    }
-
-    setIsSaving(true);
-    const finalData = {
-      ...proData,
-      average_rating: Number(proData.average_rating),
-      experience_years: Number(proData.experience_years),
-      approval_status: 'approved',
-      updated_at: serverTimestamp(),
-      slug: proData.business_name.toLowerCase().replace(/\s+/g, '-'),
-    };
-
-    if (editingUser) {
-      updateDoc(doc(db, 'vendors', editingUser.id), finalData)
-        .then(() => {
-          toast({ title: "تم التحديث بنجاح" });
-          setIsDialogOpen(false);
-          resetForm();
-        })
-        .catch(async (e) => {
-          const err = new FirestorePermissionError({ path: `vendors/${editingUser.id}`, operation: 'update', requestResourceData: finalData });
-          errorEmitter.emit('permission-error', err);
-        })
-        .finally(() => setIsSaving(false));
-    } else {
-      addDoc(collection(db, 'vendors'), {
-        ...finalData,
-        created_at: serverTimestamp(),
-      })
-        .then(() => {
-          toast({ title: "تم تسجيل المهني بنجاح" });
-          setIsDialogOpen(false);
-          resetForm();
-        })
-        .catch(async (e) => {
-          const err = new FirestorePermissionError({ path: 'vendors', operation: 'create', requestResourceData: finalData });
-          errorEmitter.emit('permission-error', err);
-        })
-        .finally(() => setIsSaving(false));
+    try {
+      if (!proData.business_name || !proData.email) {
+        toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء الاسم والبريد الإلكتروني." });
+        return;
+      }
+      setIsSaving(true);
+      const finalData = {
+        ...proData,
+        average_rating: Number(proData.average_rating),
+        experience_years: Number(proData.experience_years),
+        approval_status: 'approved',
+        updated_at: serverTimestamp(),
+        slug: proData.business_name.toLowerCase().replace(/\s+/g, '-'),
+      };
+      if (editingUser) {
+        await updateDoc(doc(db, 'vendors', editingUser.id), finalData);
+        toast({ title: "تم التحديث بنجاح" });
+      } else {
+        await addDoc(collection(db, 'vendors'), {
+          ...finalData,
+          created_at: serverTimestamp(),
+        });
+        toast({ title: "تم تسجيل المهني بنجاح" });
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "فشل في الحفظ" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleDeletePro = (id: string) => {
-    deleteDoc(doc(db, 'vendors', id))
-      .then(() => toast({ title: "تم الحذف بنجاح" }))
-      .catch(async (e) => {
-        const err = new FirestorePermissionError({ path: `vendors/${id}`, operation: 'delete' });
-        errorEmitter.emit('permission-error', err);
-      });
+  const handleDeletePro = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'vendors', id));
+      toast({ title: "تم الحذف بنجاح" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "فشل في الحذف" });
+    }
   };
 
   const openEdit = (pro: any) => {

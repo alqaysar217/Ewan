@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  Heart, 
   Zap, 
   ShoppingBag, 
   Star,
@@ -15,12 +14,7 @@ import {
   Truck,
   Hammer,
   Quote,
-  ChevronRight,
-  Sparkles,
   Loader2,
-  HelpCircle,
-  Users,
-  Palette,
   Award
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";

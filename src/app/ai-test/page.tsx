@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Send, Bot, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// تفعيل زيادة مهلة التنفيذ لـ 60 ثانية على Vercel
+// تفعيل زيادة مهلة التنفيذ لـ Vercel Next.js 15
 export const maxDuration = 60;
 
 export default function AITestPage() {
@@ -34,7 +34,7 @@ export default function AITestPage() {
       setMessages(prev => [...prev, { role: 'ai', text: result.text, prompt: result.imagePrompt }]);
     } catch (error: any) {
       console.error("AI Test Client Error:", error);
-      setMessages(prev => [...prev, { role: 'ai', text: `⚠️ خطأ في الاتصال بالنموذج: ${error.message || 'فشل غير متوقع'}. قد يكون السبب انتهاء مهلة 10 ثوانٍ في Vercel Hobby.` }]);
+      setMessages(prev => [...prev, { role: 'ai', text: `⚠️ حدث خطأ في الاتصال بالذكاء الاصطناعي: ${error.message || 'فشل غير متوقع'}. تأكد من إعدادات Vercel ورصيد OpenRouter.` }]);
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export default function AITestPage() {
           <h1 className="text-3xl font-black text-secondary flex items-center justify-center gap-3">
              <Bot className="w-8 h-8 text-primary" /> اختبار إيوان AI
           </h1>
-          <p className="text-muted-foreground font-bold">اختبار استجابة Gemma 2 عبر OpenRouter</p>
+          <p className="text-muted-foreground font-bold">اختبار استجابة Gemma 2 عبر OpenRouter بكفاءة عالية</p>
         </div>
 
         <Card className="rounded-[30px] border-none shadow-2xl overflow-hidden bg-white min-h-[500px] flex flex-col">

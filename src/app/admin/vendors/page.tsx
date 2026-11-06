@@ -30,7 +30,9 @@ import {
   Quote,
   Edit,
   X,
-  Calendar
+  Calendar,
+  Briefcase,
+  Map
 } from 'lucide-react';
 import {
   Dialog,
@@ -194,7 +196,8 @@ export default function AdminVendors() {
       experience_years: vendor.experience_years?.toString() || '5',
       available_products: vendor.available_products?.toString() || '0',
       service_areas: vendor.service_areas || [],
-      reviews: vendor.reviews || []
+      reviews: vendor.reviews || [],
+      gallery: vendor.gallery || []
     });
     setIsDialogOpen(true);
   };
@@ -274,7 +277,7 @@ export default function AdminVendors() {
                    <div className="text-white">
                       <h4 className="font-black text-lg flex items-center gap-1.5">{vendor.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
                       <p className="text-[10px] font-bold opacity-80 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-primary" /> {vendor.city}
+                        <MapPin className="w-3 h-3 text-primary" /> {vendor.service_areas?.[0] || vendor.city}
                       </p>
                    </div>
                 </div>
@@ -338,7 +341,7 @@ export default function AdminVendors() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                      <label className="text-sm font-black text-secondary flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4 text-primary" /> شعار المتجر الرسمي
+                        <Sparkles className="w-4 h-4 text-primary" /> شعار المتجر الرسمي
                      </label>
                      <div className="relative aspect-square w-24 border-2 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center group">
                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
@@ -358,17 +361,17 @@ export default function AdminVendors() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Store className="w-3 h-3 text-primary" /> الاسم التجاري للمعرض</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Briefcase className="w-3 h-3 text-primary" /> الاسم التجاري للمعرض</label>
                     <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="مثال: عالم الأثاث الفاخر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني للتواصل</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني للتواصل</label>
                     <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="store@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-secondary flex items-center gap-2"><Info className="w-3 h-3 text-primary" /> نبذة تعريفية وقصة المتجر</label>
+                  <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Info className="w-3 h-3 text-primary" /> نبذة تعريفية وقصة المتجر</label>
                   <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="اكتب وصفاً جذاباً لخدماتك ومنتجاتك..." className="rounded-xl min-h-[100px] bg-gray-50 border-none shadow-inner" />
                 </div>
               </TabsContent>
@@ -376,21 +379,21 @@ export default function AdminVendors() {
               <TabsContent value="performance" className="space-y-6 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
                     <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} placeholder="5" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Package className="w-3 h-3 text-primary" /> عدد المنتجات</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Package className="w-3 h-3 text-primary" /> عدد المنتجات</label>
                     <Input type="number" value={vendorData.available_products} onChange={e => setVendorData({...vendorData, available_products: e.target.value})} placeholder="50" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Star className="w-3 h-3 text-primary" /> التقييم العام (0-5)</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Star className="w-3 h-3 text-primary" /> التقييم العام (0-5)</label>
                     <Input type="number" max="5" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} placeholder="4.5" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                 </div>
 
                 <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                  <label className="text-sm font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
+                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Map className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
                   <div className="flex gap-2">
                     <Input 
                       value={newArea} 
