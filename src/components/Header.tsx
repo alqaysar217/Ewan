@@ -19,7 +19,9 @@ import {
   ChevronLeft,
   ShieldCheck,
   Trash2,
-  X
+  X,
+  Plus,
+  Minus
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -34,16 +36,18 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose
 } from "@/components/ui/sheet";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 export default function Header() {
   const { user, loading: userLoading } = useUser();
-  const { cart, removeFromCart, clearCart, cartCount } = useCart();
+  const { cart, removeFromCart, updateQuantity, clearCart, cartCount } = useCart();
   const db = useFirestore();
   const auth = useAuth();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData } = useDoc(userDocRef);
@@ -70,6 +74,24 @@ export default function Header() {
   ];
 
   const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  const handleWhatsAppCheckout = () => {
+    const phoneNumber = "967770000000";
+    let message = "مرحباً إيوان، أود طلب المنتجات التالية:\n\n";
+    
+    cart.forEach((item, index) => {
+      message += `${index + 1}. ${item.name}\n`;
+      message += `   الكمية: ${item.quantity}\n`;
+      message += `   السعر: ${item.price.toLocaleString('en-US')} ريال\n`;
+      message += `   المجموع: ${(item.price * item.quantity).toLocaleString('en-US')} ريال\n\n`;
+    });
+    
+    message += `إجمالي الطلب: ${cartTotal.toLocaleString('en-US')} ريال يمني\n`;
+    message += "يرجى تأكيد الطلب وتزويدي بتفاصيل التوصيل.";
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-card/90 backdrop-blur-md">
@@ -128,7 +150,7 @@ export default function Header() {
           </Button>
           
           {/* سلة المشتريات */}
-          <Sheet>
+          <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-md hover:bg-accent/10 hover:text-accent relative">
                 <ShoppingBag className="w-5 h-5" />
@@ -136,11 +158,14 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-[400px] p-0 border-l border-border/50 flex flex-col font-cairo" dir="rtl">
-              <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
+              <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white relative">
                 <SheetTitle className="text-right text-white flex items-center justify-between">
                   <span className="text-xl font-black">سلة المشتريات</span>
                   <ShoppingBag className="w-5 h-5 text-accent" />
                 </SheetTitle>
+                <SheetClose className="absolute left-4 top-6 text-white opacity-70 hover:opacity-100 transition-opacity">
+                   <X className="w-6 h-6" />
+                </SheetClose>
               </SheetHeader>
               
               <div className="flex-1 overflow-hidden flex flex-col">
@@ -153,7 +178,7 @@ export default function Header() {
                       <p className="text-lg font-black text-secondary">سلتك فارغة حالياً</p>
                       <p className="text-sm text-muted-foreground font-medium">ابدأ بتصفح المنتجات وأضف ما يعجبك هنا.</p>
                     </div>
-                    <Link href="/shop" className="w-full">
+                    <Link href="/shop" onClick={() => setIsCartOpen(false)} className="w-full">
                       <Button className="w-full rounded-xl bg-primary h-12 font-black">تسوق الآن</Button>
                     </Link>
                   </div>
@@ -163,24 +188,41 @@ export default function Header() {
                       <div className="space-y-6">
                         {cart.map((item) => (
                           <div key={item.id} className="flex gap-4 group">
-                            <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-muted/10 border border-border/50 shrink-0">
+                            <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-muted/10 border border-border/50 shrink-0">
                               <Image src={item.image} alt={item.name} fill className="object-cover" />
                             </div>
                             <div className="flex-1 flex flex-col justify-between min-w-0">
                               <div className="space-y-1">
-                                <h4 className="text-sm font-black text-secondary truncate">{item.name}</h4>
+                                <div className="flex justify-between items-start">
+                                  <h4 className="text-sm font-black text-secondary truncate pl-4">{item.name}</h4>
+                                  <button 
+                                    onClick={() => removeFromCart(item.id)}
+                                    className="text-destructive opacity-40 hover:opacity-100 transition-opacity shrink-0"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                                 <p className="text-xs font-bold text-accent">
-                                  {item.price.toLocaleString('en-US')} ريال <span className="text-muted-foreground">× {item.quantity}</span>
+                                  {item.price.toLocaleString('en-US')} ريال
                                 </p>
                               </div>
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-black text-secondary">{(item.price * item.quantity).toLocaleString('en-US')} ريال</span>
-                                <button 
-                                  onClick={() => removeFromCart(item.id)}
-                                  className="text-destructive opacity-40 hover:opacity-100 transition-opacity p-1"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-1">
+                                   <button 
+                                     onClick={() => updateQuantity(item.id, -1)}
+                                     className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:bg-gray-50 text-secondary"
+                                   >
+                                     <Minus className="w-3 h-3" />
+                                   </button>
+                                   <span className="text-sm font-black text-secondary min-w-[20px] text-center">{item.quantity}</span>
+                                   <button 
+                                     onClick={() => updateQuantity(item.id, 1)}
+                                     className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:bg-gray-50 text-secondary"
+                                   >
+                                     <Plus className="w-3 h-3" />
+                                   </button>
+                                </div>
+                                <span className="text-sm font-black text-primary">{(item.price * item.quantity).toLocaleString('en-US')} ريال</span>
                               </div>
                             </div>
                           </div>
@@ -201,8 +243,12 @@ export default function Header() {
                       </div>
                       
                       <div className="grid grid-cols-1 gap-2 pt-2">
-                        <Button className="w-full h-14 rounded-xl bg-primary text-white font-black text-lg shadow-xl shadow-primary/20">
-                          إتمام الطلب الآن
+                        <Button 
+                          onClick={handleWhatsAppCheckout}
+                          className="w-full h-14 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-black text-lg shadow-xl shadow-green-500/10 flex gap-2"
+                        >
+                          <Phone className="w-5 h-5 fill-white" />
+                          إتمام الطلب عبر واتساب
                         </Button>
                         <Button variant="ghost" onClick={clearCart} className="w-full h-10 rounded-xl text-destructive hover:bg-destructive/5 font-bold">
                           تفريغ السلة

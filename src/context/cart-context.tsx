@@ -14,6 +14,7 @@ export type CartItem = {
 interface CartContextType {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
+  updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   cartCount: number;
@@ -45,7 +46,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const existingItem = cart.find((item) => item.id === newItem.id);
 
     if (existingItem) {
-      // تحديث الكمية إذا كان المنتج موجوداً مسبقاً
       setCart((prevCart) =>
         prevCart.map((item) =>
           item.id === newItem.id
@@ -54,13 +54,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         )
       );
       
-      // إظهار التنبيه خارج وظيفة تحديث الحالة لتجنب الأخطاء البرمجية
       toast({
         title: "تم تحديث السلة",
         description: `تمت إضافة قطعة أخرى من "${newItem.name}"`,
       });
     } else {
-      // إضافة منتج جديد للسلة
       setCart((prevCart) => [...prevCart, newItem]);
       
       toast({
@@ -68,6 +66,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         description: `تمت إضافة "${newItem.name}" بنجاح.`,
       });
     }
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) => {
+        if (item.id === id) {
+          const newQty = Math.max(1, item.quantity + delta);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      })
+    );
   };
 
   const removeFromCart = (id: string) => {
@@ -81,7 +91,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, cartCount }}>
+    <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart, clearCart, cartCount }}>
       {children}
     </CartContext.Provider>
   );
