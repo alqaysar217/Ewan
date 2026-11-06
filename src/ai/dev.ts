@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-// Flows will be registered here
+// Flows registration
+import './flows/ewan-ai-flow';
