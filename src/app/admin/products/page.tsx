@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -12,21 +13,10 @@ import {
   Plus, 
   Trash2, 
   Loader2, 
-  AlertTriangle,
   Upload,
-  Image as ImageIcon,
-  Package,
-  Settings,
   Star,
-  CheckCircle2,
   Edit,
   Store,
-  Tag,
-  Info,
-  Layers,
-  Quote,
-  Clock,
-  Maximize2
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -51,7 +41,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 600): Promise<string> => {
   return new Promise((resolve) => {
@@ -105,7 +94,7 @@ export default function AdminProducts() {
     category_id: 'living',
     rating: '5.0',
     in_stock: true,
-    status: 'approved',
+    approval_status: 'approved',
     image_base64: '',
     gallery: [] as string[],
     technical_specs: '',
@@ -286,7 +275,10 @@ export default function AdminProducts() {
                 </div>
               </TabsContent>
               <TabsContent value="pricing" className="space-y-6 mt-0">
-                <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="السعر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                <div className="grid grid-cols-2 gap-6">
+                  <Input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="السعر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                  <Input type="number" value={formData.old_price} onChange={e => setFormData({...formData, old_price: e.target.value})} placeholder="السعر قبل الخصم (اختياري)" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                </div>
               </TabsContent>
               <TabsContent value="media" className="space-y-6 mt-0">
                 <div className="grid grid-cols-2 gap-6">
@@ -295,10 +287,7 @@ export default function AdminProducts() {
                     {formData.image_base64 ? <Image src={formData.image_base64} alt="Main" fill className="object-cover rounded-xl" /> : <Upload className="w-10 h-10 opacity-30" />}
                   </div>
                 </div>
-              </TabsContent>
-              <TabsContent value="specs" className="space-y-6 mt-0">
-                <Textarea value={formData.technical_specs} onChange={e => setFormData({...formData, technical_specs: e.target.value})} placeholder="المواصفات الفنية..." className="rounded-xl min-h-[100px] bg-gray-50 border-none shadow-inner" />
-              </TabsContent>
+              </change>
             </div>
             <div className="p-8 bg-gray-50 border-t flex flex-row-reverse justify-start gap-4">
               <Button onClick={handleSaveProduct} disabled={isSaving} className="rounded-xl px-12 h-14 font-black bg-secondary text-white min-w-[180px]">

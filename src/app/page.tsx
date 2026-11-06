@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -9,10 +10,8 @@ import {
   Star,
   ArrowLeft,
   Store,
-  Layout,
   CheckCircle2,
   MapPin,
-  MessageSquare,
   ShieldCheck,
   Truck,
   Hammer,
@@ -33,39 +32,37 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, where, limit, orderBy } from 'firebase/firestore';
+import { collection, query, limit, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 
 export default function HomePage() {
   const db = useFirestore();
 
-  // جلب المنتجات المميزة (الحقيقية)
+  // جلب أحدث المنتجات المضافة (للمعاينة الفورية في هذا الإصدار)
   const productsQuery = useMemo(() => query(
     collection(db, 'products'),
-    where('approval_status', '==', 'approved'),
+    orderBy('created_at', 'desc'),
     limit(4)
   ), [db]);
   const { data: productsData, loading: productsLoading } = useCollection(productsQuery);
 
-  // جلب المتاجر (الحقيقية)
+  // جلب المتاجر
   const storesQuery = useMemo(() => query(
     collection(db, 'vendors'),
-    where('business_type', '==', 'furniture_store'),
     limit(3)
   ), [db]);
   const { data: storesData, loading: storesLoading } = useCollection(storesQuery);
 
-  // جلب كافة المتاجر لربط أسماء المتاجر بالمنتجات
+  // جلب كافة المتاجر لربط الأسماء
   const allVendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
   const { data: allVendors } = useCollection(allVendorsQuery);
 
-  // تحويل بيانات المنتجات للتنسيق المطلوب في الواجهة
   const featuredProducts = useMemo(() => {
     if (!productsData || productsData.length === 0) return [];
     return productsData.map((p: any) => {
       const vendor = allVendors?.find(v => v.id === p.vendor_id);
       const price = Number(p.price) || 0;
-      const oldPrice = Number(p.compare_at_price || p.old_price) || 0;
+      const oldPrice = Number(p.old_price) || 0;
       const discount = oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
       
       return {
@@ -216,7 +213,7 @@ export default function HomePage() {
             ) : featuredProducts.length === 0 ? (
               <div className="py-20 text-center bg-gray-50 rounded-2xl border-2 border-dashed">
                 <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="font-black text-muted-foreground">لا توجد منتجات مميزة معروضة حالياً.</p>
+                <p className="font-black text-muted-foreground">لا توجد منتجات معروضة حالياً.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
