@@ -26,11 +26,9 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // 1. تسجيل الدخول عبر نظام Authentication
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
       
-      // 2. التحقق من وجود السجل في Firestore لمعرفة الصلاحيات
       const userSnap = await getDoc(doc(db, 'users', uid));
       
       if (!userSnap.exists()) {
@@ -50,7 +48,6 @@ export default function LoginPage() {
         description: `مرحباً بك مجدداً ${userSnap.data()?.full_name || ''}`,
       });
 
-      // التوجيه حسب الدور
       if (role === 'admin' || role === 'staff') {
         router.push('/admin');
       } else {
@@ -76,12 +73,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4 font-cairo" dir="rtl">
-      {/* Subtle Hexagonal Background */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23073D49' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+      <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%232C200E' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
       
-      <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-xl relative z-10">
+      <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-12px_rgba(44,32,14,0.1)] rounded-[2.5rem] overflow-hidden bg-card/80 backdrop-blur-xl relative z-10">
         <CardHeader className="space-y-6 text-center pt-12 pb-8">
-          <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-xl shadow-2xl shadow-primary/20 bg-white p-3 flex items-center justify-center border border-gray-50">
+          <div className="mx-auto relative w-20 h-20 overflow-hidden rounded-xl shadow-2xl shadow-accent/20 bg-card p-3 flex items-center justify-center border border-border/50">
             <Image 
               src="/logo.png" 
               alt="إيوان" 
@@ -91,9 +87,9 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-3xl font-black text-secondary tracking-tight">تسجيل الدخول</CardTitle>
+            <CardTitle className="text-3xl font-black text-primary tracking-tight">تسجيل الدخول</CardTitle>
             <CardDescription className="text-muted-foreground font-bold flex items-center justify-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-primary" /> الوصول الآمن للمدراء والموظفين
+              <ShieldCheck className="w-4 h-4 text-accent" /> الوصول الآمن للمدراء والموظفين
             </CardDescription>
           </div>
         </CardHeader>
@@ -101,8 +97,8 @@ export default function LoginPage() {
         <CardContent className="px-8 pb-8">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-primary" />
+              <Label htmlFor="email" className="font-black text-primary mr-1 flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-accent" />
                 البريد الإلكتروني
               </Label>
               <Input 
@@ -112,13 +108,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                className="rounded-[12px] h-14 border-border/50 bg-background/50 focus:bg-card focus:ring-2 focus:ring-accent/20 font-bold transition-all text-primary"
               />
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="password" className="font-black text-secondary flex items-center gap-2 text-sm mr-1">
-                <Key className="w-4 h-4 text-primary" />
+              <Label htmlFor="password" className="font-black text-primary flex items-center gap-2 text-sm mr-1">
+                <Key className="w-4 h-4 text-accent" />
                 كلمة المرور
               </Label>
               <Input 
@@ -128,13 +124,13 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="rounded-[12px] h-14 border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary/20 font-bold transition-all text-secondary"
+                className="rounded-[12px] h-14 border-border/50 bg-background/50 focus:bg-card focus:ring-2 focus:ring-accent/20 font-bold transition-all text-primary"
               />
             </div>
 
             <Button 
               type="submit" 
-              className="w-full h-14 rounded-[15px] text-lg font-black bg-secondary hover:bg-secondary/90 text-white transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3 group"
+              className="w-full h-14 rounded-[15px] text-lg font-black bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 group"
               disabled={loading}
             >
               {loading ? (
@@ -149,7 +145,7 @@ export default function LoginPage() {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4 pb-12 pt-4 px-8 border-t border-gray-50">
+        <CardFooter className="flex flex-col space-y-4 pb-12 pt-4 px-8 border-t border-border/50">
           <p className="text-xs text-muted-foreground text-center font-bold">
             منصة إيوان للأثاث - نظام الإدارة الموحد
           </p>

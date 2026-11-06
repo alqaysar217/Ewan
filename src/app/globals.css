@@ -4,44 +4,44 @@
 
 @layer base {
   :root {
-    --background: 150 6% 96%; /* #F4F6F5 - Main background */
-    --foreground: 193 13% 17%; /* #252D30 - Primary text */
+    --background: 24 36% 97%; /* #FCF7F3 - Soft Ivory */
+    --foreground: 37 53% 17%; /* #412F14 - Dark Brown */
     
-    --card: 0 0% 100%;
-    --card-foreground: 193 13% 17%;
+    --card: 23 67% 98%; /* #FEFAF7 - Warm White */
+    --card-foreground: 36 52% 11%; /* #2C200E - Deep Espresso */
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 193 13% 17%;
+    --popover: 23 67% 98%;
+    --popover-foreground: 36 52% 11%;
     
-    --primary: 188 75% 34%; /* #168899 - Turquoise accent */
-    --primary-foreground: 0 0% 100%;
+    --primary: 36 52% 11%; /* #2C200E - Deep Espresso */
+    --primary-foreground: 23 67% 98%;
     
-    --secondary: 191 82% 16%; /* #073D49 - Deep Teal */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 37 53% 17%; /* #412F14 - Dark Brown (Main Dark Sections) */
+    --secondary-foreground: 23 67% 98%;
     
-    --muted: 193 7% 53%;
-    --muted-foreground: 193 10% 30%;
+    --muted: 32 33% 86%; /* #E8DBCC - Muted Sand */
+    --muted-foreground: 38 12% 39%; /* #6F6658 - Warm Gray */
     
-    --accent: 188 75% 34%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 33 25% 53%; /* #A2886A - Antique Gold */
+    --accent-foreground: 23 67% 98%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 180 8% 91%; /* #E2E8E8 */
-    --input: 180 8% 91%;
-    --ring: 188 75% 34%;
+    --border: 32 33% 86%; /* #E8DBCC */
+    --input: 32 33% 86%;
+    --ring: 33 25% 53%;
     
-    --radius: 15px; /* Updated to 15px as requested */
+    --radius: 15px;
   }
 
   .dark {
-    --background: 193 13% 10%;
-    --foreground: 150 6% 96%;
-    --card: 193 13% 12%;
-    --card-foreground: 150 6% 96%;
-    --primary: 188 75% 45%;
-    --border: 193 13% 20%;
+    --background: 36 52% 5%;
+    --foreground: 24 36% 97%;
+    --card: 36 52% 7%;
+    --card-foreground: 24 36% 97%;
+    --primary: 33 25% 53%;
+    --border: 36 52% 15%;
   }
 }
 
@@ -57,12 +57,12 @@
 
 @layer utilities {
   .bg-deep-teal {
-    background-color: #073D49;
+    background-color: #2C200E; /* Updated to Deep Espresso */
   }
   .text-deep-teal {
-    color: #073D49;
+    color: #2C200E;
   }
   .border-deep-teal {
-    border-color: #073D49;
+    border-color: #2C200E;
   }
 }
