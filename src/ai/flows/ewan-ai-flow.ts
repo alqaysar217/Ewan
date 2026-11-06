@@ -2,7 +2,7 @@
 /**
  * @fileOverview Ewan AI Design Assistant Flow.
  * محرك الذكاء الاصطناعي لمنصة إيوان، يعتمد على نموذج Gemma 2 المتاح مجاناً عبر OpenRouter.
- * تم تحسينه لتوليد نصوص نظيفة وبرومبت إنجليزي دقيق وتفصيلي.
+ * تم تحسينه لتوليد نصوص نظيفة وبرومبت إنجليزي دقيق وتفصيلي مع معالجة أخطاء متقدمة.
  */
 
 import { ai } from '@/ai/genkit';
@@ -33,7 +33,7 @@ export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutp
     return await ewanAiChatFlow(input);
   } catch (error: any) {
     console.error("Ewan AI Flow Error:", error);
-    return { text: "أعتذر، واجهت مشكلة في الاتصال بمركز التصميم الذكي حالياً." };
+    return { text: "أعتذر، واجهت مشكلة في معالجة طلبك حالياً. يرجى التحقق من إعدادات المفتاح أو الرصيد." };
   }
 }
 
@@ -48,7 +48,7 @@ const ewanAiChatFlow = ai.defineFlow(
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      return { text: "عذراً، مفتاح تشغيل الذكاء الاصطناعي غير موجود في الإعدادات." };
+      return { text: "⚠️ عذراً، مفتاح تشغيل الذكاء الاصطناعي (API Key) غير موجود في إعدادات الخادم (Vercel)." };
     }
 
     const systemContent = `أنت "إيوان AI"، الخبير الذكي الرائد في التصميم الداخلي وتنسيق الأثاث لمنصة إيوان اليمنية.
@@ -102,6 +102,12 @@ const ewanAiChatFlow = ai.defineFlow(
         })
       });
 
+      if (!response.ok) {
+        const errData = await response.json();
+        console.error("OpenRouter Error Response:", errData);
+        return { text: `عذراً، حدث خطأ من مزود الخدمة: ${errData.error?.message || response.statusText}` };
+      }
+
       const data = await response.json();
       let fullContent = data.choices?.[0]?.message?.content || "";
       
@@ -113,12 +119,13 @@ const ewanAiChatFlow = ai.defineFlow(
         fullContent = fullContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
       }
 
-      // تنظيف النص النهائي من أي رموز تنسيق متبقية
+      // تنظيف النص النهائي من أي رموز تنسيق متبقية لضمان مظهر احترافي
       const cleanText = fullContent.replace(/[\*#_~`>\|]/g, '').trim();
 
       return { text: cleanText, imagePrompt };
     } catch (error: any) {
-      return { text: "عذراً، واجهت صعوبة في معالجة طلبك، تأكد من اتصال الإنترنت." };
+      console.error("Fetch Exception:", error);
+      return { text: "عذراً، واجهت صعوبة في الاتصال بمركز المعالجة الذكي، يرجى المحاولة لاحقاً." };
     }
   }
 );
