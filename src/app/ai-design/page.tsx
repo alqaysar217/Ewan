@@ -32,7 +32,8 @@ import {
   Bot,
   FileText,
   Quote,
-  RefreshCcw
+  RefreshCcw,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -89,6 +90,7 @@ export default function AIDesignStudio() {
   const [step, setStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [aiResult, setAiResult] = useState<{text: string, prompt?: string} | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const totalSteps = 6;
   const { user } = useUser();
   const db = useFirestore();
@@ -155,8 +157,9 @@ export default function AIDesignStudio() {
 
   const handleSubmitRequest = async () => {
     setIsSaving(true);
+    setError(null);
     try {
-      // استدعاء حقيقي للذكاء الاصطناعي من الـ Backend
+      // 1. استدعاء الذكاء الاصطناعي
       const aiResponse = await ewanAiChat({
         message: `قم بتحليل صورة الغرفة المرفقة وتصميمها كغرفة ${ROOM_TYPES.find(t => t.id === roomType)?.name} بمساحة ${roomArea}م² ونمط ${DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}. الحالة الحالية: ${roomStatus}.`,
         imageDataUri: originalImage || undefined,
@@ -169,9 +172,13 @@ export default function AIDesignStudio() {
         }
       });
 
+      if (aiResponse.text.includes("❌") || aiResponse.text.includes("⚠️")) {
+        throw new Error(aiResponse.text);
+      }
+
       setAiResult({ text: aiResponse.text, prompt: aiResponse.imagePrompt });
 
-      // حفظ الطلب والنتيجة في Firestore
+      // 2. حفظ الطلب في Firestore
       const requestData = {
         user_id: user?.uid || 'guest',
         original_image_url: originalImage,
@@ -191,15 +198,21 @@ export default function AIDesignStudio() {
 
       await addDoc(collection(db, 'ai_design_requests'), requestData);
       
-      setStep(7); // انتقال لصفحة عرض النتائج
+      // 3. الانتقال لخطوة النتائج
+      setStep(7);
       
       toast({
-        title: "تم اكتمال التصميم بنجاح",
-        description: "إليك التقرير الفني والمقترحات البصرية.",
+        title: "تم اكتمال التصميم!",
+        description: "إليك التقرير الفني الذكي لمساحتك.",
       });
-    } catch (error) {
-      console.error(error);
-      toast({ variant: "destructive", title: "فشل الاتصال", description: "تعذر معالجة التصميم حالياً، حاول مرة أخرى." });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "حدث خطأ غير متوقع أثناء المعالجة.");
+      toast({ 
+        variant: "destructive", 
+        title: "فشل في المعالجة", 
+        description: "يرجى التحقق من اتصال الإنترنت ومفتاح الـ API الخاص بـ OpenRouter." 
+      });
     } finally {
       setIsSaving(false);
     }
@@ -230,28 +243,48 @@ export default function AIDesignStudio() {
             )}
 
             <Card className="border-none shadow-2xl rounded-[30px] overflow-hidden bg-white/90 backdrop-blur-xl relative">
-              {/* واجهة تحميل أثناء المعالجة */}
+              {/* واجهة التحميل الذكية */}
               <AnimatePresence>
                 {isSaving && (
                   <motion.div 
                     initial={{ opacity: 0 }} 
                     animate={{ opacity: 1 }} 
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-50 bg-white/80 backdrop-blur-md flex flex-col items-center justify-center gap-6 p-12 text-center"
+                    className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-8 p-12 text-center"
                   >
                     <div className="relative">
-                      <Loader2 className="w-20 h-20 text-primary animate-spin" />
-                      <Bot className="w-10 h-10 text-primary absolute inset-0 m-auto" />
+                      <motion.div 
+                        animate={{ rotate: 360 }} 
+                        transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                        className="w-24 h-24 border-4 border-primary/20 border-t-primary rounded-full"
+                      />
+                      <Bot className="w-12 h-12 text-primary absolute inset-0 m-auto animate-pulse" />
                     </div>
-                    <div className="space-y-3">
-                      <h3 className="text-2xl font-black text-secondary">جاري التحليل الذكي لمساحتك...</h3>
-                      <p className="text-muted-foreground font-bold max-w-sm mx-auto">
-                        يقوم "إيوان AI" الآن بقراءة أبعاد الغرفة، الإضاءة، والنمط المفضل لتوليد أفضل توزيع للأثاث.
-                      </p>
+                    <div className="space-y-4 max-w-sm">
+                      <h3 className="text-3xl font-black text-secondary">يتم الآن التحليل الذكي...</h3>
+                      <div className="space-y-2">
+                        <p className="flex items-center justify-center gap-2 text-primary font-bold text-sm">
+                          <CheckCircle2 className="w-4 h-4" /> جاري قراءة تفاصيل الصورة
+                        </p>
+                        <p className="flex items-center justify-center gap-2 text-primary font-bold text-sm">
+                          <CheckCircle2 className="w-4 h-4" /> مقارنة الأنماط الفنية
+                        </p>
+                        <p className="flex items-center justify-center gap-2 text-muted-foreground font-bold text-sm animate-pulse">
+                          <Loader2 className="w-4 h-4 animate-spin" /> صياغة توصيات الخبير
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* واجهة الخطأ */}
+              {error && step === 6 && !isSaving && (
+                <div className="p-8 bg-destructive/10 border-b border-destructive/20 flex items-center gap-4 text-destructive">
+                   <AlertTriangle className="w-6 h-6 shrink-0" />
+                   <p className="font-bold text-sm">{error}</p>
+                </div>
+              )}
 
               <CardContent className="p-0">
                 <div className="min-h-[600px] flex flex-col">
@@ -451,19 +484,19 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 7 && aiResult && (
-                        <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-10">
+                        <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-12">
                            <div className="text-center space-y-4">
                               <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
                                  <CheckCircle2 className="w-12 h-12" />
                               </div>
                               <div className="space-y-2">
-                                <h3 className="text-3xl font-black text-secondary">اكتمل تحليل إيوان الذكي</h3>
-                                <p className="text-muted-foreground font-bold italic">بناءً على صورتك المرفقة، إليك رؤية الخبير لمساحتك الجديدة.</p>
+                                <h3 className="text-3xl font-black text-secondary">تم اكتمال تقرير التصميم الذكي</h3>
+                                <p className="text-muted-foreground font-bold italic">إليك الرؤية الفنية المقترحة لمساحتك الجديدة بناءً على تحليل "إيوان AI".</p>
                               </div>
                            </div>
 
                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                              <div className="space-y-6">
+                              <div className="space-y-8">
                                  <div className="p-8 bg-primary/5 rounded-[30px] border border-primary/10 relative shadow-sm">
                                     <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/10" />
                                     <h4 className="font-black text-primary flex items-center gap-2 mb-6">
@@ -473,51 +506,55 @@ export default function AIDesignStudio() {
                                        {aiResult.text}
                                     </div>
                                  </div>
+                                 
                                  {aiResult.prompt && (
-                                   <div className="p-6 bg-amber-50 rounded-[20px] border border-amber-100 space-y-3 shadow-inner">
+                                   <div className="p-8 bg-amber-50 rounded-[30px] border border-amber-100 space-y-4 shadow-inner">
                                       <h5 className="text-[10px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
-                                         <ImageIcon className="w-4 h-4" /> وصف التوليد البصري (AI Prompt)
+                                         <ImageIcon className="w-4 h-4" /> وصف التخيل البصري (AI Visual Prompt)
                                       </h5>
-                                      <p className="text-xs font-mono text-amber-800 leading-relaxed bg-white/50 p-4 rounded-xl border border-amber-200">
+                                      <p className="text-xs font-mono text-amber-800 leading-relaxed bg-white/50 p-6 rounded-2xl border border-amber-200 select-all cursor-pointer" title="انقر لنسخ البرومبت">
                                          {aiResult.prompt}
                                       </p>
+                                      <p className="text-[10px] text-amber-600/70 font-bold italic text-center">يمكن استخدام هذا الوصف في برامج توليد الصور للحصول على تصور بصري دقيق.</p>
                                    </div>
                                  )}
                               </div>
-                              <div className="space-y-6">
-                                 <div className="relative aspect-video rounded-[30px] overflow-hidden shadow-2xl border-4 border-white group">
-                                    <Image src={originalImage!} alt="Your Room" fill className="object-cover" />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                      <p className="text-white font-black text-sm">صورتك التي قمنا بتحليلها</p>
-                                    </div>
-                                    <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-md text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase">الصورة الأصلية</div>
+
+                              <div className="space-y-8">
+                                 <div className="relative aspect-video rounded-[30px] overflow-hidden shadow-2xl border-8 border-white group ring-1 ring-black/5">
+                                    <Image src={originalImage!} alt="Original Room" fill className="object-cover" />
+                                    <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-md text-white px-5 py-2 rounded-xl text-xs font-black uppercase">الصورة الأصلية التي تم تحليلها</div>
                                  </div>
                                  
                                  <Card className="rounded-[30px] border-none bg-gray-50 overflow-hidden shadow-inner">
-                                    <CardContent className="p-8 space-y-6">
-                                      <h4 className="font-black text-secondary flex items-center gap-2 border-b pb-4"><FileText className="w-5 h-5 text-primary" /> ملخص المواصفات الفنية</h4>
+                                    <CardContent className="p-10 space-y-8">
+                                      <h4 className="font-black text-secondary flex items-center gap-2 border-b pb-6"><FileText className="w-6 h-6 text-primary" /> ملخص المواصفات الفنية المعتمدة</h4>
                                       <div className="grid grid-cols-1 gap-4 text-sm">
-                                         <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                                            <span className="font-bold text-muted-foreground">النمط المختار:</span> 
-                                            <span className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</span>
+                                         <div className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground flex items-center gap-2"><Layout className="w-4 h-4" /> نوع المساحة:</span> 
+                                            <span className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                                            <span className="font-bold text-muted-foreground">المساحة الإجمالية:</span> 
+                                         <div className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground flex items-center gap-2"><Scaling className="w-4 h-4" /> المساحة التقريبية:</span> 
                                             <span className="font-black text-secondary">{roomArea} م²</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                                            <span className="font-bold text-muted-foreground">الميزانية القصوى:</span> 
+                                         <div className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground flex items-center gap-2"><Palette className="w-4 h-4" /> النمط المعتمد:</span> 
+                                            <span className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</span>
+                                         </div>
+                                         <div className="flex justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-black/5">
+                                            <span className="font-bold text-muted-foreground flex items-center gap-2"><Wallet className="w-4 h-4" /> الميزانية المرصودة:</span> 
                                             <span className="font-black text-primary">{(Number(budgetRange.max)).toLocaleString()} ر.ي</span>
                                          </div>
-                                         <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
-                                            <span className="font-bold text-muted-foreground">حالة الغرفة:</span> 
-                                            <span className="font-black text-secondary">{getRoomStatusLabel(roomStatus)}</span>
-                                         </div>
                                       </div>
-                                      <div className="pt-4 space-y-3">
-                                         <Button onClick={() => window.location.href = '/'} className="w-full h-14 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/10">العودة للرئيسية</Button>
-                                         <Button variant="ghost" onClick={() => setStep(1)} className="w-full font-black text-muted-foreground gap-2 hover:bg-gray-100 h-12 rounded-xl">
-                                            <RefreshCcw className="w-4 h-4" /> بدء تصميم مساحة أخرى
+                                      <div className="pt-6 space-y-4">
+                                         <Link href="/shop" className="block w-full">
+                                            <Button className="w-full h-16 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/10 text-lg gap-2">
+                                               تسوق القطع المقترحة <ShoppingBag className="w-5 h-5" />
+                                            </Button>
+                                         </Link>
+                                         <Button variant="ghost" onClick={() => setStep(1)} className="w-full font-black text-muted-foreground gap-3 hover:bg-gray-200 h-14 rounded-2xl border-2 border-dashed border-gray-200">
+                                            <RefreshCcw className="w-5 h-5" /> ابدأ تصميم مساحة أخرى
                                          </Button>
                                       </div>
                                     </CardContent>
@@ -539,7 +576,7 @@ export default function AIDesignStudio() {
                            <Button onClick={handleNext} disabled={isSaving} className="flex-1 md:min-w-[240px] h-14 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/20 gap-2 text-lg">المتابعة <ArrowLeft className="w-5 h-5" /></Button>
                          ) : (
                            <Button onClick={handleSubmitRequest} disabled={isSaving} className="flex-1 md:min-w-[240px] h-14 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 gap-2 text-lg">
-                             {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : <>توليد التصميم الآن <Bot className="w-5 h-5" /></>}
+                             {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : <>توليد التصميم الآن <Sparkles className="w-5 h-5" /></>}
                            </Button>
                          )}
                       </div>
@@ -550,11 +587,11 @@ export default function AIDesignStudio() {
             </Card>
             
             {step <= totalSteps && (
-              <div className="p-6 bg-white border border-border/50 rounded-2xl flex items-start gap-4 shadow-sm">
-                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center shrink-0"><Info className="w-5 h-5 text-amber-600" /></div>
-                 <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                   <span className="font-black text-secondary block mb-1">ملاحظة تقنية:</span> 
-                   سيقوم محرك "إيوان AI" المتطور (Gemini Vision) بتحليل صورتك وتقديم مقترحات حقيقية تضمن التوازن بين استغلال المساحة والجمال البصري للنمط المختار.
+              <div className="p-8 bg-white border border-border/50 rounded-[24px] flex items-start gap-5 shadow-sm">
+                 <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center shrink-0"><Info className="w-6 h-6 text-amber-600" /></div>
+                 <p className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed">
+                   <span className="font-black text-secondary block mb-1">ملاحظة تقنية حول "إيوان AI":</span> 
+                   يقوم نظامنا المتطور المدعوم بنموذج (Gemini Flash Vision) بتحليل الصورة حقيقياً لاستنتاج أبعاد المساحة، توزيع الإضاءة الطبيعية، وتحديد قطع الأثاث الموجودة حالياً لتقديم توصيات هندسية وفنية دقيقة تدمج بين الوظيفية والجمال.
                  </p>
               </div>
             )}
