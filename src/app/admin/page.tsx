@@ -18,15 +18,21 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from 
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminOverview() {
   const db = useFirestore();
   
-  // جلب البيانات الحقيقية من المجموعات الأساسية
-  const { data: users, loading: usersLoading } = useCollection(collection(db, 'users'));
-  const { data: vendors, loading: vendorsLoading } = useCollection(collection(db, 'vendors'));
-  const { data: products, loading: productsLoading } = useCollection(collection(db, 'products'));
-  const { data: orders, loading: ordersLoading } = useCollection(collection(db, 'orders'));
+  // Memoize query references to prevent infinite re-renders
+  const usersQuery = useMemo(() => collection(db, 'users'), [db]);
+  const vendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
+  const productsQuery = useMemo(() => collection(db, 'products'), [db]);
+  const ordersQuery = useMemo(() => collection(db, 'orders'), [db]);
+
+  const { data: users, loading: usersLoading } = useCollection(usersQuery);
+  const { data: vendors, loading: vendorsLoading } = useCollection(vendorsQuery);
+  const { data: products, loading: productsLoading } = useCollection(productsQuery);
+  const { data: orders, loading: ordersLoading } = useCollection(ordersQuery);
 
   const isLoading = usersLoading || vendorsLoading || productsLoading || ordersLoading;
 
@@ -52,9 +58,18 @@ export default function AdminOverview() {
 
     if (orders && orders.length > 0) {
       orders.forEach((order: any) => {
-        // محاولة الحصول على التاريخ من الحقول المتاحة
-        const dateRaw = order.created_at || order.updated_at || new Date().toISOString();
-        const date = new Date(dateRaw);
+        let date: Date;
+        // التعامل مع تاريخ Firestore Timestamp أو سلسلة نصية
+        if (order.created_at?.toDate) {
+          date = order.created_at.toDate();
+        } else if (order.created_at) {
+          date = new Date(order.created_at);
+        } else if (order.updated_at?.toDate) {
+          date = order.updated_at.toDate();
+        } else {
+          date = new Date();
+        }
+
         if (!isNaN(date.getTime())) {
           const dayIndex = date.getDay();
           salesByDay[dayIndex].sales += Number(order.total) || 0;
@@ -79,7 +94,7 @@ export default function AdminOverview() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-40 gap-6 font-cairo">
+      <div className="flex flex-col items-center justify-center py-40 gap-6 font-cairo" dir="rtl">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
         <p className="font-black text-muted-foreground text-lg">جاري تحليل بيانات المنصة الحقيقية...</p>
       </div>
