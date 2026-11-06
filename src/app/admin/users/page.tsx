@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useCollection, useFirestore, useFirebaseApp } from '@/firebase';
+import { useCollection, useFirestore } from '@/firebase';
 import { collection, query, updateDoc, doc, serverTimestamp, orderBy, setDoc } from 'firebase/firestore';
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, deleteApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { firebaseConfig } from '@/firebase/config';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,7 +22,6 @@ import {
   Edit,
   Lock,
   Camera,
-  Upload,
   Trash2,
   CheckCircle2,
   AlertCircle
@@ -113,26 +112,28 @@ export default function AdminUsers() {
     }
 
     setIsSaving(true);
+    let secondaryApp = null;
     
     try {
       let userId = editingUser?.id;
 
-      // إذا كان مستخدماً جديداً، نقوم بإنشاء حساب في Firebase Auth أولاً
       if (!editingUser) {
-        // نستخدم تطبيقاً ثانوياً لإنشاء الحساب دون تسجيل خروج المدير الحالي
-        const secondaryApp = getApps().find(a => a.name === 'secondary') || initializeApp(firebaseConfig, 'secondary');
+        // إنشاء تطبيق ثانوي معزول لإنشاء الحساب دون التأثير على الجلسة الحالية
+        const appName = `secondary-${Date.now()}`;
+        secondaryApp = initializeApp(firebaseConfig, appName);
         const secondaryAuth = getAuth(secondaryApp);
         
         try {
           const userCredential = await createUserWithEmailAndPassword(secondaryAuth, userData.email, userData.password);
           userId = userCredential.user.uid;
-          
-          // تسجيل الخروج من التطبيق الثانوي فوراً لضمان عدم حدوث تداخل
           await signOut(secondaryAuth);
         } catch (authError: any) {
           console.error("Auth creation error:", authError);
           if (authError.code === 'auth/email-already-in-use') {
             throw new Error("هذا البريد الإلكتروني مسجل مسبقاً في نظام الحماية.");
+          }
+          if (authError.code === 'auth/weak-password') {
+            throw new Error("كلمة المرور ضعيفة جداً. يرجى اختيار كلمة مرور أقوى.");
           }
           throw authError;
         }
@@ -155,7 +156,6 @@ export default function AdminUsers() {
         is_active: true
       };
 
-      // حفظ أو تحديث البيانات في Firestore باستخدام الـ UID الحقيقي من Auth
       await setDoc(doc(db, 'users', userId), {
         ...finalData,
         created_at: editingUser ? editingUser.created_at : new Date().toISOString()
@@ -163,7 +163,7 @@ export default function AdminUsers() {
 
       toast({ 
         title: editingUser ? "تم تحديث البيانات" : "تم إنشاء الحساب بنجاح", 
-        description: `يمكن لـ ${userData.full_name} تسجيل الدخول الآن باستخدام بياناته.` 
+        description: `يمكن لـ ${userData.full_name} تسجيل الدخول الآن بنجاح.` 
       });
       setIsDialogOpen(false);
       resetForm();
@@ -172,6 +172,9 @@ export default function AdminUsers() {
       toast({ variant: "destructive", title: "فشل في العملية", description: e.message || "حدث خطأ أثناء محاولة حفظ البيانات." });
     } finally {
       setIsSaving(false);
+      if (secondaryApp) {
+        try { await deleteApp(secondaryApp); } catch(err) { console.error("Clean up error:", err); }
+      }
     }
   };
 
@@ -213,7 +216,7 @@ export default function AdminUsers() {
           <h1 className="text-3xl font-black text-secondary flex items-center gap-3">
             <ShieldCheck className="w-8 h-8 text-primary" /> إدارة طاقم النظام
           </h1>
-          <p className="text-muted-foreground font-bold">إدارة حسابات المدراء والموظفين وتعيين صلاحياتهم.</p>
+          <p className="text-muted-foreground font-bold">إنشاء حسابات المدراء والموظفين وتعيين صلاحياتهم.</p>
         </div>
         <button onClick={() => { resetForm(); setIsDialogOpen(true); }} className="rounded-xl h-14 px-8 font-black bg-primary text-white shadow-lg shadow-primary/20 flex items-center gap-2 transition-transform hover:-translate-y-1">
           <UserPlus className="w-5 h-5 ml-2" /> إضافة حساب جديد
@@ -264,7 +267,7 @@ export default function AdminUsers() {
 
                    <div className="flex flex-wrap items-center justify-center gap-4 px-6 md:border-r border-gray-100">
                       <div className="flex flex-col items-center gap-1">
-                         <p className="text-[9px] font-black text-muted-foreground uppercase">الصلاحيات الممنوحة</p>
+                         <p className="text-[9px] font-black text-muted-foreground uppercase">الصلاحيات</p>
                          <div className="flex gap-1.5">
                             {[
                               { key: 'can_read', label: 'قراءة' },
@@ -282,7 +285,7 @@ export default function AdminUsers() {
                    </div>
 
                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(u)} className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary transition-all">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(u)} className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary">
                         <Edit className="w-5 h-5" />
                       </Button>
                       <DropdownMenu>
@@ -292,8 +295,8 @@ export default function AdminUsers() {
                             </Button>
                          </DropdownMenuTrigger>
                          <DropdownMenuContent className="font-cairo" align="end">
-                            <DropdownMenuItem className="text-right font-bold">تعطيل الحساب مؤقتاً</DropdownMenuItem>
-                            <DropdownMenuItem className="text-right font-bold text-destructive">حذف الحساب نهائياً</DropdownMenuItem>
+                            <DropdownMenuItem className="text-right font-bold">تعطيل الحساب</DropdownMenuItem>
+                            <DropdownMenuItem className="text-right font-bold text-destructive">حذف نهائي</DropdownMenuItem>
                          </DropdownMenuContent>
                       </DropdownMenu>
                    </div>
@@ -309,8 +312,8 @@ export default function AdminUsers() {
           <div className="bg-secondary p-8 text-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16" />
              <DialogHeader className="text-right relative z-10">
-               <DialogTitle className="text-2xl font-black">{editingUser ? 'تحديث بيانات المستخدم' : 'إنشاء حساب إداري'}</DialogTitle>
-               <DialogDescription className="text-gray-400 font-bold mt-1">عين الدور والصلاحيات المناسبة لهذا الحساب.</DialogDescription>
+               <DialogTitle className="text-2xl font-black">{editingUser ? 'تحديث بيانات المستخدم' : 'إنشاء حساب إداري جديد'}</DialogTitle>
+               <DialogDescription className="text-gray-400 font-bold mt-1">سيتم إنشاء الحساب تلقائياً في نظام المصادقة.</DialogDescription>
              </DialogHeader>
           </div>
           
@@ -326,14 +329,6 @@ export default function AdminUsers() {
                   )}
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 z-10 cursor-pointer" />
                 </div>
-                {userData.avatar_url && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setUserData(prev => ({...prev, avatar_url: ''})); }}
-                    className="absolute -top-2 -left-2 bg-destructive text-white p-1 rounded-full shadow-lg hover:scale-110 transition-transform z-20"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
               </div>
             </div>
 
@@ -348,32 +343,34 @@ export default function AdminUsers() {
                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Lock className="w-4 h-4 text-primary" /> كلمة المرور</label>
-                  <Input type="password" value={userData.password} onChange={e => setUserData({...userData, password: e.target.value})} placeholder={editingUser ? "اتركها فارغة لعدم التغيير" : "••••••••"} className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
-               </div>
-               <div className="space-y-2">
-                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> نوع الحساب (الدور)</label>
-                  <select 
-                    value={userData.role} 
-                    onChange={e => setUserData({...userData, role: e.target.value as any})}
-                    className="w-full h-12 rounded-xl bg-gray-50 border-none px-4 font-bold text-sm outline-none shadow-inner focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="admin">مدير نظام (كامل الصلاحيات)</option>
-                    <option value="staff">موظف (صلاحيات محدودة)</option>
-                  </select>
-               </div>
+            {!editingUser && (
+              <div className="space-y-2">
+                 <label className="text-sm font-black text-secondary flex items-center gap-2"><Lock className="w-4 h-4 text-primary" /> كلمة المرور للدخول</label>
+                 <Input type="password" value={userData.password} onChange={e => setUserData({...userData, password: e.target.value})} placeholder="••••••••" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
+                 <p className="text-[10px] text-muted-foreground font-bold mr-1">تأكد من إعطاء كلمة المرور هذه للموظف ليتمكن من الدخول.</p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+               <label className="text-sm font-black text-secondary flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> نوع الحساب</label>
+               <select 
+                 value={userData.role} 
+                 onChange={e => setUserData({...userData, role: e.target.value as any})}
+                 className="w-full h-12 rounded-xl bg-gray-50 border-none px-4 font-bold text-sm outline-none shadow-inner"
+               >
+                 <option value="admin">مدير نظام (كامل الصلاحيات)</option>
+                 <option value="staff">موظف (صلاحيات مخصصة)</option>
+               </select>
             </div>
 
             {userData.role === 'staff' ? (
               <div className="space-y-4 animate-in slide-in-from-top-4 duration-300">
-                 <label className="text-sm font-black text-secondary flex items-center gap-2">الصلاحيات الممنوحة للموظف</label>
+                 <label className="text-sm font-black text-secondary">الصلاحيات المحددة للموظف</label>
                  <div className="grid grid-cols-2 gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                     {[
-                      { id: 'can_read', label: 'عرض البيانات (قراءة)' },
-                      { id: 'can_write', label: 'إضافة بيانات جديدة' },
-                      { id: 'can_edit', label: 'تعديل البيانات الحالية' },
+                      { id: 'can_read', label: 'قراءة البيانات' },
+                      { id: 'can_write', label: 'إضافة بيانات' },
+                      { id: 'can_edit', label: 'تعديل البيانات' },
                       { id: 'can_delete', label: 'حذف البيانات' }
                     ].map((p) => (
                       <div key={p.id} className="flex items-center gap-3">
@@ -395,13 +392,13 @@ export default function AdminUsers() {
                 <AlertCircle className="w-6 h-6 text-primary shrink-0" />
                 <div className="space-y-1">
                   <p className="font-black text-primary text-sm">حساب مدير النظام</p>
-                  <p className="text-xs font-bold text-muted-foreground leading-relaxed">بصفتك مديراً للنظام، ستحصل تلقائياً على كافة صلاحيات القراءة والكتابة والتعديل والحذف عبر جميع واجهات المنصة دون الحاجة لضبطها يدوياً.</p>
+                  <p className="text-xs font-bold text-muted-foreground leading-relaxed">سيحصل المدير على كافة الصلاحيات تلقائياً وبشكل دائم.</p>
                 </div>
               </div>
             )}
 
-            <Button onClick={handleSaveUser} disabled={isSaving} className="w-full h-14 rounded-xl bg-secondary text-white font-black text-lg shadow-xl shadow-secondary/10 transition-all hover:-translate-y-1">
-              {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (editingUser ? 'تحديث بيانات الحساب' : 'تفعيل الحساب الآن')}
+            <Button onClick={handleSaveUser} disabled={isSaving} className="w-full h-14 rounded-xl bg-secondary text-white font-black text-lg shadow-xl">
+              {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (editingUser ? 'تحديث الحساب' : 'تفعيل الحساب والاشتراك')}
             </Button>
           </div>
         </DialogContent>

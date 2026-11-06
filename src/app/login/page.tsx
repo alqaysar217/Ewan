@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle, Info } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -35,7 +35,6 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
       
-      // جلب بيانات الدور مباشرة بعد الدخول للتوجه الصحيح
       const userSnap = await getDoc(doc(db, 'users', uid));
       const role = userSnap.data()?.role;
 
@@ -52,12 +51,16 @@ export default function LoginPage() {
         router.push('/');
       }
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("Login error:", error.code, error.message);
       let errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
       
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = "خطأ في البريد الإلكتروني أو كلمة المرور. يرجى التواصل مع الإدارة إذا كنت موظفاً جديداً.";
+      }
+
       toast({
         variant: "destructive",
-        title: "خطأ في تسجيل الدخول",
+        title: "فشل الدخول",
         description: errorMessage,
       });
     } finally {
@@ -92,16 +95,19 @@ export default function LoginPage() {
           <div className="space-y-2">
             <CardTitle className="text-3xl font-black text-secondary tracking-tight">تسجيل الدخول</CardTitle>
             <CardDescription className="text-muted-foreground font-bold flex items-center justify-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-primary" /> الوصول الآمن لمنصة إيوان
+              <ShieldCheck className="w-4 h-4 text-primary" /> الدخول الآمن لفريق إيوان
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent className="px-8 pb-8">
           {user && !userData && (
-            <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-2xl space-y-3">
-              <p className="text-[11px] font-bold text-primary leading-relaxed text-center">أنت مسجل الدخول، لكن حسابك غير مفعل كمسؤول في قاعدة البيانات.</p>
-              <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-gray-100">
+            <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
+              <div className="flex items-center gap-2 text-amber-600 font-black text-xs">
+                <Info className="w-4 h-4" /> تنبيه الصلاحيات
+              </div>
+              <p className="text-[11px] font-bold text-amber-700 leading-relaxed text-right">أنت مسجل الدخول، لكن بريدك غير معرف كمسؤول في قاعدة البيانات.</p>
+              <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-100">
                 <code className="text-[10px] font-mono text-secondary truncate max-w-[200px]">{user.uid}</code>
                 <Button size="sm" variant="ghost" className="h-8 px-2 text-primary" onClick={copyUid}>
                   {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -112,14 +118,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2">
+              <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2 text-sm">
                 <Mail className="w-4 h-4 text-primary" />
                 البريد الإلكتروني
               </Label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="name@example.com" 
+                placeholder="name@ewan.ye" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -128,12 +134,10 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center mr-1">
-                <Label htmlFor="password" className="font-black text-secondary flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-primary" />
-                  كلمة المرور
-                </Label>
-              </div>
+              <Label htmlFor="password" className="font-black text-secondary flex items-center gap-2 text-sm mr-1">
+                <Lock className="w-4 h-4 text-primary" />
+                كلمة المرور
+              </Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -164,7 +168,7 @@ export default function LoginPage() {
 
         <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
           <p className="text-xs text-muted-foreground text-center font-bold">
-            هذا النظام مخصص للمصرح لهم فقط. يتم مراقبة كافة عمليات الدخول.
+            هذا النظام مخصص للمصرح لهم فقط من فريق العمل والمتاجر.
           </p>
         </CardFooter>
       </Card>
