@@ -18,7 +18,8 @@ import {
   Hammer,
   Quote,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
@@ -31,14 +32,55 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection, query, where, limit, orderBy } from 'firebase/firestore';
+import { useMemo } from 'react';
 
 export default function HomePage() {
-  const featuredProducts = [
-    { id: 1, name: 'طقم ديوان حضرمي مطور', category: 'غرف معيشة', price: 450000, oldPrice: 540000, discount: 15, store: 'ورشة إتقان', rating: 4.9, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600' },
-    { id: 2, name: 'سرير خشبي ملكي منحوت', category: 'غرف نوم', price: 280000, oldPrice: 310000, discount: 10, store: 'أثاث الخليج', rating: 4.8, img: 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=600' },
-    { id: 3, name: 'طاولة طعام دائرية مودرن', category: 'مطابخ', price: 120000, oldPrice: 150000, discount: 20, store: 'مودرن هوم', rating: 4.7, img: 'https://images.unsplash.com/photo-1577145000247-a737ad733c99?auto=format&fit=crop&q=80&w=600' },
-    { id: 4, name: 'كرسي مكتب مريح', category: 'مكاتب', price: 45000, oldPrice: 60000, discount: 25, store: 'الرويشان للأثاث', rating: 4.5, img: 'https://images.unsplash.com/photo-1505797149-43b0ad766a0e?auto=format&fit=crop&q=80&w=600' }
-  ];
+  const db = useFirestore();
+
+  // جلب المنتجات المميزة (الحقيقية)
+  const productsQuery = useMemo(() => query(
+    collection(db, 'products'),
+    where('approval_status', '==', 'approved'),
+    limit(4)
+  ), [db]);
+  const { data: productsData, loading: productsLoading } = useCollection(productsQuery);
+
+  // جلب المتاجر (الحقيقية)
+  const storesQuery = useMemo(() => query(
+    collection(db, 'vendors'),
+    where('business_type', '==', 'furniture_store'),
+    limit(3)
+  ), [db]);
+  const { data: storesData, loading: storesLoading } = useCollection(storesQuery);
+
+  // جلب كافة المتاجر لربط أسماء المتاجر بالمنتجات
+  const allVendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
+  const { data: allVendors } = useCollection(allVendorsQuery);
+
+  // تحويل بيانات المنتجات للتنسيق المطلوب في الواجهة
+  const featuredProducts = useMemo(() => {
+    if (!productsData || productsData.length === 0) return [];
+    return productsData.map((p: any) => {
+      const vendor = allVendors?.find(v => v.id === p.vendor_id);
+      const price = Number(p.price) || 0;
+      const oldPrice = Number(p.compare_at_price || p.old_price) || 0;
+      const discount = oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+      
+      return {
+        id: p.id,
+        name: p.name_ar || 'منتج غير مسمى',
+        category: p.category_id || 'عام',
+        price: price,
+        oldPrice: oldPrice,
+        discount: discount,
+        store: vendor?.business_name || 'إيوان المعتمد',
+        rating: p.rating || 5.0,
+        img: p.image_base64 || `https://picsum.photos/seed/${p.id}/600/600`
+      };
+    });
+  }, [productsData, allVendors]);
 
   const features = [
     { title: 'تصميم ذكي', desc: 'استخدم الذكاء الاصطناعي لتخيل غرفتك قبل الشراء.', icon: Zap, color: 'text-primary', bg: 'bg-primary/10' },
@@ -77,36 +119,6 @@ export default function HomePage() {
       text: 'أفضل منصة أثاث في اليمن حالياً، التنوع بين الجاهز والمصنع حسب الطلب يعطي خيارات رائعة جداً.', 
       rating: 4.8,
       avatar: 'https://picsum.photos/seed/user3/100/100'
-    }
-  ];
-
-  const featuredStores = [
-    { 
-      id: 's1', 
-      business_name: 'المعرض الملكي', 
-      city: 'صنعاء', 
-      average_rating: 4.9, 
-      cover_url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=600',
-      logo_url: 'https://picsum.photos/seed/s1/200/200',
-      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
-    },
-    { 
-      id: 's2', 
-      business_name: 'أثاث الخليج', 
-      city: 'عدن', 
-      average_rating: 4.8, 
-      cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600',
-      logo_url: 'https://picsum.photos/seed/s2/200/200',
-      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
-    },
-    { 
-      id: 's3', 
-      business_name: 'مودرن هوم', 
-      city: 'تعز', 
-      average_rating: 4.7, 
-      cover_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600',
-      logo_url: 'https://picsum.photos/seed/s3/200/200',
-      description: 'تشكيلة واسعة من الأثاث العصري الذي يجمع بين الجودة والفخامة، موثقة ومعتمدة من إيوان لضمان رضاكم.'
     }
   ];
 
@@ -196,66 +208,82 @@ export default function HomePage() {
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {featuredProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
-                  <div className="relative aspect-square overflow-hidden bg-gray-50">
-                    <Image 
-                      src={product.img} 
-                      alt={product.name} 
-                      fill 
-                      className="object-cover group-hover:scale-105 transition-transform duration-700" 
-                    />
-                    {/* Blurry layer at bottom */}
-                    <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
-                    
-                    <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
-                    <div className="absolute top-3 right-3 z-20">
-                      <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
-                         %{product.discount.toLocaleString('en-US')} خصم
-                      </Badge>
+            {productsLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 gap-4">
+                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                 <p className="font-bold text-muted-foreground">جاري تحميل أحدث القطع...</p>
+              </div>
+            ) : featuredProducts.length === 0 ? (
+              <div className="py-20 text-center bg-gray-50 rounded-2xl border-2 border-dashed">
+                <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                <p className="font-black text-muted-foreground">لا توجد منتجات مميزة معروضة حالياً.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {featuredProducts.map((product) => (
+                  <div key={product.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
+                    <div className="relative aspect-square overflow-hidden bg-gray-50">
+                      <Image 
+                        src={product.img} 
+                        alt={product.name} 
+                        fill 
+                        className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
+                      
+                      <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
+                      {product.discount > 0 && (
+                        <div className="absolute top-3 right-3 z-20">
+                          <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                            %{product.discount.toLocaleString('en-US')} خصم
+                          </Badge>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div className="p-4 flex flex-col flex-1 gap-3">
-                    <div className="flex justify-between items-start">
-                       <h4 className="text-base font-black text-secondary flex-1 leading-tight">{product.name}</h4>
-                       <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
-                        <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
-                        <Star className="w-3 h-3 fill-current" />
+                    <div className="p-4 flex flex-col flex-1 gap-3">
+                      <div className="flex justify-between items-start">
+                        <h4 className="text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{product.name}</h4>
+                        <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
+                          <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
+                          <Star className="w-3 h-3 fill-current" />
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                       <div className="flex items-center gap-1.5 text-muted-foreground">
-                         <Store className="w-4 h-4 text-primary" />
-                         <span className="text-xs font-bold">{product.store}</span>
-                       </div>
-                       <div className="w-fit">
-                         <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full">
-                           {product.category}
-                         </Badge>
-                       </div>
-                    </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Store className="w-4 h-4 text-primary" />
+                          <span className="text-xs font-bold">{product.store}</span>
+                        </div>
+                        <div className="w-fit">
+                          <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
+                            {product.category}
+                          </Badge>
+                        </div>
+                      </div>
 
-                    <div className="mt-auto pt-2 space-y-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
-                        {product.oldPrice && <span className="text-xs font-bold text-muted-foreground line-through opacity-50">{product.oldPrice.toLocaleString('en-US')}</span>}
+                      <div className="mt-auto pt-2 space-y-4">
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                             <span className="text-lg font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال</span></span>
+                             {product.oldPrice > product.price && (
+                               <span className="text-xs font-bold text-muted-foreground line-through opacity-50">{product.oldPrice.toLocaleString('en-US')}</span>
+                             )}
+                          </div>
+                        </div>
+                        <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
+                          <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                        </Button>
                       </div>
-                      <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
-                        <ShoppingBag className="w-4 h-4" /> إضافة للسلة
-                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
         {/* Featured Stores Section */}
         <section className="py-24 bg-secondary relative overflow-hidden">
-          {/* Hexagonal Pattern Backdrop */}
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
           <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2" />
@@ -265,69 +293,77 @@ export default function HomePage() {
               <p className="text-gray-300 text-lg max-w-2xl mx-auto font-medium">نخبة من أفضل معارض الأثاث التي تقدم أرقى المجموعات الجاهزة والمصنعة.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredStores.map((store, i) => (
-                <Link 
-                  href={`/vendors/${store.id}`}
-                  key={i} 
-                  className="group bg-gray-50 border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
-                >
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <Image 
-                      src={store.cover_url || `https://picsum.photos/seed/${store.id}/800/400`} 
-                      alt={store.business_name} 
-                      fill 
-                      className="object-cover group-hover:scale-105 transition-transform duration-700" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />
-                    
-                    <div className="absolute bottom-4 right-4 flex items-center gap-3">
-                      <div className="w-14 h-14 bg-white p-1 shadow-xl relative overflow-hidden rounded-md">
-                        <Image 
-                          src={store.logo_url || `https://picsum.photos/seed/${store.id}-logo/200/200`}
-                          alt="Logo"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="text-white">
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="font-black text-lg">{store.business_name}</h4>
-                          <CheckCircle2 className="w-4 h-4 text-primary fill-white" />
+            {storesLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              </div>
+            ) : storesData?.length === 0 ? (
+              <div className="py-20 text-center text-gray-400 font-bold">لا توجد متاجر معروضة حالياً.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {storesData?.map((store: any, i: number) => (
+                  <Link 
+                    href={`/vendors/${store.id}`}
+                    key={i} 
+                    className="group bg-white/95 backdrop-blur-sm border border-border/50 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col rounded-[15px]"
+                  >
+                    <div className="relative h-48 w-full overflow-hidden">
+                      <Image 
+                        src={store.cover_url || `https://picsum.photos/seed/${store.id}/800/400`} 
+                        alt={store.business_name} 
+                        fill 
+                        className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />
+                      
+                      <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                        <div className="w-14 h-14 bg-white p-1 shadow-xl relative overflow-hidden rounded-md">
+                          <Image 
+                            src={store.logo_url || `https://picsum.photos/seed/${store.id}-logo/200/200`}
+                            alt="Logo"
+                            fill
+                            className="object-cover"
+                          />
                         </div>
-                        <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[10px] uppercase">
-                          معرض أثاث
+                        <div className="text-white">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-black text-lg">{store.business_name}</h4>
+                            <CheckCircle2 className="w-4 h-4 text-primary fill-white" />
+                          </div>
+                          <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[10px] uppercase">
+                            معرض أثاث
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="absolute top-4 left-4">
+                        <Badge className="bg-white/90 backdrop-blur-sm text-secondary font-black border-none px-2 py-1 flex items-center gap-1 shadow-lg rounded-md">
+                          <Star className="w-3 h-3 text-amber-500 fill-current" />
+                          {(store.average_rating || 5.0).toLocaleString('en-US')}
                         </Badge>
                       </div>
                     </div>
-                    
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-white/90 backdrop-blur-sm text-secondary font-black border-none px-2 py-1 flex items-center gap-1 shadow-lg rounded-md">
-                        <Star className="w-3 h-3 text-amber-500 fill-current" />
-                        {store.average_rating ? store.average_rating.toLocaleString('en-US') : '5.0'}
-                      </Badge>
-                    </div>
-                  </div>
 
-                  <div className="p-6 flex-1 flex flex-col space-y-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed font-medium line-clamp-2">
-                      {store.description}
-                    </p>
-                    
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
-                        <MapPin className="w-3.5 h-3.5 text-primary" />
-                        {store.city}
+                    <div className="p-6 flex-1 flex flex-col space-y-4">
+                      <p className="text-sm text-muted-foreground leading-relaxed font-medium line-clamp-2 italic">
+                        "{store.description || 'شريك معتمد في منصة إيوان للأثاث الفاخر.'}"
+                      </p>
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
+                          <MapPin className="w-3.5 h-3.5 text-primary" />
+                          {store.city}
+                        </div>
+                        <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                          تصفح المنتجات 
+                          <ArrowLeft className="w-4 h-4 mr-2" />
+                        </Button>
                       </div>
-                      <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
-                        تصفح المنتجات 
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                      </Button>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            )}
             
             <div className="mt-16 text-center">
                <Link href="/vendors">
@@ -369,7 +405,6 @@ export default function HomePage() {
 
         {/* Testimonials Section */}
         <section className="py-24 bg-secondary text-white relative overflow-hidden">
-          {/* Hexagonal Pattern Backdrop */}
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
           <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
