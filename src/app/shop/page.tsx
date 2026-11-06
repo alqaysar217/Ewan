@@ -358,17 +358,6 @@ export default function ShopPage() {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
-                              {p.category_id}
-                            </Badge>
-                            {p.style && (
-                              <Badge variant="outline" className="text-[9px] font-bold text-muted-foreground border-border px-2 py-0.5 rounded-full">
-                                {styles.find(s => s.id === p.style)?.name || p.style}
-                              </Badge>
-                            )}
-                          </div>
-
                           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between gap-4">
                             <div className="flex flex-col">
                               <span className="text-xl font-black text-secondary">

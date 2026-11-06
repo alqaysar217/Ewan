@@ -309,11 +309,6 @@ export default function HomePage() {
                           <Store className="w-4 h-4 text-accent" />
                           <span className="text-xs font-bold">{product.store}</span>
                         </div>
-                        <div className="w-fit">
-                          <Badge variant="outline" className="text-[9px] font-bold text-accent border-accent/20 bg-accent/5 px-2 py-0.5 rounded-full uppercase">
-                            {product.category}
-                          </Badge>
-                        </div>
                       </div>
 
                       <div className="mt-auto pt-2 space-y-4">
@@ -533,7 +528,7 @@ export default function HomePage() {
                 <Quote className="w-10 h-10 text-accent" />
               </div>
               <h2 className="text-4xl md:text-5xl font-black">ماذا يقول عملاؤنا؟</h2>
-              <p className="text-gray-400 text-lg max-w-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
+              <p className="text-gray-400 text-lg max-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
             </motion.div>
             
             {testimonialsLoading ? (

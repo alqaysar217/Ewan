@@ -210,11 +210,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                               <Store className="w-4 h-4 text-primary" />
                               <span className="text-[10px] font-bold">{vendor.business_name}</span>
                             </div>
-                            <div className="w-fit">
-                              <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
-                                {p.category_id}
-                              </Badge>
-                            </div>
                           </div>
 
                           <div className="mt-auto pt-2 space-y-4">
