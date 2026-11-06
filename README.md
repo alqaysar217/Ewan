@@ -1,5 +1,33 @@
-# Firebase Studio
+# إيوان (Ewan) - منصة تصميم وتجارة الأثاث الذكية
 
-This is a NextJS starter in Firebase Studio.
+هذا المشروع هو منصة متكاملة تربط بين العملاء، معارض الأثاث الكبرى، والحرفيين (النجارين والمصممين) في اليمن، مع دمج تقنيات الذكاء الاصطناعي لتسهيل تجربة التصميم الداخلي.
 
-To get started, take a look at src/app/page.tsx.
+## تعليمات الرفع على GitHub (حل مشكلة Authentication)
+
+إذا واجهت خطأ `Invalid username or token` عند محاولة الرفع (`git push`)، اتبع هذه الخطوات:
+
+1. **إنشاء مفتاح الوصول (Token)**:
+   - ادخل لحسابك في GitHub.
+   - اذهب إلى `Settings` -> `Developer Settings` -> `Personal access tokens` -> `Tokens (classic)`.
+   - اضغط `Generate new token (classic)`.
+   - حدد صلاحية `repo`.
+   - انسخ التوكن (Token) الناتج.
+
+2. **تحديث الرابط في الـ Terminal**:
+   قم بتنفيذ الأمر التالي مع استبدال الكلمات الكبيرة ببياناتك:
+   ```bash
+   git remote set-url origin https://<انسخ_التوكن_هنا>@github.com/alqaysar217/Ewan.git
+   ```
+
+3. **الرفع مجدداً**:
+   ```bash
+   git push origin main
+   ```
+
+## المميزات التقنية
+- **الذكاء الاصطناعي**: يعتمد على نموذج Gemma 2 عبر OpenRouter لتوليد نصائح تصميم وبرومبت (Prompt) فائق الدقة.
+- **قاعدة البيانات**: Firebase Firestore لإدارة المتاجر والمنتجات والمستخدمين.
+- **التصميم**: استجابة كاملة للهواتف مع واجهات إدارية احترافية باستخدام ShadCN UI و Tailwind CSS.
+
+---
+تم التطوير بكل ❤️ في اليمن.
