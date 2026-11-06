@@ -130,7 +130,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
         {/* Content Section */}
         <section className="container mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-24">
           <Tabs defaultValue="products" className="w-full">
-            <TabsList className="w-full flex flex-row-reverse justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
+            <TabsList className="w-full flex justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
               <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
                 <Package className="w-4 h-4 md:w-5 md:h-5" /> منتجات المتجر
               </TabsTrigger>
@@ -160,7 +160,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   {vendorProducts?.map((p: any) => (
-                    <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40">
+                    <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col group border border-border/40">
                       <div className="relative aspect-square overflow-hidden bg-gray-50">
                         <Image 
                           src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
@@ -168,10 +168,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                           fill 
                           className="object-cover group-hover:scale-105 transition-transform duration-700" 
                         />
-                        <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/40 to-transparent backdrop-blur-[2px] opacity-60" />
+                        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent backdrop-blur-[1px] opacity-70 group-hover:opacity-90 transition-opacity" />
                         
                         <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
-                        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                        <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
                           {Number(p.discount) > 0 && (
                             <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
                               %{p.discount.toLocaleString('en-US')} خصم
@@ -242,10 +242,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
             {/* آراء العملاء */}
             <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
-               <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row-reverse items-center justify-between gap-8 border border-primary/10">
-                 <div className="text-center md:text-left">
+               <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
+                 <div className="text-right space-y-2">
                    <h3 className="text-6xl md:text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
-                   <div className="flex gap-2 justify-center md:justify-end text-amber-500 mb-2">
+                   <div className="flex gap-2 justify-center md:justify-start text-amber-500 mb-2">
                      {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-8 h-8", i < Math.floor(vendor.average_rating) ? "fill-current" : "fill-none")} />)}
                    </div>
                    <p className="text-muted-foreground font-black text-lg">بناءً على {vendor.reviewsCount.toLocaleString('en-US')} تجربة عملاء موثقة</p>
@@ -257,16 +257,16 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                  {(vendorData?.reviews || []).length > 0 ? (
                    vendorData.reviews.map((rev: any, i: number) => (
                     <div key={i} className="p-8 bg-white border border-border/50 rounded-2xl space-y-6 shadow-sm hover:shadow-lg transition-all relative">
-                      <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/5 scale-x-[-1]" />
-                      <div className="flex flex-row-reverse justify-between items-start">
-                        <div className="flex flex-row-reverse items-center gap-4 text-left">
+                      <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/5" />
+                      <div className="flex flex-row justify-between items-start">
+                        <div className="flex flex-row items-center gap-4 text-right">
                           <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center font-black text-secondary text-xl border-2 border-primary/10">
                             {rev.name?.[0] || 'ع'}
                           </div>
                           <div className="space-y-1">
                             <p className="font-black text-secondary text-lg">{rev.name}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold justify-end">
-                              {rev.date || 'الآن'} <Calendar className="w-3.5 h-3.5" />
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold justify-start">
+                              <Calendar className="w-3.5 h-3.5" /> {rev.date || 'الآن'}
                             </div>
                           </div>
                         </div>
@@ -274,7 +274,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                           {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-4 h-4", i < (rev.rating || 5) ? "fill-current" : "fill-none")} />)}
                         </div>
                       </div>
-                      <p className="text-base text-muted-foreground leading-relaxed font-medium italic pl-4 border-l-2 border-primary/20 text-left">"{rev.text}"</p>
+                      <p className="text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20 text-right">"{rev.text}"</p>
                     </div>
                    ))
                  ) : (
@@ -289,7 +289,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             {/* حول المتجر */}
             <TabsContent value="about" className="animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* النبذة والإحصائيات - أصبحت في اليمين */}
+                {/* النبذة والإحصائيات */}
                 <div className="lg:col-span-2 space-y-10">
                   <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                     <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
@@ -331,10 +331,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   )}
                 </div>
 
-                {/* معلومات جانبية إضافية - أصبحت في اليسار */}
+                {/* معلومات جانبية إضافية */}
                 <div className="space-y-10">
                    <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
+                      <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 -translate-x-16 transition-transform group-hover:scale-125" />
                       <div className="relative z-10 space-y-4">
                         <Award className="w-12 h-12 text-primary" />
                         <h4 className="text-2xl font-black">ضمان إيوان المعتمد</h4>
