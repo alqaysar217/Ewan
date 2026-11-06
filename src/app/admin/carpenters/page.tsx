@@ -31,7 +31,9 @@ import {
   Info,
   Calendar,
   X,
-  Briefcase
+  Briefcase,
+  Quote,
+  Map
 } from 'lucide-react';
 import {
   Dialog,
@@ -100,7 +102,7 @@ export default function AdminProfessionals() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [editingPro, setEditingPro] = useState<any>(null);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [newArea, setNewArea] = useState('');
 
   const [proData, setProData] = useState({
@@ -162,15 +164,15 @@ export default function AdminProfessionals() {
       slug: proData.business_name.toLowerCase().replace(/\s+/g, '-'),
     };
 
-    if (editingPro) {
-      updateDoc(doc(db, 'vendors', editingPro.id), finalData)
+    if (editingUser) {
+      updateDoc(doc(db, 'vendors', editingUser.id), finalData)
         .then(() => {
           toast({ title: "تم التحديث بنجاح" });
           setIsDialogOpen(false);
           resetForm();
         })
         .catch(async (e) => {
-          const err = new FirestorePermissionError({ path: `vendors/${editingPro.id}`, operation: 'update', requestResourceData: finalData });
+          const err = new FirestorePermissionError({ path: `vendors/${editingUser.id}`, operation: 'update', requestResourceData: finalData });
           errorEmitter.emit('permission-error', err);
         })
         .finally(() => setIsSaving(false));
@@ -202,7 +204,7 @@ export default function AdminProfessionals() {
   };
 
   const openEdit = (pro: any) => {
-    setEditingPro(pro);
+    setEditingUser(pro);
     setProData({
       ...pro,
       experience_years: pro.experience_years?.toString() || '5',
@@ -214,7 +216,7 @@ export default function AdminProfessionals() {
   };
 
   const resetForm = () => {
-    setEditingPro(null);
+    setEditingUser(null);
     setProData({ 
       business_name: '', business_type: 'carpenter', city: 'صنعاء', email: '', 
       description: '', logo_url: '', cover_url: '', average_rating: 5, 
@@ -337,7 +339,7 @@ export default function AdminProfessionals() {
           <Tabs defaultValue="profile" className="w-full">
             <div className="bg-secondary p-6 pb-0 text-white">
               <DialogHeader className="mb-4 text-right">
-                <DialogTitle className="text-2xl font-black">{editingPro ? 'تحديث ملف المهني' : 'تسجيل مهني جديد'}</DialogTitle>
+                <DialogTitle className="text-2xl font-black">{editingUser ? 'تحديث ملف المهني' : 'تسجيل مهني جديد'}</DialogTitle>
                 <DialogDescription className="text-gray-400 font-bold text-xs mt-1">أدخل بيانات الهوية المهنية بدقة لضمان ثقة العملاء.</DialogDescription>
               </DialogHeader>
               <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-12 p-0 gap-4">
@@ -525,7 +527,7 @@ export default function AdminProfessionals() {
 
             <div className="p-6 bg-gray-50 border-t flex flex-row-reverse justify-start gap-4">
               <Button onClick={handleSavePro} disabled={isSaving} className="rounded-xl px-10 h-12 font-black bg-secondary text-white min-w-[160px] shadow-xl shadow-secondary/10">
-                {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : (editingPro ? 'حفظ التعديلات' : 'تسجيل المهني')}
+                {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : (editingUser ? 'حفظ التعديلات' : 'تسجيل المهني')}
               </Button>
               <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="rounded-xl px-8 h-12 font-black">إلغاء</Button>
             </div>
