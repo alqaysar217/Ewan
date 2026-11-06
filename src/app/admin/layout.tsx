@@ -11,15 +11,16 @@ import {
   Store, 
   Package, 
   Layers, 
-  Hammer, 
-  Scissors, 
+  Users, 
   LogOut, 
   Loader2, 
   ShieldCheck, 
   Bell,
   ChevronRight,
   ChevronLeft,
-  Menu
+  Handshake,
+  Quote,
+  HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -39,7 +40,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  // تثبيت مرجع وثيقة المستخدم لمنع حلقات التكرار
   const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
@@ -74,10 +74,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const navItems = [
     { href: '/admin', label: 'ملخص النظام', icon: LayoutDashboard },
     { href: '/admin/vendors', label: 'إدارة المتاجر', icon: Store },
-    { href: '/admin/carpenters', label: 'إدارة النجارين', icon: Hammer },
+    { href: '/admin/carpenters', label: 'المصممين والنجارين', icon: Users },
     { href: '/admin/products', label: 'إدارة المنتجات', icon: Package },
     { href: '/admin/categories', label: 'إدارة التصنيفات', icon: Layers },
-    { href: '/admin/tailoring', label: 'التفصيل المخصص', icon: Scissors },
+    { href: '/admin/partners', label: 'شركاء النجاح', icon: Handshake },
+    { href: '/admin/reviews', label: 'آراء العملاء', icon: Quote },
+    { href: '/admin/faq', label: 'الأسئلة الشائعة', icon: HelpCircle },
   ];
 
   const handleLogout = async () => {
@@ -88,14 +90,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-[#F4F6F5] flex font-cairo" dir="rtl">
-        {/* Sidebar */}
         <aside 
           className={cn(
             "bg-secondary text-white hidden lg:flex flex-col border-l border-white/5 sticky top-0 h-screen transition-all duration-300 ease-in-out z-30 shadow-2xl",
             isCollapsed ? "w-24" : "w-72"
           )}
         >
-          {/* Collapse Toggle Button */}
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -left-3 top-10 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform z-40"
@@ -112,7 +112,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             )}
           </div>
           
-          <nav className="flex-1 px-4 space-y-1 mt-4">
+          <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto no-scrollbar">
             {navItems.map((item) => (
               <Tooltip key={item.href} delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -153,30 +153,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </div>
               )}
             </div>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  onClick={handleLogout}
-                  className={cn(
-                    "w-full justify-start gap-4 h-12 text-destructive hover:text-destructive hover:bg-destructive/5 rounded-xl transition-all",
-                    isCollapsed ? "px-0 justify-center" : "px-6"
-                  )}
-                >
-                  <LogOut className="w-5 h-5 shrink-0" /> 
-                  {!isCollapsed && <span className="font-bold animate-in fade-in duration-500">تسجيل الخروج</span>}
-                </Button>
-              </TooltipTrigger>
-              {isCollapsed && (
-                <TooltipContent side="left" className="bg-destructive text-white border-none font-bold">
-                  تسجيل الخروج
-                </TooltipContent>
+            <Button 
+              variant="ghost" 
+              onClick={handleLogout}
+              className={cn(
+                "w-full justify-start gap-4 h-12 text-destructive hover:text-destructive hover:bg-destructive/5 rounded-xl transition-all",
+                isCollapsed ? "px-0 justify-center" : "px-6"
               )}
-            </Tooltip>
+            >
+              <LogOut className="w-5 h-5 shrink-0" /> 
+              {!isCollapsed && <span className="font-bold animate-in fade-in duration-500">خروج</span>}
+            </Button>
           </div>
         </aside>
 
-        {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
           <header className="h-20 bg-white border-b border-border/50 flex items-center justify-between px-8 sticky top-0 z-20">
             <div className="flex items-center gap-4 lg:hidden">
