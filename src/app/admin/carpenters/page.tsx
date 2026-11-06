@@ -58,8 +58,6 @@ import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 const compressImage = (base64Str: string, maxWidth = 1000, maxHeight = 800): Promise<string> => {
   return new Promise((resolve) => {
@@ -149,58 +147,46 @@ export default function AdminProfessionals() {
 
   const handleSavePro = async () => {
     if (isSaving) return;
-    if (!proData.business_name || !proData.email) {
-      toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء الاسم والبريد الإلكتروني." });
-      return;
-    }
-
-    setIsSaving(true);
-    const finalData = {
-      ...proData,
-      average_rating: Number(proData.average_rating),
-      experience_years: Number(proData.experience_years),
-      approval_status: 'approved',
-      updated_at: serverTimestamp(),
-      slug: proData.business_name.toLowerCase().replace(/\s+/g, '-'),
-    };
-
-    if (editingUser) {
-      updateDoc(doc(db, 'vendors', editingUser.id), finalData)
-        .then(() => {
-          toast({ title: "تم التحديث بنجاح" });
-          setIsDialogOpen(false);
-          resetForm();
-        })
-        .catch(async (e) => {
-          const err = new FirestorePermissionError({ path: `vendors/${editingUser.id}`, operation: 'update', requestResourceData: finalData });
-          errorEmitter.emit('permission-error', err);
-        })
-        .finally(() => setIsSaving(false));
-    } else {
-      addDoc(collection(db, 'vendors'), {
-        ...finalData,
-        created_at: serverTimestamp(),
-      })
-        .then(() => {
-          toast({ title: "تم تسجيل المهني بنجاح" });
-          setIsDialogOpen(false);
-          resetForm();
-        })
-        .catch(async (e) => {
-          const err = new FirestorePermissionError({ path: 'vendors', operation: 'create', requestResourceData: finalData });
-          errorEmitter.emit('permission-error', err);
-        })
-        .finally(() => setIsSaving(false));
+    try {
+      if (!proData.business_name || !proData.email) {
+        toast({ variant: "destructive", title: "بيانات ناقصة", description: "يرجى ملء الاسم والبريد الإلكتروني." });
+        return;
+      }
+      setIsSaving(true);
+      const finalData = {
+        ...proData,
+        average_rating: Number(proData.average_rating),
+        experience_years: Number(proData.experience_years),
+        approval_status: 'approved',
+        updated_at: serverTimestamp(),
+        slug: proData.business_name.toLowerCase().replace(/\s+/g, '-'),
+      };
+      if (editingUser) {
+        await updateDoc(doc(db, 'vendors', editingUser.id), finalData);
+        toast({ title: "تم التحديث بنجاح" });
+      } else {
+        await addDoc(collection(db, 'vendors'), {
+          ...finalData,
+          created_at: serverTimestamp(),
+        });
+        toast({ title: "تم تسجيل المهني بنجاح" });
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "فشل في الحفظ" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleDeletePro = (id: string) => {
-    deleteDoc(doc(db, 'vendors', id))
-      .then(() => toast({ title: "تم الحذف بنجاح" }))
-      .catch(async (e) => {
-        const err = new FirestorePermissionError({ path: `vendors/${id}`, operation: 'delete' });
-        errorEmitter.emit('permission-error', err);
-      });
+  const handleDeletePro = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'vendors', id));
+      toast({ title: "تم الحذف بنجاح" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "فشل في الحذف" });
+    }
   };
 
   const openEdit = (pro: any) => {
@@ -291,7 +277,7 @@ export default function AdminProfessionals() {
                    </div>
                    <div className="text-white">
                       <h4 className="font-black text-lg flex items-center gap-1.5">{pro.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-start gap-3">
                         <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[9px] uppercase">
                           {pro.business_type === 'carpenter' ? 'نجار' : 'مصمم ديكور'}
                         </Badge>
@@ -361,26 +347,26 @@ export default function AdminProfessionals() {
             <div className="p-6 max-h-[60vh] overflow-y-auto bg-white text-right">
               <TabsContent value="profile" className="space-y-6 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Briefcase className="w-3 h-3 text-primary" /> الاسم التجاري / الشخصي</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><Briefcase className="w-3 h-3 text-primary" /> الاسم التجاري / الشخصي</label>
                     <Input value={proData.business_name} onChange={e => setProData({...proData, business_name: e.target.value})} placeholder="مثال: ورشة إتقان للنجارة" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني</label>
                     <Input value={proData.email} onChange={e => setProData({...proData, email: e.target.value})} placeholder="pro@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Hammer className="w-3 h-3 text-primary" /> نوع المهنة</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><Hammer className="w-3 h-3 text-primary" /> نوع المهنة</label>
                     <select value={proData.business_type} onChange={e => setProData({...proData, business_type: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold text-sm outline-none shadow-inner">
                       <option value="carpenter">نجار محترف</option>
                       <option value="interior_designer">مصمم ديكور</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><MapPin className="w-3 h-3 text-primary" /> المدينة الرئيسية</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><MapPin className="w-3 h-3 text-primary" /> المدينة الرئيسية</label>
                     <select value={proData.city} onChange={e => setProData({...proData, city: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold text-sm outline-none shadow-inner">
                       <option value="صنعاء">صنعاء</option>
                       <option value="عدن">عدن</option>
@@ -388,14 +374,14 @@ export default function AdminProfessionals() {
                       <option value="المكلا">المكلا</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
                     <Input type="number" value={proData.experience_years} onChange={e => setProData({...proData, experience_years: e.target.value})} placeholder="5" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                 </div>
 
-                <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Map className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
+                <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 text-right">
+                  <label className="text-sm font-black text-secondary flex items-center justify-start gap-2"><Map className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
                   <div className="flex gap-2">
                     <Input 
                       value={newArea} 
@@ -406,7 +392,7 @@ export default function AdminProfessionals() {
                     />
                     <Button onClick={addArea} type="button" className="h-12 px-6 rounded-xl bg-primary text-white font-black">إضافة</Button>
                   </div>
-                  <div className="flex flex-wrap gap-2 pt-2">
+                  <div className="flex flex-wrap justify-start gap-2 pt-2">
                     {proData.service_areas.length > 0 ? proData.service_areas.map((area, idx) => (
                       <Badge key={idx} className="bg-white text-secondary border border-primary/20 px-3 py-1.5 rounded-lg flex items-center gap-2 font-bold shadow-sm">
                         {area}
@@ -418,23 +404,23 @@ export default function AdminProfessionals() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Info className="w-3 h-3 text-primary" /> نبذة عن المهني وأسلوب العمل</label>
+                <div className="space-y-2 text-right">
+                  <label className="text-xs font-black text-secondary mr-1 flex items-center justify-start gap-2"><Info className="w-3 h-3 text-primary" /> نبذة عن المهني وأسلوب العمل</label>
                   <Textarea value={proData.description} onChange={e => setProData({...proData, description: e.target.value})} placeholder="اكتب وصفاً جذاباً لمهاراتك والخدمات التي تقدمها..." className="rounded-xl min-h-[100px] bg-gray-50 border-none" />
                 </div>
               </TabsContent>
 
               <TabsContent value="branding" className="space-y-6 mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right">
                   <div className="space-y-3">
-                     <label className="text-sm font-black text-secondary flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary" /> شعار المهني</label>
+                     <label className="text-sm font-black text-secondary flex items-center justify-start gap-2"><Sparkles className="w-4 h-4 text-primary" /> شعار المهني</label>
                      <div className="relative aspect-square w-24 border-2 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center group">
                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
                         {proData.logo_url ? <Image src={proData.logo_url} alt="Logo" fill className="object-cover" /> : <Upload className="w-6 h-6 opacity-30 group-hover:scale-110 transition-transform" />}
                      </div>
                   </div>
                   <div className="space-y-3">
-                     <label className="text-sm font-black text-secondary flex items-center gap-2"><ImageIcon className="w-4 h-4 text-primary" /> صورة الخلفية للملف الشخصي</label>
+                     <label className="text-sm font-black text-secondary flex items-center justify-start gap-2"><ImageIcon className="w-4 h-4 text-primary" /> صورة الخلفية للملف الشخصي</label>
                      <div className="relative aspect-video w-full border-2 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center group">
                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
                         {proData.cover_url ? <Image src={proData.cover_url} alt="Cover" fill className="object-cover" /> : <Upload className="w-8 h-8 opacity-30 group-hover:scale-110 transition-transform" />}
@@ -443,7 +429,7 @@ export default function AdminProfessionals() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="reviews" className="space-y-4 mt-0">
+              <TabsContent value="reviews" className="space-y-4 mt-0 text-right">
                  <div className="flex justify-between items-center mb-2">
                     <h3 className="text-sm font-black text-secondary flex items-center gap-2"><Quote className="w-4 h-4 text-primary" /> مراجعات العملاء المثبتة</h3>
                     <Button variant="outline" size="sm" onClick={() => setProData(prev => ({...prev, reviews: [...prev.reviews, {name: '', text: '', rating: 5, date: 'الآن'}]}))} className="rounded-lg h-9 font-bold">+ إضافة مراجعة</Button>
@@ -451,12 +437,12 @@ export default function AdminProfessionals() {
                  
                  <div className="space-y-4">
                    {proData.reviews.length > 0 ? proData.reviews.map((rev, i) => (
-                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner">
+                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner text-right" dir="rtl">
                          <button onClick={() => setProData(prev => ({...prev, reviews: prev.reviews.filter((_, idx) => idx !== i)}))} className="absolute top-4 left-4 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
                          
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><User className="w-3 h-3" /> اسم العميل</label>
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><User className="w-3 h-3" /> اسم العميل</label>
                                <Input value={rev.name} onChange={e => {
                                   const newRev = [...proData.reviews];
                                   newRev[i].name = e.target.value;
@@ -464,7 +450,7 @@ export default function AdminProfessionals() {
                                }} placeholder="مثال: محمد الريمي" className="bg-white border-none h-10 font-bold rounded-lg" />
                             </div>
                             <div className="space-y-1">
-                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
                                <Input value={rev.date} onChange={e => {
                                   const newRev = [...proData.reviews];
                                   newRev[i].date = e.target.value;
@@ -474,7 +460,7 @@ export default function AdminProfessionals() {
                          </div>
 
                          <div className="space-y-1">
-                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
+                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
                             <Textarea value={rev.text} onChange={e => {
                                const newRev = [...proData.reviews];
                                newRev[i].text = e.target.value;
@@ -482,7 +468,7 @@ export default function AdminProfessionals() {
                             }} placeholder="اكتب تجربة العميل بوضوح..." className="bg-white border-none min-h-[60px] font-medium rounded-lg shadow-sm" />
                          </div>
 
-                         <div className="flex items-center gap-4">
+                         <div className="flex items-center gap-4 justify-start">
                             <label className="text-[10px] font-black text-muted-foreground flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-current" /> التقييم:</label>
                             <select value={rev.rating} onChange={e => {
                                const newRev = [...proData.reviews];
@@ -503,7 +489,7 @@ export default function AdminProfessionals() {
               </TabsContent>
 
               <TabsContent value="gallery" className="space-y-6 mt-0">
-                 <div className="flex items-center justify-between">
+                 <div className="flex items-center justify-between text-right">
                     <h3 className="text-sm font-black text-secondary">صور من أعمال سابقة (بورتفوليو)</h3>
                     <Badge variant="outline" className="font-bold text-[10px]">{proData.gallery.length} صور مضافة</Badge>
                  </div>

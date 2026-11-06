@@ -30,7 +30,8 @@ import {
   Quote,
   Edit,
   X,
-  Calendar
+  Calendar,
+  Map
 } from 'lucide-react';
 import {
   Dialog,
@@ -194,7 +195,8 @@ export default function AdminVendors() {
       experience_years: vendor.experience_years?.toString() || '5',
       available_products: vendor.available_products?.toString() || '0',
       service_areas: vendor.service_areas || [],
-      reviews: vendor.reviews || []
+      reviews: vendor.reviews || [],
+      gallery: vendor.gallery || []
     });
     setIsDialogOpen(true);
   };
@@ -274,7 +276,7 @@ export default function AdminVendors() {
                    <div className="text-white">
                       <h4 className="font-black text-lg flex items-center gap-1.5">{vendor.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
                       <p className="text-[10px] font-bold opacity-80 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-primary" /> {vendor.city}
+                        <MapPin className="w-3 h-3 text-primary" /> {vendor.service_areas?.[0] || vendor.city}
                       </p>
                    </div>
                 </div>
@@ -390,7 +392,7 @@ export default function AdminVendors() {
                 </div>
 
                 <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                  <label className="text-sm font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
+                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Map className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
                   <div className="flex gap-2">
                     <Input 
                       value={newArea} 
@@ -422,12 +424,12 @@ export default function AdminVendors() {
                  
                  <div className="space-y-4">
                    {vendorData.reviews.length > 0 ? vendorData.reviews.map((rev, i) => (
-                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner">
+                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner text-right" dir="rtl">
                          <button onClick={() => setVendorData(prev => ({...prev, reviews: prev.reviews.filter((_, idx) => idx !== i)}))} className="absolute top-4 left-4 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
                          
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><User className="w-3 h-3" /> اسم العميل</label>
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><User className="w-3 h-3" /> اسم العميل</label>
                                <Input value={rev.name} onChange={e => {
                                   const newRev = [...vendorData.reviews];
                                   newRev[i].name = e.target.value;
@@ -435,7 +437,7 @@ export default function AdminVendors() {
                                }} placeholder="مثال: محمد الريمي" className="bg-white border-none h-10 font-bold rounded-lg" />
                             </div>
                             <div className="space-y-1">
-                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
                                <Input value={rev.date} onChange={e => {
                                   const newRev = [...vendorData.reviews];
                                   newRev[i].date = e.target.value;
@@ -445,7 +447,7 @@ export default function AdminVendors() {
                          </div>
 
                          <div className="space-y-1">
-                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
+                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center justify-start gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
                             <Textarea value={rev.text} onChange={e => {
                                const newRev = [...vendorData.reviews];
                                newRev[i].text = e.target.value;
@@ -453,7 +455,7 @@ export default function AdminVendors() {
                             }} placeholder="اكتب تجربة العميل بوضوح..." className="bg-white border-none min-h-[60px] font-medium rounded-lg shadow-sm" />
                          </div>
 
-                         <div className="flex items-center gap-4">
+                         <div className="flex items-center gap-4 justify-start">
                             <label className="text-[10px] font-black text-muted-foreground flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-current" /> التقييم:</label>
                             <select value={rev.rating} onChange={e => {
                                const newRev = [...vendorData.reviews];

@@ -2,7 +2,7 @@
 /**
  * @fileOverview Ewan AI Design Assistant Flow.
  * محرك الذكاء الاصطناعي لمنصة إيوان، يعتمد على نموذج Gemma 2 المتاح عبر OpenRouter.
- * تم تحسينه للعمل في بيئة Vercel مع معالجة أخطاء تفصيلية.
+ * تم تحسينه للعمل في بيئة Vercel مع معالجة أخطاء تفصيلية وتنظيف شامل للمخرجات.
  */
 
 import { ai } from '@/ai/genkit';
@@ -30,16 +30,16 @@ export type EwanAiChatOutput = z.infer<typeof EwanAiChatOutputSchema>;
 
 /**
  * دالة استدعاء الذكاء الاصطناعي (Server Action)
+ * يتم تصدير الدوال غير المتزامنة فقط هنا لضمان توافق Next.js 15
  */
 export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutput> {
   try {
-    console.log("Ewan AI: Starting request for message:", input.message);
-    const result = await ewanAiChatFlow(input);
-    return result;
+    console.log("Ewan AI: Starting production request...");
+    return await ewanAiChatFlow(input);
   } catch (error: any) {
     console.error("CRITICAL: Ewan AI Server Action Crash:", error);
     return { 
-      text: `⚠️ فشل الخادم في معالجة الطلب: ${error.message || 'خطأ غير معروف'}. يرجى التحقق من سجلات Vercel ومفتاح API.` 
+      text: `⚠️ فشل في معالجة الطلب: ${error.message || 'خطأ غير معروف'}. يرجى التحقق من رصيد OpenRouter ومفتاح API في Vercel.` 
     };
   }
 }
@@ -55,23 +55,25 @@ const ewanAiChatFlow = ai.defineFlow(
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      console.error("Ewan AI: OPENROUTER_API_KEY is missing from environment variables.");
-      return { text: "⚠️ مفتاح البرمجة (API Key) غير موجود في إعدادات Vercel. يرجى إضافته باسم OPENROUTER_API_KEY." };
+      return { text: "⚠️ مفتاح OPENROUTER_API_KEY غير موجود في إعدادات Vercel. يرجى إضافته وإعادة النشر (Redeploy)." };
     }
 
-    const systemContent = `أنت "إيوان AI"، الخبير الذكي في التصميم الداخلي لمنصة إيوان اليمنية.
-هويتك: خبير في دمج الطرازات المودرن مع اللمسات التراثية اليمنية.
+    // بناء سياق النظام بلهجة خبير تصميم وبدون رموز تنسيق
+    const systemContent = `You are "Ewan AI", a high-end interior design expert for the Yemeni platform "Ewan". 
+Your task is to provide design recommendations in clear, clean Arabic paragraphs. 
 
-قواعد الرد:
-1. الرد بالعربية بأسلوب فقرات نظيفة. يمنع تماماً استخدام رموز مثل (***) أو (###) أو (---).
-2. قم دائماً بإنشاء وصف تفصيلي بالإنجليزية في نهاية ردك بتنسيق: [PROMPT: نص البرومبت هنا].
-3. اجعل البرومبت مخصصاً لمحركات الصور، يصف الغرفة بناءً على المساحة (${contextData?.area}m2) والنمط (${contextData?.style}).
+STRICT RULES:
+1. RESPONSE IN ARABIC ONLY (except for the prompt).
+2. DO NOT use markdown symbols like (***, ###, ---, ||, __, ++). Keep the text plain and elegant.
+3. At the very end of your response, provide a highly detailed English Image Prompt for an AI image generator (like Midjourney/Flux).
+4. Format the prompt EXACTLY as: [PROMPT: Your detailed English text here].
+5. The prompt must describe the room using the provided data: Area (${contextData?.area}m2), Style (${contextData?.style}), and Budget (${contextData?.budget}).
 
-بيانات الغرفة:
-- النوع: ${contextData?.roomType || 'غير محدد'}
-- المساحة: ${contextData?.area || 'غير محدد'} م²
-- النمط: ${contextData?.style || 'غير محدد'}
-- الميزانية: ${contextData?.budget || 'غير محدد'}`;
+Context:
+- Room Type: ${contextData?.roomType || 'Living Room'}
+- Style: ${contextData?.style || 'Modern'}
+- Area: ${contextData?.area || '20'} m2
+- Budget: ${contextData?.budget || 'Not specified'}`;
 
     const apiMessages: any[] = [
       { role: 'system', content: systemContent }
@@ -89,13 +91,12 @@ const ewanAiChatFlow = ai.defineFlow(
     apiMessages.push({ role: 'user', content: message });
 
     try {
-      // استخدام fetch بسيط مع إعدادات متوافقة مع Vercel
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'X-Title': 'Ewan Furniture AI',
+          'X-Title': 'Ewan AI Studio',
           'HTTP-Referer': 'https://ewan-furniture.vercel.app',
         },
         body: JSON.stringify({
@@ -103,32 +104,33 @@ const ewanAiChatFlow = ai.defineFlow(
           messages: apiMessages,
           temperature: 0.7,
         }),
-        // عدم وضع timeout طويل هنا، نعتمد على مهلة Vercel
       });
 
       if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        console.error("OpenRouter API Error Response:", errJson);
-        throw new Error(errJson.error?.message || `HTTP ${response.status}`);
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
-      let fullContent = data.choices?.[0]?.message?.content || "";
+      let rawContent = data.choices?.[0]?.message?.content || "";
       
+      // استخراج البرومبت الإنجليزي
       let imagePrompt = "";
-      const promptMatch = fullContent.match(/\[PROMPT: (.*?)\]/is);
+      const promptMatch = rawContent.match(/\[PROMPT: (.*?)\]/is);
       if (promptMatch) {
         imagePrompt = promptMatch[1].replace(/[\*#_~`>\|]/g, '').trim();
-        fullContent = fullContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
+        rawContent = rawContent.replace(/\[PROMPT: (.*?)\]/is, "").trim();
       }
 
-      const cleanText = fullContent.replace(/[\*#_~`>\|]/g, '').trim();
-      console.log("Ewan AI: Request completed successfully.");
-      
+      // تنظيف النص العربي من كافة الرموز المزعجة
+      const cleanText = rawContent
+        .replace(/[\*#_~`>\|]/g, '') // إزالة الرموز
+        .replace(/\n{3,}/g, '\n\n') // إزالة المسافات الزائدة جداً
+        .trim();
+
       return { text: cleanText, imagePrompt };
     } catch (error: any) {
-      console.error("Ewan AI: Fetch Exception:", error.message);
-      throw error; // سيتم التقاطه في ewanAiChat
+      throw error;
     }
   }
 );
