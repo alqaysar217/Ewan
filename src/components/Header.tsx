@@ -135,7 +135,7 @@ export default function Header() {
                 <span className="absolute top-1 left-1 w-4 h-4 bg-accent text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount}</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full sm:max-w-[400px] p-0 border-r border-border/50 flex flex-col font-cairo" dir="rtl">
+            <SheetContent side="right" className="w-full sm:max-w-[400px] p-0 border-l border-border/50 flex flex-col font-cairo" dir="rtl">
               <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
                 <SheetTitle className="text-right text-white flex items-center justify-between">
                   <span className="text-xl font-black">سلة المشتريات</span>
@@ -159,7 +159,7 @@ export default function Header() {
                   </div>
                 ) : (
                   <>
-                    <ScrollArea className="flex-1 p-6">
+                    <ScrollArea className="flex-1 p-6" dir="rtl">
                       <div className="space-y-6">
                         {cart.map((item) => (
                           <div key={item.id} className="flex gap-4 group">
@@ -260,7 +260,7 @@ export default function Header() {
                   <Menu className="w-6 h-6 text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50 font-cairo">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 border-l border-border/50 font-cairo" dir="rtl">
                 <SheetHeader className="p-6 border-b border-border/50 bg-secondary text-white">
                   <SheetTitle className="text-right text-white flex items-center gap-3">
                     <div className="relative w-8 h-8 overflow-hidden rounded-md bg-card">
