@@ -25,7 +25,13 @@ import {
   Palette,
   Camera,
   Layers,
-  Sparkles
+  Sparkles,
+  User,
+  Mail,
+  Info,
+  Calendar,
+  X,
+  Briefcase
 } from 'lucide-react';
 import {
   Dialog,
@@ -84,7 +90,6 @@ const compressImage = (base64Str: string, maxWidth = 1000, maxHeight = 800): Pro
 export default function AdminProfessionals() {
   const db = useFirestore();
   
-  // جلب النجارين والمصممين معاً
   const prosQuery = useMemo(() => query(
     collection(db, 'vendors'), 
     or(where('business_type', '==', 'carpenter'), where('business_type', '==', 'interior_designer'))
@@ -96,6 +101,7 @@ export default function AdminProfessionals() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingPro, setEditingPro] = useState<any>(null);
+  const [newArea, setNewArea] = useState('');
 
   const [proData, setProData] = useState({
     business_name: '',
@@ -107,7 +113,7 @@ export default function AdminProfessionals() {
     cover_url: '',
     average_rating: 5,
     experience_years: '5',
-    service_areas: ['صنعاء'],
+    service_areas: [] as string[],
     reviews: [] as any[],
     gallery: [] as string[]
   });
@@ -126,6 +132,17 @@ export default function AdminProfessionals() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const addArea = () => {
+    if (newArea.trim() && !proData.service_areas.includes(newArea.trim())) {
+      setProData(prev => ({ ...prev, service_areas: [...prev.service_areas, newArea.trim()] }));
+      setNewArea('');
+    }
+  };
+
+  const removeArea = (area: string) => {
+    setProData(prev => ({ ...prev, service_areas: prev.service_areas.filter(a => a !== area) }));
   };
 
   const handleSavePro = async () => {
@@ -189,6 +206,9 @@ export default function AdminProfessionals() {
     setProData({
       ...pro,
       experience_years: pro.experience_years?.toString() || '5',
+      service_areas: pro.service_areas || [],
+      reviews: pro.reviews || [],
+      gallery: pro.gallery || []
     });
     setIsDialogOpen(true);
   };
@@ -198,7 +218,7 @@ export default function AdminProfessionals() {
     setProData({ 
       business_name: '', business_type: 'carpenter', city: 'صنعاء', email: '', 
       description: '', logo_url: '', cover_url: '', average_rating: 5, 
-      experience_years: '5', service_areas: ['صنعاء'], 
+      experience_years: '5', service_areas: [], 
       reviews: [], gallery: [] 
     });
   };
@@ -274,7 +294,7 @@ export default function AdminProfessionals() {
                           {pro.business_type === 'carpenter' ? 'نجار' : 'مصمم ديكور'}
                         </Badge>
                         <p className="text-[10px] font-bold opacity-80 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-primary" /> {pro.city}
+                          <MapPin className="w-3 h-3 text-primary" /> {pro.service_areas?.[0] || pro.city}
                         </p>
                       </div>
                    </div>
@@ -322,10 +342,13 @@ export default function AdminProfessionals() {
               </DialogHeader>
               <TabsList className="bg-white/5 border-none w-full justify-start rounded-none h-12 p-0 gap-4">
                 <TabsTrigger value="profile" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
-                  <Award className="w-4 h-4" /> البيانات المهنية
+                  <User className="w-4 h-4" /> الملف التعريفي
                 </TabsTrigger>
                 <TabsTrigger value="branding" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
                   <ImageIcon className="w-4 h-4" /> الهوية البصرية
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
+                  <Star className="w-4 h-4" /> آراء العملاء
                 </TabsTrigger>
                 <TabsTrigger value="gallery" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
                   <Camera className="w-4 h-4" /> معرض الأعمال
@@ -337,25 +360,25 @@ export default function AdminProfessionals() {
               <TabsContent value="profile" className="space-y-6 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1">الاسم التجاري / الشخصي</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Briefcase className="w-3 h-3 text-primary" /> الاسم التجاري / الشخصي</label>
                     <Input value={proData.business_name} onChange={e => setProData({...proData, business_name: e.target.value})} placeholder="مثال: ورشة إتقان للنجارة" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1">البريد الإلكتروني</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني</label>
                     <Input value={proData.email} onChange={e => setProData({...proData, email: e.target.value})} placeholder="pro@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1">نوع المهنة</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Hammer className="w-3 h-3 text-primary" /> نوع المهنة</label>
                     <select value={proData.business_type} onChange={e => setProData({...proData, business_type: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold text-sm outline-none shadow-inner">
                       <option value="carpenter">نجار محترف</option>
                       <option value="interior_designer">مصمم ديكور</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1">المدينة الرئيسية</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><MapPin className="w-3 h-3 text-primary" /> المدينة الرئيسية</label>
                     <select value={proData.city} onChange={e => setProData({...proData, city: e.target.value})} className="w-full h-12 rounded-xl border-none bg-gray-50 px-4 font-bold text-sm outline-none shadow-inner">
                       <option value="صنعاء">صنعاء</option>
                       <option value="عدن">عدن</option>
@@ -364,13 +387,37 @@ export default function AdminProfessionals() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-secondary mr-1">سنوات الخبرة</label>
+                    <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
                     <Input type="number" value={proData.experience_years} onChange={e => setProData({...proData, experience_years: e.target.value})} placeholder="5" className="rounded-xl h-12 bg-gray-50 border-none" />
                   </div>
                 </div>
 
+                <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                  <label className="text-sm font-black text-secondary flex items-center gap-2"><Map className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
+                  <div className="flex gap-2">
+                    <Input 
+                      value={newArea} 
+                      onChange={e => setNewArea(e.target.value)} 
+                      placeholder="أدخل اسم المدينة أو المنطقة (مثال: عدن)" 
+                      className="rounded-xl h-12 bg-white border-none shadow-sm flex-1" 
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addArea())}
+                    />
+                    <Button onClick={addArea} type="button" className="h-12 px-6 rounded-xl bg-primary text-white font-black">إضافة</Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {proData.service_areas.length > 0 ? proData.service_areas.map((area, idx) => (
+                      <Badge key={idx} className="bg-white text-secondary border border-primary/20 px-3 py-1.5 rounded-lg flex items-center gap-2 font-bold shadow-sm">
+                        {area}
+                        <button onClick={() => removeArea(area)} className="text-destructive hover:scale-110 transition-transform"><X className="w-3 h-3" /></button>
+                      </Badge>
+                    )) : (
+                      <p className="text-xs text-muted-foreground italic mr-1">لم يتم تحديد مناطق تغطية بعد.</p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-secondary mr-1">نبذة عن المهني وأسلوب العمل</label>
+                  <label className="text-xs font-black text-secondary mr-1 flex items-center gap-2"><Info className="w-3 h-3 text-primary" /> نبذة عن المهني وأسلوب العمل</label>
                   <Textarea value={proData.description} onChange={e => setProData({...proData, description: e.target.value})} placeholder="اكتب وصفاً جذاباً لمهاراتك والخدمات التي تقدمها..." className="rounded-xl min-h-[100px] bg-gray-50 border-none" />
                 </div>
               </TabsContent>
@@ -392,6 +439,65 @@ export default function AdminProfessionals() {
                      </div>
                   </div>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="space-y-4 mt-0">
+                 <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-sm font-black text-secondary flex items-center gap-2"><Quote className="w-4 h-4 text-primary" /> مراجعات العملاء المثبتة</h3>
+                    <Button variant="outline" size="sm" onClick={() => setProData(prev => ({...prev, reviews: [...prev.reviews, {name: '', text: '', rating: 5, date: 'الآن'}]}))} className="rounded-lg h-9 font-bold">+ إضافة مراجعة</Button>
+                 </div>
+                 
+                 <div className="space-y-4">
+                   {proData.reviews.length > 0 ? proData.reviews.map((rev, i) => (
+                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner">
+                         <button onClick={() => setProData(prev => ({...prev, reviews: prev.reviews.filter((_, idx) => idx !== i)}))} className="absolute top-4 left-4 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
+                         
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><User className="w-3 h-3" /> اسم العميل</label>
+                               <Input value={rev.name} onChange={e => {
+                                  const newRev = [...proData.reviews];
+                                  newRev[i].name = e.target.value;
+                                  setProData({...proData, reviews: newRev});
+                               }} placeholder="مثال: محمد الريمي" className="bg-white border-none h-10 font-bold rounded-lg" />
+                            </div>
+                            <div className="space-y-1">
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
+                               <Input value={rev.date} onChange={e => {
+                                  const newRev = [...proData.reviews];
+                                  newRev[i].date = e.target.value;
+                                  setProData({...proData, reviews: newRev});
+                               }} placeholder="مثال: منذ أسبوعين" className="bg-white border-none h-10 font-bold rounded-lg" />
+                            </div>
+                         </div>
+
+                         <div className="space-y-1">
+                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
+                            <Textarea value={rev.text} onChange={e => {
+                               const newRev = [...proData.reviews];
+                               newRev[i].text = e.target.value;
+                               setProData({...proData, reviews: newRev});
+                            }} placeholder="اكتب تجربة العميل بوضوح..." className="bg-white border-none min-h-[60px] font-medium rounded-lg shadow-sm" />
+                         </div>
+
+                         <div className="flex items-center gap-4">
+                            <label className="text-[10px] font-black text-muted-foreground flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-current" /> التقييم:</label>
+                            <select value={rev.rating} onChange={e => {
+                               const newRev = [...proData.reviews];
+                               newRev[i].rating = Number(e.target.value);
+                               setProData({...proData, reviews: newRev});
+                            }} className="bg-white border-none rounded-lg h-8 px-3 font-black text-xs outline-none shadow-sm">
+                               {[5,4,3,2,1].map(v => <option key={v} value={v}>{v} نجوم</option>)}
+                            </select>
+                         </div>
+                      </div>
+                   )) : (
+                     <div className="py-10 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 flex flex-col items-center gap-2 opacity-50">
+                        <MessageSquare className="w-10 h-10" />
+                        <p className="text-xs font-black">لا توجد مراجعات مضافة لهذا المهني.</p>
+                     </div>
+                   )}
+                 </div>
               </TabsContent>
 
               <TabsContent value="gallery" className="space-y-6 mt-0">
@@ -429,4 +535,3 @@ export default function AdminProfessionals() {
     </div>
   );
 }
-
