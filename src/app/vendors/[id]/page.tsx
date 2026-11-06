@@ -49,6 +49,9 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   const productsQuery = useMemo(() => query(collection(db, 'products'), where('vendor_id', '==', id)), [db, id]);
   const { data: vendorProducts, loading: productsLoading } = useCollection(productsQuery);
 
+  const isStore = vendorData?.business_type === 'furniture_store';
+  const defaultTab = isStore ? 'products' : 'gallery';
+
   const vendor = {
     ...vendorData,
     id,
@@ -61,11 +64,19 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
     logo_url: vendorData?.logo_url || 'https://picsum.photos/seed/v1/200/200',
     gallery: vendorData?.gallery || [],
     stats: [
-      { label: 'منتج متاح', value: (vendorProducts?.length || 0).toLocaleString('en-US'), icon: Package },
       { label: 'سنة خبرة', value: (vendorData?.experience_years || 1).toLocaleString('en-US'), icon: Clock },
       { label: 'تقييم عام', value: (vendorData?.average_rating || 5.0).toLocaleString('en-US'), icon: Star },
     ]
   };
+
+  // إضافة إحصائية المنتجات فقط للمتاجر
+  if (isStore) {
+    vendor.stats.unshift({ 
+      label: 'منتج متاح', 
+      value: (vendorProducts?.length || 0).toLocaleString('en-US'), 
+      icon: Package 
+    });
+  }
 
   if (vendorLoading) {
     return (
@@ -130,11 +141,13 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
         </section>
 
         <section className="container mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-24">
-          <Tabs defaultValue="products" className="w-full" dir="rtl">
+          <Tabs defaultValue={defaultTab} className="w-full" dir="rtl">
             <TabsList className="w-full flex justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
-              <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
-                <Package className="w-4 h-4 md:w-5 md:h-5" /> منتجات المتجر
-              </TabsTrigger>
+              {isStore && (
+                <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
+                  <Package className="w-4 h-4 md:w-5 md:h-5" /> منتجات المتجر
+                </TabsTrigger>
+              )}
               <TabsTrigger value="gallery" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
                 <Images className="w-4 h-4 md:w-5 md:h-5" /> معرض الأعمال
               </TabsTrigger>
@@ -146,78 +159,80 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="products" className="animate-in fade-in duration-700">
-              {productsLoading ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4">
-                  <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                  <p className="font-bold text-muted-foreground">جاري عرض منتجات المتجر...</p>
-                </div>
-              ) : vendorProducts?.length === 0 ? (
-                <div className="py-24 text-center space-y-4 bg-white rounded-2xl border-2 border-dashed border-gray-100">
-                   <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto" />
-                   <p className="text-lg font-black text-muted-foreground">لا توجد منتجات معروضة حالياً لهذا الشريك.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {vendorProducts?.map((p: any) => (
-                    <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col group border border-border/40">
-                      <div className="relative aspect-square overflow-hidden bg-gray-50">
-                        <Image 
-                          src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
-                          alt={p.name_ar} 
-                          fill 
-                          className="object-cover group-hover:scale-105 transition-transform duration-700" 
-                        />
-                        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent backdrop-blur-[1px] opacity-70 group-hover:opacity-90 transition-opacity" />
-                        
-                        <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
-                        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
-                          {Number(p.discount) > 0 && (
-                            <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
-                              %{p.discount.toLocaleString('en-US')} خصم
-                            </Badge>
-                          )}
-                          <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[9px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
-                             {p.in_stock ? 'متوفر' : 'غير متوفر'}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="p-4 flex flex-col flex-1 gap-3">
-                        <div className="flex justify-between items-start">
-                          <h4 className="text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{p.name_ar}</h4>
-                          <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
-                            <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
-                            <Star className="w-3 h-3 fill-current" />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-1.5 text-muted-foreground">
-                            <Store className="w-4 h-4 text-primary" />
-                            <span className="text-[10px] font-bold">{vendor.business_name}</span>
-                          </div>
-                          <div className="w-fit">
-                            <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
-                              {p.category_id}
+            {isStore && (
+              <TabsContent value="products" className="animate-in fade-in duration-700">
+                {productsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-24 gap-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    <p className="font-bold text-muted-foreground">جاري عرض منتجات المتجر...</p>
+                  </div>
+                ) : vendorProducts?.length === 0 ? (
+                  <div className="py-24 text-center space-y-4 bg-white rounded-2xl border-2 border-dashed border-gray-100">
+                    <ShoppingBag className="w-16 h-16 text-gray-200 mx-auto" />
+                    <p className="text-lg font-black text-muted-foreground">لا توجد منتجات معروضة حالياً لهذا الشريك.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {vendorProducts?.map((p: any) => (
+                      <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col group border border-border/40">
+                        <div className="relative aspect-square overflow-hidden bg-gray-50">
+                          <Image 
+                            src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
+                            alt={p.name_ar} 
+                            fill 
+                            className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                          />
+                          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent backdrop-blur-[1px] opacity-70 group-hover:opacity-90 transition-opacity" />
+                          
+                          <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
+                          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                            {Number(p.discount) > 0 && (
+                              <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                                %{p.discount.toLocaleString('en-US')} خصم
+                              </Badge>
+                            )}
+                            <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[9px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
+                              {p.in_stock ? 'متوفر' : 'غير متوفر'}
                             </Badge>
                           </div>
                         </div>
+                        <div className="p-4 flex flex-col flex-1 gap-3">
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{p.name_ar}</h4>
+                            <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
+                              <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
+                              <Star className="w-3 h-3 fill-current" />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Store className="w-4 h-4 text-primary" />
+                              <span className="text-[10px] font-bold">{vendor.business_name}</span>
+                            </div>
+                            <div className="w-fit">
+                              <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
+                                {p.category_id}
+                              </Badge>
+                            </div>
+                          </div>
 
-                        <div className="mt-auto pt-2 space-y-4">
-                           <div className="flex items-center gap-2">
-                              <span className="text-lg font-black text-secondary">{(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
-                              {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>}
-                           </div>
-                           <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
-                              <ShoppingBag className="w-4 h-4" /> إضافة للسلة
-                           </Button>
+                          <div className="mt-auto pt-2 space-y-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-lg font-black text-secondary">{(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
+                                {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>}
+                            </div>
+                            <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
+                                <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            )}
 
             <TabsContent value="gallery" className="animate-in fade-in duration-700">
                {vendor.gallery.length > 0 ? (
@@ -286,7 +301,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
             <TabsContent value="about" className="animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-10 order-1">
+                <div className="lg:col-span-2 space-y-10">
                   <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                     <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
                        <Info className="w-6 h-6 text-primary" /> نبذة عن الشريك
@@ -326,7 +341,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   )}
                 </div>
 
-                <div className="space-y-10 order-2">
+                <div className="space-y-10">
                    <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
                       <div className="relative z-10 space-y-4">
