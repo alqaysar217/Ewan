@@ -41,7 +41,7 @@ export default function Header() {
 
   // جلب بيانات المستخدم لمعرفة الدور (Role) مع تثبيت المرجع
   const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
-  const { data: userData, loading: docLoading } = useDoc(userDocRef);
+  const { data: userData } = useDoc(userDocRef);
 
   const handleLogout = async () => {
     try {
@@ -59,7 +59,7 @@ export default function Header() {
     { href: "/", label: "الرئيسية", icon: Home },
     { href: "/vendors", label: "المتاجر", icon: Store },
     { href: "/shop", label: "المنتجات", icon: LayoutGrid },
-    { href: "/professionals", label: "النجارين والتجار", icon: Users },
+    { href: "/professionals", label: "المصممين والنجارين", icon: Users },
     { href: "/about", label: "حول المنصة", icon: Info },
     { href: "/contact", label: "التواصل", icon: Phone },
   ];
