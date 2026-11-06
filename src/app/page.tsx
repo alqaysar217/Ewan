@@ -269,13 +269,13 @@ export default function HomePage() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={containerVariants}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8"
               >
                 {featuredProducts.map((product, idx) => (
                   <motion.div 
                     key={product.id} 
                     variants={itemFadeUp}
-                    className="bg-card rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40"
+                    className="bg-card rounded-[15px] md:rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40"
                   >
                     <div className="relative aspect-square overflow-hidden bg-muted/10">
                       <Image 
@@ -288,35 +288,35 @@ export default function HomePage() {
                       
                       <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
                       {product.discount > 0 && (
-                        <div className="absolute top-3 right-3 z-20">
-                          <Badge className="bg-accent text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                        <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20">
+                          <Badge className="bg-accent text-white font-black rounded-md md:rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 shadow-sm border-none text-[8px] md:text-[10px]">
                             %{product.discount.toLocaleString('en-US')} خصم
                           </Badge>
                         </div>
                       )}
                     </div>
-                    <div className="p-4 flex flex-col flex-1 gap-3">
+                    <div className="p-3 md:p-4 flex flex-col flex-1 gap-2 md:gap-3">
                       <div className="flex justify-between items-start">
-                        <h4 className="text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{product.name}</h4>
-                        <div className="flex items-center gap-1 text-accent shrink-0 mr-2">
-                          <span className="text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
-                          <Star className="w-3 h-3 fill-current" />
+                        <h4 className="text-sm md:text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{product.name}</h4>
+                        <div className="flex items-center gap-0.5 md:gap-1 text-accent shrink-0 mr-1 md:mr-2">
+                          <span className="text-[10px] md:text-xs font-black">{product.rating.toLocaleString('en-US')}</span>
+                          <Star className="w-2.5 h-2.5 md:w-3 md:h-3 fill-current" />
                         </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Store className="w-4 h-4 text-accent" />
-                          <span className="text-xs font-bold">{product.store}</span>
+                      <div className="space-y-1 md:space-y-2">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Store className="w-3 h-3 md:w-4 md:h-4 text-accent" />
+                          <span className="text-[10px] md:text-xs font-bold">{product.store}</span>
                         </div>
                       </div>
 
-                      <div className="mt-auto pt-2 space-y-4">
+                      <div className="mt-auto pt-1 md:pt-2 space-y-2 md:space-y-4">
                         <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                             <span className="text-lg font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال</span></span>
+                          <div className="flex items-center gap-1 md:gap-2">
+                             <span className="text-base md:text-lg font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-[9px] md:text-[10px] font-bold">ريال</span></span>
                              {product.oldPrice > product.price && (
-                               <span className="text-xs font-bold text-muted-foreground line-through opacity-50">{product.oldPrice.toLocaleString('en-US')}</span>
+                               <span className="text-[10px] md:text-xs font-bold text-muted-foreground line-through opacity-50">{product.oldPrice.toLocaleString('en-US')}</span>
                              )}
                           </div>
                         </div>
@@ -328,9 +328,9 @@ export default function HomePage() {
                             image: product.img,
                             quantity: 1
                           })}
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black gap-2 h-11 rounded-xl transition-all shadow-sm"
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black gap-1 md:gap-2 h-9 md:h-11 rounded-lg md:rounded-xl transition-all shadow-sm text-[10px] md:text-sm px-2"
                         >
-                          <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                          <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4" /> إضافة للسلة
                         </Button>
                       </div>
                     </div>

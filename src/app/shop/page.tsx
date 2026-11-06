@@ -300,9 +300,9 @@ export default function ShopPage() {
                 </div>
 
                 <div className={cn(
-                  "grid gap-8", 
+                  "grid gap-3 md:gap-8", 
                   viewType === 'grid' 
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4" 
                     : "grid-cols-1"
                 )}>
                   {filteredProducts.map((p: any) => {
@@ -312,7 +312,7 @@ export default function ShopPage() {
                     
                     return (
                       <div key={p.id} className={cn(
-                        "bg-white rounded-[24px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex group border border-border/40",
+                        "bg-white rounded-[15px] md:rounded-[24px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex group border border-border/40",
                         viewType === 'grid' ? "flex-col" : "flex-col md:flex-row h-auto md:h-64"
                       )}>
                         <div className={cn(
@@ -328,14 +328,14 @@ export default function ShopPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity" />
                           
                           <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
-                          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                          <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20 flex flex-col gap-1 md:gap-2">
                              {Number(p.discount) > 0 && (
-                               <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                               <Badge className="bg-secondary text-white font-black rounded-md md:rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 shadow-sm border-none text-[8px] md:text-[10px]">
                                  %{p.discount.toLocaleString('en-US')} خصم
                                </Badge>
                              )}
                              <Badge className={cn(
-                               "font-black px-2 py-1 rounded-md border-none shadow-sm text-[9px]", 
+                               "font-black px-1.5 py-0.5 md:px-2 md:py-1 rounded-md border-none shadow-sm text-[8px] md:text-[9px]", 
                                p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white"
                              )}>
                                {p.in_stock ? 'متوفر' : 'غير متوفر'}
@@ -343,28 +343,28 @@ export default function ShopPage() {
                           </div>
                         </div>
 
-                        <div className="p-5 flex flex-col flex-1 gap-4">
-                          <div className="flex justify-between items-start gap-4">
-                            <div className="space-y-1 flex-1">
-                              <h4 className="text-lg font-black text-secondary leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name_ar}</h4>
-                              <div className="flex items-center gap-1.5 text-muted-foreground">
-                                <Store className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-xs font-bold">{vendor?.business_name || 'إيوان المعتمد'}</span>
+                        <div className="p-3 md:p-5 flex flex-col flex-1 gap-2 md:gap-4">
+                          <div className="flex justify-between items-start gap-2 md:gap-4">
+                            <div className="space-y-0.5 md:space-y-1 flex-1">
+                              <h4 className="text-sm md:text-lg font-black text-secondary leading-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name_ar}</h4>
+                              <div className="flex items-center gap-1 md:gap-1.5 text-muted-foreground">
+                                <Store className="w-3 md:w-3.5 h-3 md:h-3.5 text-primary" />
+                                <span className="text-[9px] md:text-xs font-bold">{vendor?.business_name || 'إيوان المعتمد'}</span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1 text-amber-500 shrink-0 bg-amber-50 px-2 py-0.5 rounded-lg">
-                              <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
-                              <Star className="w-3 h-3 fill-current" />
+                            <div className="flex items-center gap-0.5 md:gap-1 text-amber-500 shrink-0 bg-amber-50 px-1.5 md:px-2 py-0.5 rounded-lg">
+                              <span className="text-[9px] md:text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
+                              <Star className="w-2.5 md:w-3 h-2.5 md:h-3 fill-current" />
                             </div>
                           </div>
 
-                          <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between gap-4">
-                            <div className="flex flex-col">
-                              <span className="text-xl font-black text-secondary">
-                                {productPrice.toLocaleString('en-US')} <span className="text-[10px] font-bold">ر.ي</span>
+                          <div className="mt-auto pt-2 md:pt-4 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-2 md:gap-4">
+                            <div className="flex flex-col items-center sm:items-start w-full sm:w-auto">
+                              <span className="text-base md:text-xl font-black text-secondary">
+                                {productPrice.toLocaleString('en-US')} <span className="text-[9px] md:text-[10px] font-bold">ر.ي</span>
                               </span>
                               {Number(p.old_price) > 0 && (
-                                <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>
+                                <span className="text-[10px] md:text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>
                               )}
                             </div>
                             <Button 
@@ -375,9 +375,9 @@ export default function ShopPage() {
                                 image: productImage,
                                 quantity: 1
                               })}
-                              className="bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-10 px-6 rounded-xl transition-all shadow-sm"
+                              className="bg-secondary hover:bg-secondary/90 text-white font-black gap-1 md:gap-2 h-9 md:h-10 px-4 md:px-6 rounded-lg md:rounded-xl transition-all shadow-sm w-full sm:w-auto text-[10px] md:text-sm"
                             >
-                              <ShoppingBag className="w-4 h-4" /> إضافة
+                              <ShoppingBag className="w-3.5 md:w-4 h-3.5 md:h-4" /> إضافة
                             </Button>
                           </div>
                         </div>

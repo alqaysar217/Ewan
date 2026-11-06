@@ -172,9 +172,9 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                     <p className="text-lg font-black text-muted-foreground">لا توجد منتجات معروضة حالياً لهذا الشريك.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-8">
                     {vendorProducts?.map((p: any) => (
-                      <div key={p.id} className="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col group border border-border/40">
+                      <div key={p.id} className="bg-white rounded-[15px] md:rounded-[20px] shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col group border border-border/40">
                         <div className="relative aspect-square overflow-hidden bg-gray-50">
                           <Image 
                             src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
@@ -185,40 +185,40 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent backdrop-blur-[1px] opacity-70 group-hover:opacity-90 transition-opacity" />
                           
                           <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
-                          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                          <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20 flex flex-col gap-1 md:gap-2">
                             {Number(p.discount) > 0 && (
-                              <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
+                              <Badge className="bg-secondary text-white font-black rounded-md md:rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 shadow-sm border-none text-[8px] md:text-[10px]">
                                 %{p.discount.toLocaleString('en-US')} خصم
                               </Badge>
                             )}
-                            <Badge className={cn("font-black px-2 py-1 rounded-md border-none shadow-sm text-[9px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
+                            <Badge className={cn("font-black px-1.5 py-0.5 md:px-2 md:py-1 rounded-md border-none shadow-sm text-[8px] md:text-[9px]", p.in_stock ? "bg-emerald-500 text-white" : "bg-destructive text-white")}>
                               {p.in_stock ? 'متوفر' : 'غير متوفر'}
                             </Badge>
                           </div>
                         </div>
-                        <div className="p-4 flex flex-col flex-1 gap-3">
-                          <div className="flex justify-between items-start">
-                            <h4 className="text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{p.name_ar}</h4>
-                            <div className="flex items-center gap-1 text-amber-500 shrink-0 mr-2">
-                              <span className="text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
-                              <Star className="w-3 h-3 fill-current" />
+                        <div className="p-3 md:p-4 flex flex-col flex-1 gap-2 md:gap-3">
+                          <div className="flex justify-between items-start gap-2">
+                            <h4 className="text-sm md:text-base font-black text-secondary flex-1 leading-tight line-clamp-1">{p.name_ar}</h4>
+                            <div className="flex items-center gap-0.5 md:gap-1 text-amber-500 shrink-0 mr-1 md:mr-2">
+                              <span className="text-[9px] md:text-xs font-black">{(p.rating || 5.0).toLocaleString('en-US')}</span>
+                              <Star className="w-2.5 md:w-3 h-2.5 md:h-3 fill-current" />
                             </div>
                           </div>
                           
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Store className="w-4 h-4 text-primary" />
-                              <span className="text-[10px] font-bold">{vendor.business_name}</span>
+                          <div className="space-y-1 md:space-y-2">
+                            <div className="flex items-center gap-1 md:gap-1.5 text-muted-foreground">
+                              <Store className="w-3 md:w-4 h-3 md:h-4 text-primary" />
+                              <span className="text-[9px] md:text-[10px] font-bold">{vendor.business_name}</span>
                             </div>
                           </div>
 
-                          <div className="mt-auto pt-2 space-y-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-lg font-black text-secondary">{(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ريال يمني</span></span>
-                                {Number(p.old_price) > 0 && <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>}
+                          <div className="mt-auto pt-1 md:pt-2 space-y-2 md:space-y-4">
+                            <div className="flex items-center gap-1 md:gap-2">
+                                <span className="text-base md:text-lg font-black text-secondary">{(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[9px] md:text-[10px] font-bold">ريال</span></span>
+                                {Number(p.old_price) > 0 && <span className="text-[10px] md:text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>}
                             </div>
-                            <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
-                                <ShoppingBag className="w-4 h-4" /> إضافة للسلة
+                            <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-black gap-1 md:gap-2 h-9 md:h-11 rounded-lg md:rounded-xl transition-all shadow-sm text-[10px] md:text-sm px-2">
+                                <ShoppingBag className="w-3.5 md:w-4 h-3.5 md:h-4" /> إضافة للسلة
                             </Button>
                           </div>
                         </div>
@@ -231,12 +231,12 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
             <TabsContent value="gallery" className="animate-in fade-in duration-700">
                {vendor.gallery.length > 0 ? (
-                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                     {vendor.gallery.map((img: string, i: number) => (
-                      <div key={i} className="group relative aspect-[4/5] rounded-[20px] overflow-hidden border border-border/50 shadow-sm hover:shadow-xl transition-all cursor-pointer">
+                      <div key={i} className="group relative aspect-[4/5] rounded-[15px] md:rounded-[20px] overflow-hidden border border-border/50 shadow-sm hover:shadow-xl transition-all cursor-pointer">
                         <Image src={img} alt={`Work ${i}`} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                           <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white"><Sparkles className="w-6 h-6" /></div>
+                           <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white"><Sparkles className="w-5 h-5 md:w-6 md:h-6" /></div>
                         </div>
                       </div>
                     ))}
@@ -250,39 +250,39 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             </TabsContent>
 
             <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
-               <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
+               <div className="bg-primary/5 p-8 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
                  <div className="text-right space-y-2">
-                   <h3 className="text-6xl md:text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
-                   <div className="flex gap-2 justify-start text-amber-500 mb-2">
-                     {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-8 h-8", i < Math.floor(vendor.average_rating) ? "fill-current" : "fill-none")} />)}
+                   <h3 className="text-5xl md:text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
+                   <div className="flex gap-1.5 md:gap-2 justify-start text-amber-500 mb-2">
+                     {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-6 h-6 md:w-8 md:h-8", i < Math.floor(vendor.average_rating) ? "fill-current" : "fill-none")} />)}
                    </div>
-                   <p className="text-muted-foreground font-black text-lg">بناءً على {vendor.reviewsCount.toLocaleString('en-US')} تجربة عملاء موثقة</p>
+                   <p className="text-base md:text-lg text-muted-foreground font-black">بناءً على {vendor.reviewsCount.toLocaleString('en-US')} تجربة عملاء موثقة</p>
                  </div>
-                 <Button className="w-full md:w-auto h-16 px-12 rounded-xl bg-secondary text-white font-black text-xl shadow-2xl">أضف تقييمك الآن</Button>
+                 <Button className="w-full md:w-auto h-14 md:h-16 px-10 md:px-12 rounded-xl bg-secondary text-white font-black text-lg md:text-xl shadow-2xl">أضف تقييمك الآن</Button>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                  {(vendorData?.reviews || []).length > 0 ? (
                    vendorData.reviews.map((rev: any, i: number) => (
-                    <div key={i} className="p-8 bg-white border border-border/50 rounded-2xl space-y-6 shadow-sm hover:shadow-lg transition-all relative">
-                      <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/5" />
+                    <div key={i} className="p-6 md:p-8 bg-white border border-border/50 rounded-2xl space-y-4 md:space-y-6 shadow-sm hover:shadow-lg transition-all relative">
+                      <Quote className="absolute top-4 right-4 md:top-6 md:right-6 w-8 h-8 md:w-10 md:h-10 text-primary/5" />
                       <div className="flex flex-row justify-between items-start">
-                        <div className="flex flex-row items-center gap-4 text-right">
-                          <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center font-black text-secondary text-xl border-2 border-primary/10">
+                        <div className="flex flex-row items-center gap-3 md:gap-4 text-right">
+                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gray-100 flex items-center justify-center font-black text-secondary text-lg md:text-xl border-2 border-primary/10">
                             {rev.name?.[0] || 'ع'}
                           </div>
-                          <div className="space-y-1">
-                            <p className="font-black text-secondary text-lg">{rev.name}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold justify-start">
-                              <Calendar className="w-3.5 h-3.5" /> {rev.date || 'الآن'}
+                          <div className="space-y-0.5 md:space-y-1">
+                            <p className="font-black text-secondary text-base md:text-lg">{rev.name}</p>
+                            <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-muted-foreground font-bold justify-start">
+                              <Calendar className="w-3 md:w-3.5 h-3 md:h-3.5" /> {rev.date || 'الآن'}
                             </div>
                           </div>
                         </div>
-                        <div className="flex text-amber-500 gap-1">
-                          {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-4 h-4", i < (rev.rating || 5) ? "fill-current" : "fill-none")} />)}
+                        <div className="flex text-amber-500 gap-0.5 md:gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-3.5 h-3.5 md:w-4 h-4", i < (rev.rating || 5) ? "fill-current" : "fill-none")} />)}
                         </div>
                       </div>
-                      <p className="text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20 text-right">"{rev.text}"</p>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20 text-right">"{rev.text}"</p>
                     </div>
                    ))
                  ) : (
@@ -295,40 +295,40 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             </TabsContent>
 
             <TabsContent value="about" className="animate-in fade-in duration-700">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-10">
-                  <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
-                    <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
-                       <Info className="w-6 h-6 text-primary" /> نبذة عن الشريك
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
+                <div className="lg:col-span-2 space-y-8 md:space-y-10">
+                  <div className="bg-white p-6 md:p-10 rounded-2xl border border-border/50 shadow-sm space-y-4 md:space-y-6">
+                    <h3 className="text-xl md:text-2xl font-black text-secondary flex items-center gap-3">
+                       <Info className="w-5 md:w-6 h-5 md:h-6 text-primary" /> نبذة عن الشريك
                     </h3>
-                    <p className="text-xl leading-relaxed text-muted-foreground font-medium text-justify">
+                    <p className="text-base md:text-xl leading-relaxed text-muted-foreground font-medium text-justify">
                       {vendor.description}
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6 pt-4 md:pt-6">
                       {vendor.stats.map((stat, i) => (
-                        <div key={i} className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border border-gray-100 group hover:bg-primary/5 transition-all text-center">
-                          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                            <stat.icon className="w-7 h-7" />
+                        <div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-gray-50 rounded-2xl border border-gray-100 group hover:bg-primary/5 transition-all text-center">
+                          <div className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                            <stat.icon className="w-5 h-5 md:w-7 md:h-7" />
                           </div>
-                          <span className="text-3xl font-black text-secondary mb-1">{stat.value}</span>
-                          <span className="text-sm font-bold text-muted-foreground">{stat.label}</span>
+                          <span className="text-xl md:text-3xl font-black text-secondary mb-0.5 md:mb-1">{stat.value}</span>
+                          <span className="text-[10px] md:text-sm font-bold text-muted-foreground">{stat.label}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {vendor.service_areas && vendor.service_areas.length > 0 && (
-                    <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
-                      <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
-                         <Map className="w-6 h-6 text-primary" /> نطاق التغطية والخدمة
+                    <div className="bg-white p-6 md:p-10 rounded-2xl border border-border/50 shadow-sm space-y-4 md:space-y-6">
+                      <h3 className="text-xl md:text-2xl font-black text-secondary flex items-center gap-3">
+                         <Map className="w-5 md:w-6 h-5 md:h-6 text-primary" /> نطاق التغطية والخدمة
                       </h3>
-                      <p className="text-muted-foreground font-medium">يقدم هذا الشريك خدماته اللوجستية وتوصيل المنتجات للمناطق التالية:</p>
-                      <div className="flex flex-wrap gap-4 pt-2">
+                      <p className="text-sm md:text-base text-muted-foreground font-medium">يقدم هذا الشريك خدماته اللوجستية وتوصيل المنتجات للمناطق التالية:</p>
+                      <div className="flex flex-wrap gap-3 md:gap-4 pt-2">
                         {vendor.service_areas.map((area: string) => (
-                          <div key={area} className="flex items-center gap-3 bg-primary/5 border border-primary/10 rounded-xl px-6 py-3 transition-all hover:bg-primary hover:text-white group">
-                            <MapPin className="w-4 h-4 text-primary group-hover:text-white" />
-                            <span className="font-black text-lg">{area}</span>
+                          <div key={area} className="flex items-center gap-2 md:gap-3 bg-primary/5 border border-primary/10 rounded-xl px-4 md:px-6 py-2 md:py-3 transition-all hover:bg-primary hover:text-white group">
+                            <MapPin className="w-3.5 md:w-4 h-3.5 md:h-4 text-primary group-hover:text-white" />
+                            <span className="font-black text-base md:text-lg">{area}</span>
                           </div>
                         ))}
                       </div>
@@ -336,33 +336,33 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   )}
                 </div>
 
-                <div className="space-y-10">
-                   <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
-                      <div className="relative z-10 space-y-4">
-                        <Award className="w-12 h-12 text-primary" />
-                        <h4 className="text-2xl font-black">ضمان إيوان المعتمد</h4>
-                        <p className="text-gray-300 font-medium leading-relaxed">
+                <div className="space-y-8 md:space-y-10">
+                   <div className="bg-secondary text-white p-8 md:p-10 rounded-2xl space-y-6 md:space-y-8 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-primary/10 rotate-45 -translate-y-12 md:-translate-y-16 translate-x-12 md:translate-x-16 transition-transform group-hover:scale-125" />
+                      <div className="relative z-10 space-y-3 md:space-y-4">
+                        <Award className="w-10 h-10 md:w-12 md:h-12 text-primary" />
+                        <h4 className="text-xl md:text-2xl font-black">ضمان إيوان المعتمد</h4>
+                        <p className="text-sm md:text-gray-300 font-medium leading-relaxed">
                           هذا الشريك يخضع لرقابة دورية من قبل منصة إيوان لضمان جودة التصنيع والالتزام بمواعيد التوصيل والتركيب.
                         </p>
                       </div>
                       <Separator className="bg-white/10" />
-                      <div className="flex items-center gap-4 text-primary">
-                        <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6" />
+                      <div className="flex items-center gap-3 md:gap-4 text-primary">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 rounded-xl flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
                         </div>
-                        <span className="font-black text-lg">شريك استراتيجي معتمد</span>
+                        <span className="font-black text-base md:text-lg">شريك استراتيجي معتمد</span>
                       </div>
                    </div>
 
-                   <div className="bg-white p-8 rounded-2xl border border-border/50 shadow-sm space-y-6">
+                   <div className="bg-white p-6 md:p-8 rounded-2xl border border-border/50 shadow-sm space-y-4 md:space-y-6">
                       <h4 className="font-black text-secondary text-lg border-b pb-4">هل لديك استفسار خاص؟</h4>
-                      <div className="space-y-4">
-                         <Button className="w-full h-14 rounded-xl bg-gray-50 text-secondary border-none hover:bg-gray-100 font-black gap-3">
-                            <Info className="w-5 h-5 text-primary" /> طلب مواصفات مخصصة
+                      <div className="space-y-3 md:space-y-4">
+                         <Button className="w-full h-12 md:h-14 rounded-xl bg-gray-50 text-secondary border-none hover:bg-gray-100 font-black gap-2 md:gap-3 text-sm md:text-base">
+                            <Info className="w-4 md:w-5 h-4 md:h-5 text-primary" /> طلب مواصفات مخصصة
                          </Button>
-                         <Button variant="outline" className="w-full h-14 rounded-xl border-primary text-primary font-black gap-3">
-                            <Calendar className="w-5 h-5" /> حجز موعد زيارة للموقع
+                         <Button variant="outline" className="w-full h-12 md:h-14 rounded-xl border-primary text-primary font-black gap-2 md:gap-3 text-sm md:text-base">
+                            <Calendar className="w-4 md:w-5 h-4 md:h-5" /> حجز موعد زيارة للموقع
                          </Button>
                       </div>
                    </div>
