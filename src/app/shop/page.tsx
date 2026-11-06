@@ -16,7 +16,10 @@ import {
   Search,
   Layers,
   CircleDollarSign,
-  ChevronDown
+  ChevronDown,
+  Palette,
+  Hammer,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +45,10 @@ export default function ShopPage() {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [maxPrice, setMaxPrice] = useState([2000000]);
+  const [styleFilter, setStyleFilter] = useState('all');
+  const [colorFilter, setColorFilter] = useState('all');
+  const [materialFilter, setMaterialFilter] = useState('all');
+  const [maxPrice, setMaxPrice] = useState([3000000]);
   
   const db = useFirestore();
   
@@ -62,16 +68,55 @@ export default function ShopPage() {
     { id: 'office', name: 'الأثاث المكتبي' }
   ];
 
-  // تصفية المنتجات محلياً بناءً على الفلاتر
+  const styles = [
+    { id: 'all', name: 'جميع الأنماط' },
+    { id: 'modern', name: 'مودرن / حديث' },
+    { id: 'classic', name: 'كلاسيك' },
+    { id: 'traditional', name: 'تراثي يمني' },
+    { id: 'minimalist', name: 'بسيط / مينمليست' }
+  ];
+
+  const colors = [
+    { id: 'all', name: 'جميع الألوان' },
+    { id: 'white', name: 'أبيض' },
+    { id: 'black', name: 'أسود' },
+    { id: 'brown', name: 'بني' },
+    { id: 'grey', name: 'رمادي' },
+    { id: 'blue', name: 'أزرق' },
+    { id: 'gold', name: 'ذهبي' }
+  ];
+
+  const materials = [
+    { id: 'all', name: 'جميع المواد' },
+    { id: 'wood', name: 'خشب طبيعي' },
+    { id: 'metal', name: 'معدن' },
+    { id: 'fabric', name: 'قماش فاخر' },
+    { id: 'glass', name: 'زجاج' },
+    { id: 'marble', name: 'رخام' }
+  ];
+
+  // تصفية المنتجات محلياً بناءً على الفلاتر المتقدمة
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     return products.filter((p: any) => {
       const matchesSearch = p.name_ar?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === 'all' || p.category_id === categoryFilter;
+      const matchesStyle = styleFilter === 'all' || p.style === styleFilter;
+      const matchesColor = colorFilter === 'all' || p.color === colorFilter;
+      const matchesMaterial = materialFilter === 'all' || p.material === materialFilter;
       const matchesPrice = (Number(p.price) || 0) <= maxPrice[0];
-      return matchesSearch && matchesCategory && matchesPrice;
+      return matchesSearch && matchesCategory && matchesStyle && matchesColor && matchesMaterial && matchesPrice;
     });
-  }, [products, searchTerm, categoryFilter, maxPrice]);
+  }, [products, searchTerm, categoryFilter, styleFilter, colorFilter, materialFilter, maxPrice]);
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setCategoryFilter('all');
+    setStyleFilter('all');
+    setColorFilter('all');
+    setMaterialFilter('all');
+    setMaxPrice([3000000]);
+  };
 
   return (
     <div className="min-h-screen bg-[#F4F6F5] flex flex-col font-cairo" dir="rtl">
@@ -91,46 +136,110 @@ export default function ShopPage() {
       <main className="container mx-auto py-8 px-4 md:px-8 flex-1">
         <div className="space-y-8">
           
-          {/* Top Horizontal Filter Bar */}
-          <div className="bg-white p-4 md:p-6 rounded-[20px] border border-border/50 shadow-sm">
-             <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6">
+          {/* Top Horizontal Filter Bar - Advanced */}
+          <div className="bg-white p-4 md:p-6 rounded-[24px] border border-border/50 shadow-sm">
+             <div className="flex flex-col gap-6">
                 
-                {/* Search Field */}
-                <div className="w-full lg:flex-1 relative group">
-                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    placeholder="ابحث عن قطعة أثاث بالاسم..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pr-12 h-12 bg-gray-50 border-none shadow-inner rounded-xl font-bold text-base focus-visible:ring-2 focus-visible:ring-primary/20"
-                  />
+                {/* Row 1: Search & Basic Filters */}
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                  <div className="w-full lg:flex-1 relative group">
+                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                    <Input 
+                      placeholder="ابحث عن قطعة أثاث بالاسم..." 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pr-12 h-14 bg-gray-50 border-none shadow-inner rounded-xl font-bold text-base focus-visible:ring-2 focus-visible:ring-primary/20"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl shadow-inner shrink-0">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setViewType('grid')} 
+                      className={cn("h-11 w-11 rounded-lg transition-all", viewType === 'grid' ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-secondary")}
+                    >
+                      <LayoutGrid className="w-5 h-5" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setViewType('list')} 
+                      className={cn("h-11 w-11 rounded-lg transition-all", viewType === 'list' ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-secondary")}
+                    >
+                      <List className="w-5 h-5" />
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Filters Row */}
-                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                {/* Row 2: Advanced Select Filters */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {/* Category Filter */}
-                  <div className="min-w-[160px] flex-1 sm:flex-initial">
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className="h-12 rounded-xl border-none bg-gray-50 font-bold px-4 shadow-inner focus:ring-2 focus:ring-primary/20">
-                        <div className="flex items-center gap-2">
-                           <Layers className="w-4 h-4 text-primary" />
-                           <SelectValue placeholder="القسم" />
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
-                        {categories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.id} className="font-bold py-3">{cat.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="h-12 rounded-xl border-none bg-gray-50 font-bold px-4 shadow-inner focus:ring-2 focus:ring-primary/20">
+                      <div className="flex items-center gap-2">
+                         <Layers className="w-4 h-4 text-primary" />
+                         <SelectValue placeholder="القسم" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
+                      {categories.map(cat => (
+                        <SelectItem key={cat.id} value={cat.id} className="font-bold py-3">{cat.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                  {/* Price Range Popover */}
+                  {/* Style Filter */}
+                  <Select value={styleFilter} onValueChange={setStyleFilter}>
+                    <SelectTrigger className="h-12 rounded-xl border-none bg-gray-50 font-bold px-4 shadow-inner focus:ring-2 focus:ring-primary/20">
+                      <div className="flex items-center gap-2">
+                         <Sparkles className="w-4 h-4 text-primary" />
+                         <SelectValue placeholder="النمط" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
+                      {styles.map(s => (
+                        <SelectItem key={s.id} value={s.id} className="font-bold py-3">{s.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Material Filter */}
+                  <Select value={materialFilter} onValueChange={setMaterialFilter}>
+                    <SelectTrigger className="h-12 rounded-xl border-none bg-gray-50 font-bold px-4 shadow-inner focus:ring-2 focus:ring-primary/20">
+                      <div className="flex items-center gap-2">
+                         <Hammer className="w-4 h-4 text-primary" />
+                         <SelectValue placeholder="المادة" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
+                      {materials.map(m => (
+                        <SelectItem key={m.id} value={m.id} className="font-bold py-3">{m.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Color Filter */}
+                  <Select value={colorFilter} onValueChange={setColorFilter}>
+                    <SelectTrigger className="h-12 rounded-xl border-none bg-gray-50 font-bold px-4 shadow-inner focus:ring-2 focus:ring-primary/20">
+                      <div className="flex items-center gap-2">
+                         <Palette className="w-4 h-4 text-primary" />
+                         <SelectValue placeholder="اللون" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
+                      {colors.map(c => (
+                        <SelectItem key={c.id} value={c.id} className="font-bold py-3">{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Budget Filter */}
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="h-12 rounded-xl bg-gray-50 border-none px-6 font-bold shadow-inner flex items-center gap-2 flex-1 sm:flex-initial">
+                      <Button variant="outline" className="h-12 rounded-xl bg-gray-50 border-none px-4 font-bold shadow-inner flex items-center gap-2">
                         <CircleDollarSign className="w-4 h-4 text-primary" />
-                        الميزانية
+                        <span>الميزانية</span>
                         <ChevronDown className="w-4 h-4 opacity-50 mr-auto" />
                       </Button>
                     </PopoverTrigger>
@@ -138,8 +247,8 @@ export default function ShopPage() {
                       <div className="space-y-6">
                         <h4 className="font-black text-secondary text-sm">حدد سقف السعر (ر.ي)</h4>
                         <Slider 
-                          defaultValue={[2000000]} 
-                          max={3000000} 
+                          defaultValue={[3000000]} 
+                          max={5000000} 
                           step={50000} 
                           value={maxPrice} 
                           onValueChange={setMaxPrice} 
@@ -151,26 +260,6 @@ export default function ShopPage() {
                       </div>
                     </PopoverContent>
                   </Popover>
-
-                  {/* View Toggles */}
-                  <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-xl shadow-inner ml-auto sm:ml-0">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => setViewType('grid')} 
-                      className={cn("h-10 w-10 rounded-lg transition-all", viewType === 'grid' ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-secondary")}
-                    >
-                      <LayoutGrid className="w-5 h-5" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => setViewType('list')} 
-                      className={cn("h-10 w-10 rounded-lg transition-all", viewType === 'list' ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-secondary")}
-                    >
-                      <List className="w-5 h-5" />
-                    </Button>
-                  </div>
                 </div>
              </div>
           </div>
@@ -180,7 +269,7 @@ export default function ShopPage() {
             {productsLoading ? (
               <div className="flex flex-col items-center justify-center py-40 gap-4">
                 <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                <p className="font-black text-muted-foreground">جاري عرض الكتالوج...</p>
+                <p className="font-black text-muted-foreground">جاري عرض الكتالوج المخصص...</p>
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="py-32 text-center space-y-6 bg-white rounded-[24px] border-2 border-dashed border-gray-100">
@@ -189,14 +278,14 @@ export default function ShopPage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-2xl font-black text-secondary">لا توجد قطع تطابق بحثك</p>
-                  <p className="text-muted-foreground font-bold">جرب تغيير الفلاتر أو الميزانية لرؤية المزيد.</p>
+                  <p className="text-muted-foreground font-bold">جرب تغيير الأنماط أو الميزانية لرؤية المزيد.</p>
                 </div>
                 <Button 
                   variant="outline" 
-                  onClick={() => { setSearchTerm(''); setCategoryFilter('all'); setMaxPrice([2000000]); }} 
+                  onClick={resetFilters} 
                   className="rounded-xl font-black h-12 px-8"
                 >
-                  إعادة تعيين الفلاتر
+                  إعادة تعيين كافة الفلاتر
                 </Button>
               </div>
             ) : (
@@ -268,9 +357,9 @@ export default function ShopPage() {
                             <Badge variant="outline" className="text-[9px] font-bold text-primary border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full uppercase">
                               {p.category_id}
                             </Badge>
-                            {p.material && (
+                            {p.style && (
                               <Badge variant="outline" className="text-[9px] font-bold text-muted-foreground border-border px-2 py-0.5 rounded-full">
-                                {p.material}
+                                {styles.find(s => s.id === p.style)?.name || p.style}
                               </Badge>
                             )}
                           </div>
