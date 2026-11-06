@@ -9,6 +9,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Send, Bot, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// تفعيل زيادة مهلة التنفيذ لـ 60 ثانية على Vercel
+export const maxDuration = 60;
+
 export default function AITestPage() {
   const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string, prompt?: string}[]>([]);
   const [input, setInput] = useState('');
@@ -29,8 +32,9 @@ export default function AITestPage() {
       });
 
       setMessages(prev => [...prev, { role: 'ai', text: result.text, prompt: result.imagePrompt }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'خطأ في الاتصال بالنموذج.' }]);
+    } catch (error: any) {
+      console.error("AI Test Client Error:", error);
+      setMessages(prev => [...prev, { role: 'ai', text: `⚠️ خطأ في الاتصال بالنموذج: ${error.message || 'فشل غير متوقع'}. قد يكون السبب انتهاء مهلة 10 ثوانٍ في Vercel Hobby.` }]);
     } finally {
       setLoading(false);
     }
@@ -44,7 +48,7 @@ export default function AITestPage() {
           <h1 className="text-3xl font-black text-secondary flex items-center justify-center gap-3">
              <Bot className="w-8 h-8 text-primary" /> اختبار إيوان AI
           </h1>
-          <p className="text-muted-foreground font-bold">هذه الصفحة لاختبار نموذج Gemma من خلال OpenRouter</p>
+          <p className="text-muted-foreground font-bold">اختبار استجابة Gemma 2 عبر OpenRouter</p>
         </div>
 
         <Card className="rounded-[30px] border-none shadow-2xl overflow-hidden bg-white min-h-[500px] flex flex-col">
@@ -85,7 +89,7 @@ export default function AITestPage() {
             {loading && (
               <div className="flex items-center gap-3 text-muted-foreground animate-pulse">
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span className="text-xs font-bold">إيوان AI يفكر...</span>
+                <span className="text-xs font-bold">إيوان AI يفكر... (قد يستغرق 30-60 ثانية)</span>
               </div>
             )}
           </CardContent>

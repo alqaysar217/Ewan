@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Zap, 
-  Upload, 
   Palette, 
   Wallet, 
   Ruler, 
@@ -15,16 +14,10 @@ import {
   ArrowLeft, 
   ArrowRight,
   Info,
-  Maximize2,
   Home,
-  Coins,
-  Search,
-  Layout,
   ShoppingBag,
   Camera,
   Layers,
-  ChevronRight,
-  Star,
   ImageIcon,
   Check,
   Box,
@@ -33,7 +26,6 @@ import {
   FileText,
   Quote,
   RefreshCcw,
-  AlertTriangle,
   Copy,
   ClipboardCheck
 } from 'lucide-react';
@@ -51,13 +43,20 @@ import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ewanAiChat } from '@/ai/flows/ewan-ai-flow';
 
+// هذه الإعدادات تطلب من Vercel زيادة مهلة التنفيذ لـ 60 ثانية لهذه الصفحة
+export const maxDuration = 60;
+
 const ROOM_TYPES = [
   { id: 'living', name: 'غرفة معيشة', icon: Home },
   { id: 'bedroom', name: 'غرفة نوم', icon: Layers },
-  { id: 'kitchen', name: 'مطبخ', icon: Layout },
+  { id: 'kitchen', name: 'مطبخ', icon: LayoutGrid },
   { id: 'majlis', name: 'مجلس عربي', icon: Palette },
   { id: 'office', name: 'مكتب منزلي', icon: Ruler }
 ];
+
+const LayoutGrid = Layout; // كاختصار للأيقونة
+
+function Layout() { return <Layers className="w-full h-full" />; }
 
 const DESIGN_STYLES = [
   { id: 'modern', name: 'مودرن حديث', img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=400' },
@@ -90,7 +89,7 @@ const compressImage = (base64Str: string, maxWidth = 800): Promise<string> => {
       canvas.height = height;
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+      resolve(canvas.toDataURL('image/jpeg', 0.6));
     };
   });
 };
@@ -143,7 +142,7 @@ export default function AIDesignStudio() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast({ title: "تم النسخ بنجاح", description: "يمكنك الآن لصق البرومبت في محرك الصور." });
+      toast({ title: "تم النسخ بنجاح" });
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       console.error('Failed to copy: ', err);
@@ -181,7 +180,7 @@ export default function AIDesignStudio() {
     setError(null);
     try {
       const aiResponse = await ewanAiChat({
-        message: `قم بتحليل وتصميم مساحة لغرفة من نوع ${ROOM_TYPES.find(t => t.id === roomType)?.name} بمساحة ${roomArea}م² ونمط ${DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}. الحالة الحالية للغرفة هي ${getRoomStatusLabel(roomStatus)}. اقترح أفضل توزيع للأثاث وتنسيق للألوان.`,
+        message: `قم بتحليل وتصميم مساحة لغرفة من نوع ${ROOM_TYPES.find(t => t.id === roomType)?.name} بمساحة ${roomArea}م² ونمط ${DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}.`,
         imageDataUri: originalImage || undefined,
         contextData: {
           roomType,
@@ -216,32 +215,20 @@ export default function AIDesignStudio() {
       };
 
       await addDoc(collection(db, 'ai_design_requests'), requestData);
-      
       setStep(7);
-      
-      toast({
-        title: "اكتمل تحليل التصميم!",
-        description: "لقد أعد لك المصمم الذكي رؤية فنية لمساحتك.",
-      });
+      toast({ title: "اكتمل تحليل التصميم!" });
     } catch (err: any) {
       console.error(err);
       setError(err.message || "حدث خطأ في الاتصال بالذكاء الاصطناعي.");
       toast({ 
         variant: "destructive", 
         title: "فشل المعالجة", 
-        description: "يرجى التأكد من استقرار الإنترنت." 
+        description: "انتهت مهلة الطلب أو هناك مشكلة في المفتاح." 
       });
     } finally {
       setIsSaving(false);
     }
   };
-
-  function getRoomStatusLabel(id: string) {
-    if (id === 'empty') return 'فارغة تماماً';
-    if (id === 'partially_furnished') return 'مؤثثة جزئياً';
-    if (id === 'fully_furnished') return 'مؤثثة بالكامل';
-    return id;
-  }
 
   const handleReset = () => {
     setStep(1);
@@ -249,87 +236,73 @@ export default function AIDesignStudio() {
     setAiResult(null);
     setError(null);
     setSelectedProductIds([]);
-    setCopied(false);
   };
 
   return (
     <div className="min-h-screen bg-[#F4F6F5] flex flex-col font-cairo" dir="rtl">
       <Header />
-      <main className="flex-1 py-4 md:py-16">
+      <main className="flex-1 py-4 md:py-10">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
+          <div className="max-w-4xl mx-auto space-y-4">
             
             {step <= totalSteps && (
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex justify-between items-center text-[10px] md:text-sm font-black text-secondary">
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black text-secondary">
                   <span>المرحلة {step} من {totalSteps}</span>
                   <span>{Math.round((step / totalSteps) * 100)}% مكتمل</span>
                 </div>
-                <Progress value={(step / totalSteps) * 100} className="h-1 md:h-1.5 rounded-full" />
+                <Progress value={(step / totalSteps) * 100} className="h-1 rounded-full" />
               </div>
             )}
 
-            <Card className="border-none shadow-xl md:shadow-2xl rounded-[20px] md:rounded-[30px] overflow-hidden bg-white/90 backdrop-blur-xl relative">
+            <Card className="border-none shadow-lg rounded-[20px] md:rounded-[24px] overflow-hidden bg-white relative">
               <AnimatePresence>
                 {isSaving && (
                   <motion.div 
                     initial={{ opacity: 0 }} 
                     animate={{ opacity: 1 }} 
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 md:gap-8 p-6 md:p-12 text-center"
+                    className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 p-6 text-center"
                   >
                     <div className="relative">
                       <motion.div 
                         animate={{ rotate: 360 }} 
                         transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                        className="w-16 h-16 md:w-24 md:h-24 border-4 border-primary/20 border-t-primary rounded-full"
+                        className="w-16 h-16 md:w-20 md:h-20 border-4 border-primary/20 border-t-primary rounded-full"
                       />
-                      <Bot className="w-8 h-8 md:w-12 md:h-12 text-primary absolute inset-0 m-auto animate-pulse" />
+                      <Bot className="w-8 h-8 md:w-10 md:h-10 text-primary absolute inset-0 m-auto animate-pulse" />
                     </div>
-                    <div className="space-y-3 md:space-y-4 max-w-sm">
-                      <h3 className="text-xl md:text-3xl font-black text-secondary">يتم الآن التحليل الذكي...</h3>
-                      <div className="space-y-1.5 md:space-y-2">
-                        <p className="flex items-center justify-center gap-2 text-primary font-bold text-xs md:text-sm">
-                          <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> معالجة البيانات المدخلة
-                        </p>
-                        <p className="flex items-center justify-center gap-2 text-primary font-bold text-xs md:text-sm">
-                          <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> مطابقة الأنماط المعمارية
-                        </p>
-                        <p className="flex items-center justify-center gap-2 text-muted-foreground font-bold text-xs md:text-sm animate-pulse">
-                          <Loader2 className="w-3.5 h-3.5 md:w-4 md:h-4 animate-spin" /> صياغة تقرير المصمم الخبير
-                        </p>
-                      </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl md:text-2xl font-black text-secondary">يتم الآن التحليل الذكي...</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground font-bold animate-pulse">قد يستغرق هذا دقيقة واحدة بناءً على ضغط السيرفر.</p>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               <CardContent className="p-0">
-                <div className="min-h-[400px] md:min-h-[550px] flex flex-col">
-                  <div className="flex-1 p-4 md:p-10 overflow-y-auto">
+                <div className="min-h-[350px] md:min-h-[500px] flex flex-col">
+                  <div className="flex-1 p-4 md:p-8 overflow-y-auto">
                     <AnimatePresence mode="wait">
                       {step === 1 && (
-                        <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4 md:space-y-8">
-                          <div className="text-center space-y-1 md:space-y-2">
-                            <h3 className="text-lg md:text-3xl font-black text-secondary">ابدأ بتحميل صورة غرفتك</h3>
-                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">التقط صورة واضحة لغرفتك الحالية ليتمكن الذكاء الاصطناعي من تحليلها.</p>
+                        <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4 md:space-y-6">
+                          <div className="text-center space-y-1">
+                            <h3 className="text-lg md:text-2xl font-black text-secondary">تحميل صورة الغرفة</h3>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">التقط صورة واضحة لغرفتك الحالية للتحليل.</p>
                           </div>
-                          <div onClick={() => fileInputRef.current?.click()} className="group relative border-2 md:border-4 border-dashed border-gray-100 rounded-[20px] md:rounded-[30px] p-6 md:p-20 text-center hover:border-primary/40 transition-all cursor-pointer bg-gray-50/50 flex flex-col items-center justify-center gap-4 md:gap-6">
+                          <div onClick={() => fileInputRef.current?.click()} className="group relative border-2 border-dashed border-gray-100 rounded-[15px] md:rounded-[20px] p-6 md:p-12 text-center hover:border-primary/40 transition-all cursor-pointer bg-gray-50/50 flex flex-col items-center justify-center gap-4">
                              {originalImage ? (
-                               <div className="relative w-full max-w-lg aspect-video rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
+                               <div className="relative w-full max-w-sm aspect-video rounded-xl overflow-hidden shadow-lg">
                                   <Image src={originalImage} alt="Preview" fill className="object-cover" />
-                                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                     <p className="text-white font-black text-sm">تغيير الصورة</p>
-                                  </div>
                                </div>
                              ) : (
                                <>
-                                 <div className="w-12 h-12 md:w-20 md:h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                   <Camera className="w-6 h-6 md:w-10 md:h-10" />
+                                 <div className="w-10 h-10 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                   <Camera className="w-6 h-6 md:w-8 md:h-8" />
                                  </div>
                                  <div className="space-y-1">
-                                   <p className="text-base md:text-xl font-black text-secondary">انقر للاختيار أو سحب الصورة</p>
-                                   <p className="text-[10px] md:text-sm text-muted-foreground font-bold">يدعم JPG, PNG (بحد أقصى 5 ميجابايت)</p>
+                                   <p className="text-sm md:text-lg font-black text-secondary">انقر للاختيار</p>
+                                   <p className="text-[9px] md:text-xs text-muted-foreground font-bold">JPG, PNG (بحد أقصى 5MB)</p>
                                  </div>
                                </>
                              )}
@@ -339,17 +312,16 @@ export default function AIDesignStudio() {
                       )}
                       
                       {step === 2 && (
-                        <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
-                          <div className="text-center space-y-1 md:space-y-2">
-                            <h3 className="text-lg md:text-3xl font-black text-secondary">ما نوع هذه المساحة؟</h3>
-                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">اختر نوع الغرفة التي ترغب في إعادة تصميمها.</p>
+                        <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 md:space-y-6">
+                          <div className="text-center space-y-1">
+                            <h3 className="text-lg md:text-2xl font-black text-secondary">نوع المساحة</h3>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">اختر نوع الغرفة المراد تصميمها.</p>
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
                             {ROOM_TYPES.map((type) => (
-                              <div key={type.id} onClick={() => setRoomType(type.id)} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 transition-all cursor-pointer flex flex-col items-center gap-3 md:gap-4 text-center group", roomType === type.id ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-50 bg-gray-50/30 hover:border-gray-200")}>
-                                <type.icon className={cn("w-6 h-6 md:w-8 md:h-8 transition-colors", roomType === type.id ? "text-primary" : "text-gray-400 group-hover:text-secondary")} />
-                                <span className={cn("font-black text-[10px] md:text-sm", roomType === type.id ? "text-primary" : "text-secondary")}>{type.name}</span>
-                                {roomType === type.id && <div className="w-4 h-4 md:w-5 md:h-5 bg-primary rounded-full flex items-center justify-center"><Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" /></div>}
+                              <div key={type.id} onClick={() => setRoomType(type.id)} className={cn("p-3 md:p-5 rounded-[12px] md:rounded-[18px] border-2 transition-all cursor-pointer flex flex-col items-center gap-2 md:gap-3 text-center", roomType === type.id ? "border-primary bg-primary/5" : "border-gray-50 bg-gray-50/30")}>
+                                <type.icon className={cn("w-5 h-5 md:w-7 md:h-7", roomType === type.id ? "text-primary" : "text-gray-400")} />
+                                <span className={cn("font-black text-[9px] md:text-xs", roomType === type.id ? "text-primary" : "text-secondary")}>{type.name}</span>
                               </div>
                             ))}
                           </div>
@@ -357,20 +329,19 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 3 && (
-                        <motion.div key="step3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
-                          <div className="text-center space-y-1 md:space-y-2">
-                            <h3 className="text-lg md:text-3xl font-black text-secondary">اختر نمطك المفضل</h3>
-                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">سيعتمد الذكاء الاصطناعي على هذا النمط في توليد الألوان والأثاث.</p>
+                        <motion.div key="step3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 md:space-y-6">
+                          <div className="text-center space-y-1">
+                            <h3 className="text-lg md:text-2xl font-black text-secondary">اختر نمطك المفضل</h3>
+                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">سيعتمد الذكاء الاصطناعي على هذا النمط.</p>
                           </div>
-                          <div className="grid grid-cols-2 gap-3 md:gap-6">
+                          <div className="grid grid-cols-2 gap-2 md:gap-4">
                             {DESIGN_STYLES.map((style) => (
-                              <div key={style.id} onClick={() => setSelectedStyle(style.id)} className={cn("relative h-28 md:h-40 rounded-[15px] md:rounded-[24px] overflow-hidden cursor-pointer group transition-all", selectedStyle === style.id ? "ring-4 ring-primary shadow-xl" : "opacity-70 hover:opacity-100")}>
-                                <Image src={style.img} alt={style.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                <div className="absolute bottom-3 right-3 left-3 md:bottom-5 md:right-5 md:left-5 flex justify-between items-center text-white">
-                                  <span className="text-[10px] md:text-lg font-black">{style.name}</span>
-                                  {selectedStyle === style.id && <div className="w-5 h-5 md:w-7 md:h-7 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-3 h-3 md:w-4 md:h-4 text-white" /></div>}
+                              <div key={style.id} onClick={() => setSelectedStyle(style.id)} className={cn("relative h-24 md:h-36 rounded-[12px] md:rounded-[18px] overflow-hidden cursor-pointer transition-all", selectedStyle === style.id ? "ring-4 ring-primary" : "opacity-80 hover:opacity-100")}>
+                                <Image src={style.img} alt={style.name} fill className="object-cover" />
+                                <div className="absolute inset-0 bg-black/40 flex items-end p-2 md:p-4">
+                                  <span className="text-white font-black text-[10px] md:text-sm">{style.name}</span>
                                 </div>
+                                {selectedStyle === style.id && <div className="absolute top-2 right-2 w-4 h-4 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-2 md:w-3 h-2 md:h-3 text-white" /></div>}
                               </div>
                             ))}
                           </div>
@@ -378,253 +349,115 @@ export default function AIDesignStudio() {
                       )}
 
                       {step === 4 && (
-                        <motion.div key="step4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
-                          <div className="text-center space-y-1 md:space-y-2">
-                            <h3 className="text-lg md:text-3xl font-black text-secondary">طريقة اختيار القطع</h3>
-                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">هل تريد أن يقترح النظام قطعاً تلقائياً أم ترغب باختيارها من المتجر؟</p>
+                        <motion.div key="step4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 md:space-y-6">
+                          <div className="text-center space-y-1">
+                            <h3 className="text-lg md:text-2xl font-black text-secondary">طريقة اختيار القطع</h3>
                           </div>
-                          <div className="flex flex-col gap-4 md:gap-6 max-w-lg mx-auto">
-                            <div onClick={() => setSelectionMode('auto')} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'auto' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
-                               <div className={cn("w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'auto' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
-                                  <Sparkles className="w-6 h-6 md:w-7 md:h-7" />
+                          <div className="flex flex-col gap-3 max-w-sm mx-auto">
+                            <div onClick={() => setSelectionMode('auto')} className={cn("p-4 rounded-[12px] md:rounded-[15px] border-2 cursor-pointer flex items-center gap-4", selectionMode === 'auto' ? "border-primary bg-primary/5" : "border-gray-100")}>
+                               <Sparkles className={cn("w-5 h-5", selectionMode === 'auto' ? "text-primary" : "text-gray-400")} />
+                               <div className="text-right">
+                                  <h4 className="font-black text-[11px] md:text-sm text-secondary">اقتراحات تلقائية</h4>
+                                  <p className="text-[9px] md:text-xs text-muted-foreground font-bold">دع الذكاء الاصطناعي يختار.</p>
                                </div>
-                               <div>
-                                  <h4 className="font-black text-[11px] md:text-lg text-secondary">اقتراحات تلقائية ذكية</h4>
-                                  <p className="text-[9px] md:text-sm text-muted-foreground font-bold">دع الذكاء الاصطناعي يختار القطع المناسبة.</p>
-                               </div>
-                               {selectionMode === 'auto' && <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-primary mr-auto" />}
                             </div>
-                            <div onClick={() => setSelectionMode('manual')} className={cn("p-4 md:p-6 rounded-[15px] md:rounded-[24px] border-2 cursor-pointer transition-all flex items-center gap-4 md:gap-6", selectionMode === 'manual' ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" : "border-gray-100 hover:border-gray-200")}>
-                               <div className={cn("w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0", selectionMode === 'manual' ? "bg-primary text-white" : "bg-gray-100 text-gray-400")}>
-                                  <ShoppingBag className="w-6 h-6 md:w-7 md:h-7" />
+                            <div onClick={() => setSelectionMode('manual')} className={cn("p-4 rounded-[12px] md:rounded-[15px] border-2 cursor-pointer flex items-center gap-4", selectionMode === 'manual' ? "border-primary bg-primary/5" : "border-gray-100")}>
+                               <ShoppingBag className={cn("w-5 h-5", selectionMode === 'manual' ? "text-primary" : "text-gray-400")} />
+                               <div className="text-right">
+                                  <h4 className="font-black text-[11px] md:text-sm text-secondary">اختيار يدوي</h4>
+                                  <p className="text-[9px] md:text-xs text-muted-foreground font-bold">من الكتالوج مباشرة.</p>
                                </div>
-                               <div>
-                                  <h4 className="font-black text-[11px] md:text-lg text-secondary">اختيار يدوي من الكتالوج</h4>
-                                  <p className="text-[9px] md:text-sm text-muted-foreground font-bold">تصفح القطع المتوفرة في المتجر.</p>
-                               </div>
-                               {selectionMode === 'manual' && <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-primary mr-auto" />}
                             </div>
                           </div>
                         </motion.div>
                       )}
 
                       {step === 5 && (
-                        <motion.div key="step5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-8">
-                          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
-                            <div>
-                               <h3 className="text-lg md:text-2xl font-black text-secondary">اختر قطعك المفضلة</h3>
-                               <p className="text-[9px] md:text-sm text-muted-foreground font-bold">حدد المنتجات التي تريد تضمينها في التصميم.</p>
-                            </div>
-                            <div className="relative w-full md:w-80 group">
-                              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input placeholder="ابحث في المتجر..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pr-10 h-10 md:h-12 rounded-xl bg-gray-100/50 border-none text-[11px] md:text-sm" />
-                            </div>
+                        <motion.div key="step5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 md:space-y-6">
+                          <div className="flex items-center justify-between">
+                             <h3 className="text-sm md:text-lg font-black text-secondary">اختر قطعك المفضلة</h3>
+                             <Badge variant="outline" className="text-[9px] font-bold">{selectedProductIds.length} مختار</Badge>
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-                            {productsLoading ? (
-                               [1,2,3,4,5].map(i => <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse rounded-xl md:rounded-2xl" />)
-                            ) : filteredProducts.length === 0 ? (
-                               <div className="col-span-full py-16 text-center opacity-30 font-black text-sm">لم يتم العثور على منتجات.</div>
-                            ) : (
-                              filteredProducts.map(product => (
-                                <div key={product.id} onClick={() => toggleProductSelection(product.id)} className={cn("group relative aspect-[3/4] bg-white rounded-xl md:rounded-2xl border-2 md:border-4 transition-all cursor-pointer overflow-hidden", selectedProductIds.includes(product.id) ? "border-primary" : "border-transparent")}>
-                                  <Image src={product.image_base64 || `https://picsum.photos/seed/${product.id}/600/800`} alt={product.name_ar} fill className="object-cover" />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                  <div className="absolute bottom-2 right-2 left-2 md:bottom-3 md:right-3 md:left-3 text-white">
-                                    <p className="font-black text-[9px] md:text-[10px] leading-tight line-clamp-2">{product.name_ar}</p>
-                                    <p className="text-primary font-bold text-[9px] md:text-[10px] mt-0.5">{(Number(product.price)).toLocaleString()} ر.ي</p>
-                                  </div>
-                                  {selectedProductIds.includes(product.id) && (
-                                    <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-3 h-3 md:w-4 md:h-4 text-white" /></div>
-                                  )}
-                                </div>
-                              ))
-                            )}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                            {filteredProducts.slice(0, 8).map(product => (
+                              <div key={product.id} onClick={() => toggleProductSelection(product.id)} className={cn("relative aspect-[3/4] rounded-lg overflow-hidden border-2 cursor-pointer", selectedProductIds.includes(product.id) ? "border-primary" : "border-transparent")}>
+                                <Image src={product.image_base64 || `https://picsum.photos/seed/${product.id}/600/800`} alt="Product" fill className="object-cover" />
+                                {selectedProductIds.includes(product.id) && (
+                                  <div className="absolute top-1 right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-2.5 h-2.5 text-white" /></div>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         </motion.div>
                       )}
 
                       {step === 6 && (
-                        <motion.div key="step6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 md:space-y-10">
-                          <div className="text-center space-y-1 md:space-y-2">
-                            <h3 className="text-lg md:text-3xl font-black text-secondary">تفاصيل التنفيذ والميزانية</h3>
-                            <p className="text-[10px] md:text-sm text-muted-foreground font-bold">ساعدنا في فهم أبعاد مساحتك وميزانيتك المتوقعة.</p>
+                        <motion.div key="step6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                          <div className="text-center space-y-1">
+                            <h3 className="text-lg md:text-2xl font-black text-secondary">التفاصيل النهائية</h3>
                           </div>
-                          <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                               <div className="space-y-2">
-                                  <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Box className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> حالة الغرفة الحالية</Label>
-                                  <select value={roomStatus} onChange={e => setRoomStatus(e.target.value)} className="w-full h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none px-4 font-bold text-[11px] md:text-sm outline-none shadow-inner">
-                                    <option value="empty">فارغة تماماً</option>
-                                    <option value="partially_furnished">مؤثثة جزئياً</option>
-                                    <option value="fully_furnished">مؤثثة بالكامل</option>
-                                  </select>
-                               </div>
-                               <div className="space-y-2">
-                                  <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Scaling className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> المساحة (م²)</Label>
-                                  <Input type="number" value={roomArea} onChange={e => setRoomArea(e.target.value)} placeholder="مثال: 25" className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
-                               </div>
-                            </div>
-                            <Separator />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                               <div className="space-y-2">
-                                  <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Wallet className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> الميزانية الدنيا (ر.ي)</Label>
-                                  <Input type="number" value={budgetRange.min} onChange={e => setBudgetRange({...budgetRange, min: e.target.value})} className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
-                               </div>
-                               <div className="space-y-2">
-                                  <Label className="font-black text-[10px] md:text-sm text-secondary flex items-center gap-2"><Wallet className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> الميزانية القصوى (ر.ي)</Label>
-                                  <Input type="number" value={budgetRange.max} onChange={e => setBudgetRange({...budgetRange, max: e.target.value})} className="h-11 md:h-12 rounded-xl md:rounded-2xl bg-gray-50 border-none font-black text-sm md:text-lg" />
-                               </div>
-                            </div>
-                            <div className="p-4 md:p-6 bg-primary/5 rounded-[20px] md:rounded-[30px] border border-primary/10 space-y-4 md:space-y-6">
-                               <h4 className="font-black text-[11px] md:text-base text-secondary flex items-center gap-2"><Info className="w-4 h-4 md:w-5 md:h-5 text-primary" /> ملخص طلبك الذكي</h4>
-                               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[9px] md:text-sm">
-                                  <div>
-                                     <p className="text-muted-foreground font-bold mb-0.5 md:mb-1">نوع الغرفة</p>
-                                     <p className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</p>
-                                  </div>
-                                  <div>
-                                     <p className="text-muted-foreground font-bold mb-0.5 md:mb-1">المساحة</p>
-                                     <p className="font-black text-secondary">{roomArea} م²</p>
-                                  </div>
-                                  <div>
-                                     <p className="text-muted-foreground font-bold mb-0.5 md:mb-1">النمط</p>
-                                     <p className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</p>
-                                  </div>
-                                  <div>
-                                     <p className="text-muted-foreground font-bold mb-0.5 md:mb-1">الاختيار</p>
-                                     <p className="font-black text-secondary">{selectionMode === 'auto' ? 'تلقائي' : 'يدوي'}</p>
-                                  </div>
-                               </div>
-                            </div>
+                          <div className="max-w-md mx-auto space-y-4">
+                             <div className="space-y-1.5">
+                                <Label className="font-black text-[10px] md:text-xs">المساحة التقريبية (م²)</Label>
+                                <Input type="number" value={roomArea} onChange={e => setRoomArea(e.target.value)} className="h-10 rounded-xl bg-gray-50 border-none font-black" />
+                             </div>
+                             <div className="space-y-1.5">
+                                <Label className="font-black text-[10px] md:text-xs">الميزانية القصوى (ريال)</Label>
+                                <Input type="number" value={budgetRange.max} onChange={e => setBudgetRange({...budgetRange, max: e.target.value})} className="h-10 rounded-xl bg-gray-50 border-none font-black" />
+                             </div>
                           </div>
                         </motion.div>
                       )}
 
                       {step === 7 && aiResult && (
-                        <motion.div key="result" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 md:space-y-10">
-                           <div className="text-center space-y-2">
-                              <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
-                                 <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10" />
-                              </div>
-                              <h3 className="text-lg md:text-2xl font-black text-secondary">اكتمل تحليل التصميم بنجاح</h3>
+                        <motion.div key="result" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+                           <div className="text-center">
+                              <h3 className="text-lg md:text-xl font-black text-secondary">تقرير المصمم الذكي</h3>
                            </div>
-
-                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
-                              <div className="space-y-6">
-                                 <div className="p-6 md:p-10 bg-white border border-border/50 rounded-[20px] md:rounded-[30px] shadow-sm relative">
-                                    <Quote className="absolute top-6 left-6 w-8 h-8 text-primary/10" />
-                                    <h4 className="font-black text-[11px] md:text-lg text-primary flex items-center gap-2 mb-4 md:mb-6 border-r-4 border-primary pr-3">
-                                      توصيات المصمم الذكي
-                                    </h4>
-                                    <div className="text-muted-foreground leading-relaxed md:leading-loose font-medium text-sm md:text-lg whitespace-pre-wrap">
-                                       {aiResult.text}
-                                    </div>
-                                 </div>
-                                 
-                                 {aiResult.prompt && (
-                                   <div className="p-6 md:p-8 bg-secondary text-white rounded-[20px] md:rounded-[30px] shadow-2xl relative overflow-hidden group">
-                                      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rotate-45 -translate-y-12 translate-x-12" />
-                                      <div className="flex items-center justify-between mb-4 md:mb-6">
-                                        <h5 className="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest flex items-center gap-2">
-                                           <ImageIcon className="w-4 h-4" /> Visual Generation Prompt
-                                        </h5>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          onClick={() => copyToClipboard(aiResult.prompt!)}
-                                          className="text-white hover:bg-white/10 rounded-lg h-9 gap-2 font-bold text-xs"
-                                        >
-                                          {copied ? <ClipboardCheck className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                                          {copied ? 'تم النسخ' : 'نسخ النص'}
-                                        </Button>
-                                      </div>
-                                      <div className="bg-white/5 p-4 md:p-6 rounded-xl border border-white/10 select-all cursor-text font-mono text-[10px] md:text-xs leading-relaxed text-gray-300">
-                                         {aiResult.prompt}
-                                      </div>
-                                      <p className="text-[9px] md:text-[10px] text-gray-500 mt-4 italic">استخدم هذا النص في برامج توليد الصور (Midjourney, DALL-E) للحصول على تصور بصري دقيق.</p>
+                           <div className="p-4 md:p-6 bg-gray-50 rounded-xl space-y-4">
+                              <div className="text-muted-foreground leading-relaxed text-sm md:text-base font-medium whitespace-pre-wrap">
+                                 {aiResult.text}
+                              </div>
+                              {aiResult.prompt && (
+                                <div className="p-4 bg-secondary text-white rounded-xl space-y-3">
+                                   <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-black opacity-50 uppercase tracking-widest">Image Prompt (EN)</span>
+                                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(aiResult.prompt!)} className="h-7 text-white text-[10px] gap-1.5">
+                                         {copied ? <ClipboardCheck className="w-3 h-3" /> : <Copy className="w-3 h-3" />} النسخ
+                                      </Button>
                                    </div>
-                                 )}
-                              </div>
-
-                              <div className="space-y-6">
-                                 <div className="relative aspect-video rounded-[20px] md:rounded-[30px] overflow-hidden shadow-xl border-4 border-white">
-                                    <Image src={originalImage!} alt="Original Room" fill className="object-cover" />
-                                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">المرجع الأصلي</div>
-                                 </div>
-                                 
-                                 <Card className="rounded-[20px] md:rounded-[30px] border-none bg-gray-50 overflow-hidden shadow-inner">
-                                    <CardContent className="p-6 md:p-8 space-y-6">
-                                      <h4 className="font-black text-sm md:text-lg text-secondary flex items-center gap-2 border-b pb-4"><FileText className="w-4 h-4 md:w-5 md:h-5 text-primary" /> ملخص البيانات</h4>
-                                      <div className="grid grid-cols-1 gap-3 md:gap-4 text-xs md:text-base">
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">نوع المساحة:</span> 
-                                            <span className="font-black text-secondary">{ROOM_TYPES.find(t => t.id === roomType)?.name}</span>
-                                         </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">المساحة:</span> 
-                                            <span className="font-black text-secondary">{roomArea} م²</span>
-                                         </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">النمط المختار:</span> 
-                                            <span className="font-black text-secondary">{DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}</span>
-                                         </div>
-                                         <div className="flex justify-between items-center bg-white p-3 md:p-4 rounded-xl shadow-sm border border-black/5">
-                                            <span className="font-bold text-muted-foreground">الميزانية المقدرة:</span> 
-                                            <span className="font-black text-primary">{(Number(budgetRange.max)).toLocaleString()} ر.ي</span>
-                                         </div>
-                                      </div>
-                                      <div className="pt-4 space-y-3">
-                                         <Link href="/shop" className="block w-full">
-                                            <Button className="w-full h-12 md:h-14 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-xl text-sm md:text-lg gap-2">
-                                               تسوق القطع المقترحة <ShoppingBag className="w-4 h-4" />
-                                            </Button>
-                                         </Link>
-                                         <Button variant="ghost" onClick={handleReset} className="w-full font-black text-xs md:text-sm text-muted-foreground gap-2 h-10 md:h-12 rounded-xl md:rounded-2xl border-2 border-dashed border-gray-200">
-                                            <RefreshCcw className="w-3.5 h-3.5" /> بدء تصميم آخر
-                                         </Button>
-                                      </div>
-                                    </CardContent>
-                                 </Card>
-                              </div>
+                                   <p className="font-mono text-[10px] leading-tight opacity-80 break-all">{aiResult.prompt}</p>
+                                </div>
+                              )}
                            </div>
+                           <Button onClick={handleReset} variant="outline" className="w-full h-10 rounded-xl font-black text-xs gap-2">
+                              <RefreshCcw className="w-3 h-3" /> تصميم مساحة أخرى
+                           </Button>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                   
                   {step <= totalSteps && (
-                    <div className="p-4 md:p-8 bg-gray-50/50 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="flex gap-3 w-full sm:w-auto order-2 sm:order-1">
-                         <Button variant="ghost" onClick={handleBack} disabled={step === 1 || isSaving} className="flex-1 sm:flex-none rounded-xl md:rounded-2xl h-11 md:h-12 px-6 md:px-8 font-black text-[11px] md:text-sm gap-2"><ArrowRight className="w-4 h-4" /> السابقة</Button>
-                      </div>
-                      <div className="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
-                         {step < totalSteps ? (
-                           <Button onClick={handleNext} disabled={isSaving} className="flex-1 sm:min-w-[180px] h-11 md:h-12 bg-secondary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-base gap-2">المتابعة <ArrowLeft className="w-4 h-4" /></Button>
-                         ) : (
-                           <Button onClick={handleSubmitRequest} disabled={isSaving} className="flex-1 sm:min-w-[180px] h-11 md:h-12 bg-primary text-white font-black rounded-xl md:rounded-2xl shadow-lg text-[11px] md:text-base gap-2">
-                             {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>توليد التصميم الآن <Sparkles className="w-4 h-4" /></>}
-                           </Button>
-                         )}
-                      </div>
+                    <div className="p-4 md:p-6 bg-gray-50/50 border-t flex items-center justify-between gap-3">
+                      <Button variant="ghost" onClick={handleBack} disabled={step === 1 || isSaving} className="rounded-xl h-10 md:h-12 px-4 md:px-8 font-black text-[11px] md:text-sm">السابقة</Button>
+                      {step < totalSteps ? (
+                        <Button onClick={handleNext} disabled={isSaving} className="h-10 md:h-12 bg-secondary text-white font-black rounded-xl md:rounded-2xl px-6 md:px-12 text-[11px] md:text-sm">المتابعة</Button>
+                      ) : (
+                        <Button onClick={handleSubmitRequest} disabled={isSaving} className="h-10 md:h-12 bg-primary text-white font-black rounded-xl md:rounded-2xl px-6 md:px-12 text-[11px] md:text-sm">
+                          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'توليد التصميم'}
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
-            
-            {step <= totalSteps && (
-              <div className="p-4 md:p-6 bg-white border border-border/50 rounded-[20px] md:rounded-[24px] flex items-start gap-3 md:gap-4 shadow-sm">
-                 <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-50 rounded-xl flex items-center justify-center shrink-0"><Info className="w-4 h-4 md:w-5 md:h-5 text-amber-600" /></div>
-                 <p className="text-[10px] md:text-sm text-muted-foreground font-medium leading-relaxed">
-                   <span className="font-black text-secondary block mb-0.5 text-[11px] md:text-sm">ملاحظة تقنية:</span> 
-                   يستخدم "إيوان AI" نموذج Gemma 2 المتقدم لتحليل البيانات الوصفية وتقديم توصيات دقيقة لدمج الأثاث الوطني مع التصاميم الحديثة. يتم حفظ طلبك للرجوع إليه عند التنفيذ.
-                 </p>
-              </div>
-            )}
           </div>
         </div>
       </main>
     </div>
   );
 }
+
+function LayoutGridIcon() { return <Layers className="w-full h-full" />; }
