@@ -150,7 +150,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section - Inverted Design */}
-        <section className="py-32 bg-background relative overflow-hidden">
+        <section className="pt-32 pb-12 bg-background relative overflow-hidden">
           <div className="container px-4 md:px-8 mx-auto text-center relative z-10">
             <div className="mb-20 space-y-5 text-center">
               <div className="flex items-center justify-center gap-3">
@@ -162,11 +162,11 @@ export default function HomePage() {
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نجمع بين التكنولوجيا المتطورة وحرفية النجار اليمني لنقدم لك تجربة تأثيث لا تُنسى.</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
               {features.map((feature, i) => (
                 <div 
                   key={i} 
-                  className="group relative p-10 bg-secondary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
+                  className="group relative p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
                 >
                   {/* Subtle Background Accent */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
