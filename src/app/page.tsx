@@ -67,7 +67,7 @@ export default function HomePage() {
   const testimonialsQuery = useMemo(() => query(
     collection(db, 'testimonials'),
     orderBy('created_at', 'desc'),
-    limit(3)
+    limit(4)
   ), [db]);
   const { data: testimonialsData, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
@@ -543,38 +543,38 @@ export default function HomePage() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={containerVariants}
-                className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8"
               >
                 {testimonialsData?.map((t: any, i: number) => (
                   <motion.div 
                     key={i} 
                     variants={itemFadeUp}
-                    className="group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right"
+                    className="group relative p-4 md:p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-4 md:space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right"
                   >
-                    <div className="flex gap-1 text-accent justify-start">
+                    <div className="flex gap-0.5 text-accent justify-start">
                       {Array.from({ length: 5 }).map((_, starIdx) => (
-                        <Star key={starIdx} className={cn("w-4 h-4", starIdx >= (t.rating || 5) ? "fill-none" : "fill-current")} />
+                        <Star key={starIdx} className={cn("w-3 h-3 md:w-4 md:h-4", starIdx >= (t.rating || 5) ? "fill-none" : "fill-current")} />
                       ))}
                     </div>
                     
                     <div className="relative flex-1">
-                      <Quote className="absolute -top-4 -right-4 w-10 h-10 text-accent opacity-20" />
-                      <p className="text-lg font-medium leading-relaxed text-right relative z-10 italic">
+                      <Quote className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-6 h-6 md:w-10 md:h-10 text-accent opacity-20" />
+                      <p className="text-xs md:text-lg font-medium leading-relaxed text-right relative z-10 italic line-clamp-4 md:line-clamp-none">
                         "{t.text}"
                       </p>
                     </div>
                     
-                    <div className="flex items-center gap-4 pt-6 border-t border-white/10">
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-accent/20 shrink-0 bg-white/10">
+                    <div className="flex items-center gap-3 md:gap-4 pt-4 md:pt-6 border-t border-white/10">
+                      <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl overflow-hidden shadow-lg border-2 border-accent/20 shrink-0 bg-white/10">
                         {t.avatar_url ? (
                           <Image src={t.avatar_url} alt={t.name} fill className="object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-black text-accent text-xl">{t.name?.charAt(0)}</div>
+                          <div className="w-full h-full flex items-center justify-center font-black text-accent text-sm md:text-xl">{t.name?.charAt(0)}</div>
                         )}
                       </div>
-                      <div className="text-right">
-                        <h4 className="font-black text-white text-base">{t.name}</h4>
-                        <p className="text-xs text-accent font-bold mt-0.5">{t.role || 'عميل إيوان'}</p>
+                      <div className="text-right min-w-0">
+                        <h4 className="font-black text-white text-[11px] md:text-base truncate">{t.name}</h4>
+                        <p className="text-[9px] md:text-xs text-accent font-bold mt-0.5 truncate">{t.role || 'عميل إيوان'}</p>
                       </div>
                     </div>
                   </motion.div>
