@@ -73,9 +73,16 @@ const compressImage = (base64Str: string, maxWidth = 800): Promise<string> => {
       const canvas = document.createElement('canvas');
       let width = img.width;
       let height = img.height;
-      if (width > maxWidth) {
-        height *= maxWidth / width;
-        width = maxWidth;
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
       }
       canvas.width = width;
       canvas.height = height;
@@ -159,9 +166,9 @@ export default function AIDesignStudio() {
     setIsSaving(true);
     setError(null);
     try {
-      // 1. استدعاء الذكاء الاصطناعي
+      // استدعاء محرك إيوان AI (Gemma 2)
       const aiResponse = await ewanAiChat({
-        message: `قم بتحليل صورة الغرفة المرفقة وتصميمها كغرفة ${ROOM_TYPES.find(t => t.id === roomType)?.name} بمساحة ${roomArea}م² ونمط ${DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}. الحالة الحالية: ${roomStatus}.`,
+        message: `قم بتحليل وتصميم مساحة لغرفة من نوع ${ROOM_TYPES.find(t => t.id === roomType)?.name} بمساحة ${roomArea}م² ونمط ${DESIGN_STYLES.find(s => s.id === selectedStyle)?.name}. الحالة الحالية للغرفة هي ${getRoomStatusLabel(roomStatus)}. اقترح أفضل توزيع للأثاث وتنسيق للألوان.`,
         imageDataUri: originalImage || undefined,
         contextData: {
           roomType,
@@ -178,7 +185,7 @@ export default function AIDesignStudio() {
 
       setAiResult({ text: aiResponse.text, prompt: aiResponse.imagePrompt });
 
-      // 2. حفظ الطلب في Firestore
+      // حفظ الطلب في Firestore
       const requestData = {
         user_id: user?.uid || 'guest',
         original_image_url: originalImage,
@@ -198,31 +205,39 @@ export default function AIDesignStudio() {
 
       await addDoc(collection(db, 'ai_design_requests'), requestData);
       
-      // 3. الانتقال لخطوة النتائج
+      // الانتقال لعرض النتائج بوضوح
       setStep(7);
       
       toast({
-        title: "تم اكتمال التصميم!",
-        description: "إليك التقرير الفني الذكي لمساحتك.",
+        title: "اكتمل تحليل التصميم!",
+        description: "لقد أعد لك المصمم الذكي رؤية فنية لمساحتك.",
       });
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "حدث خطأ غير متوقع أثناء المعالجة.");
+      setError(err.message || "حدث خطأ في الاتصال بالذكاء الاصطناعي.");
       toast({ 
         variant: "destructive", 
-        title: "فشل في المعالجة", 
-        description: "يرجى التحقق من اتصال الإنترنت ومفتاح الـ API الخاص بـ OpenRouter." 
+        title: "فشل المعالجة", 
+        description: "يرجى التأكد من مفتاح OpenRouter واستقرار الإنترنت." 
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const getRoomStatusLabel = (id: string) => {
+  function getRoomStatusLabel(id: string) {
     if (id === 'empty') return 'فارغة تماماً';
     if (id === 'partially_furnished') return 'مؤثثة جزئياً';
     if (id === 'fully_furnished') return 'مؤثثة بالكامل';
     return id;
+  }
+
+  const handleReset = () => {
+    setStep(1);
+    setOriginalImage(null);
+    setAiResult(null);
+    setError(null);
+    setSelectedProductIds([]);
   };
 
   return (
@@ -243,7 +258,6 @@ export default function AIDesignStudio() {
             )}
 
             <Card className="border-none shadow-2xl rounded-[30px] overflow-hidden bg-white/90 backdrop-blur-xl relative">
-              {/* واجهة التحميل الذكية */}
               <AnimatePresence>
                 {isSaving && (
                   <motion.div 
@@ -264,27 +278,19 @@ export default function AIDesignStudio() {
                       <h3 className="text-3xl font-black text-secondary">يتم الآن التحليل الذكي...</h3>
                       <div className="space-y-2">
                         <p className="flex items-center justify-center gap-2 text-primary font-bold text-sm">
-                          <CheckCircle2 className="w-4 h-4" /> جاري قراءة تفاصيل الصورة
+                          <CheckCircle2 className="w-4 h-4" /> معالجة البيانات المدخلة
                         </p>
                         <p className="flex items-center justify-center gap-2 text-primary font-bold text-sm">
-                          <CheckCircle2 className="w-4 h-4" /> مقارنة الأنماط الفنية
+                          <CheckCircle2 className="w-4 h-4" /> مطابقة الأنماط المعمارية
                         </p>
                         <p className="flex items-center justify-center gap-2 text-muted-foreground font-bold text-sm animate-pulse">
-                          <Loader2 className="w-4 h-4 animate-spin" /> صياغة توصيات الخبير
+                          <Loader2 className="w-4 h-4 animate-spin" /> صياغة تقرير المصمم الخبير
                         </p>
                       </div>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* واجهة الخطأ */}
-              {error && step === 6 && !isSaving && (
-                <div className="p-8 bg-destructive/10 border-b border-destructive/20 flex items-center gap-4 text-destructive">
-                   <AlertTriangle className="w-6 h-6 shrink-0" />
-                   <p className="font-bold text-sm">{error}</p>
-                </div>
-              )}
 
               <CardContent className="p-0">
                 <div className="min-h-[600px] flex flex-col">
@@ -414,7 +420,7 @@ export default function AIDesignStudio() {
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                                   <div className="absolute bottom-3 right-3 left-3 text-white">
                                     <p className="font-black text-[10px] leading-tight line-clamp-2">{product.name_ar}</p>
-                                    <p className="text-primary font-bold text-[10px] mt-1">{product.price.toLocaleString()} ر.ي</p>
+                                    <p className="text-primary font-bold text-[10px] mt-1">{(Number(product.price)).toLocaleString()} ر.ي</p>
                                   </div>
                                   {selectedProductIds.includes(product.id) && (
                                     <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-lg"><Check className="w-4 h-4 text-white" /></div>
@@ -553,7 +559,7 @@ export default function AIDesignStudio() {
                                                تسوق القطع المقترحة <ShoppingBag className="w-5 h-5" />
                                             </Button>
                                          </Link>
-                                         <Button variant="ghost" onClick={() => setStep(1)} className="w-full font-black text-muted-foreground gap-3 hover:bg-gray-200 h-14 rounded-2xl border-2 border-dashed border-gray-200">
+                                         <Button variant="ghost" onClick={handleReset} className="w-full font-black text-muted-foreground gap-3 hover:bg-gray-200 h-14 rounded-2xl border-2 border-dashed border-gray-200">
                                             <RefreshCcw className="w-5 h-5" /> ابدأ تصميم مساحة أخرى
                                          </Button>
                                       </div>
@@ -591,7 +597,7 @@ export default function AIDesignStudio() {
                  <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center shrink-0"><Info className="w-6 h-6 text-amber-600" /></div>
                  <p className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed">
                    <span className="font-black text-secondary block mb-1">ملاحظة تقنية حول "إيوان AI":</span> 
-                   يقوم نظامنا المتطور المدعوم بنموذج (Gemini Flash Vision) بتحليل الصورة حقيقياً لاستنتاج أبعاد المساحة، توزيع الإضاءة الطبيعية، وتحديد قطع الأثاث الموجودة حالياً لتقديم توصيات هندسية وفنية دقيقة تدمج بين الوظيفية والجمال.
+                   يستخدم نظامنا المتطور نموذج (Gemma 2) لتحليل المعطيات الهندسية وتقديم توصيات فنية دقيقة لدمج الأثاث الوطني مع التصاميم العالمية. يتم حفظ كافة تفاصيل طلبك بأمان ليتم مراجعتها من قبل الحرفيين المختصين عند الطلب.
                  </p>
               </div>
             )}
