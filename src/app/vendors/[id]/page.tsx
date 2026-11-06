@@ -242,10 +242,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
             {/* آراء العملاء */}
             <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
-               <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
-                 <div className="text-center md:text-right">
+               <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row-reverse items-center justify-between gap-8 border border-primary/10">
+                 <div className="text-center md:text-left">
                    <h3 className="text-6xl md:text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
-                   <div className="flex gap-2 justify-center md:justify-start text-amber-500 mb-2">
+                   <div className="flex gap-2 justify-center md:justify-end text-amber-500 mb-2">
                      {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-8 h-8", i < Math.floor(vendor.average_rating) ? "fill-current" : "fill-none")} />)}
                    </div>
                    <p className="text-muted-foreground font-black text-lg">بناءً على {vendor.reviewsCount.toLocaleString('en-US')} تجربة عملاء موثقة</p>
@@ -257,16 +257,16 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                  {(vendorData?.reviews || []).length > 0 ? (
                    vendorData.reviews.map((rev: any, i: number) => (
                     <div key={i} className="p-8 bg-white border border-border/50 rounded-2xl space-y-6 shadow-sm hover:shadow-lg transition-all relative">
-                      <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/5" />
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-4">
+                      <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/5 scale-x-[-1]" />
+                      <div className="flex flex-row-reverse justify-between items-start">
+                        <div className="flex flex-row-reverse items-center gap-4 text-left">
                           <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center font-black text-secondary text-xl border-2 border-primary/10">
                             {rev.name?.[0] || 'ع'}
                           </div>
                           <div className="space-y-1">
                             <p className="font-black text-secondary text-lg">{rev.name}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
-                              <Calendar className="w-3.5 h-3.5" /> {rev.date || 'الآن'}
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold justify-end">
+                              {rev.date || 'الآن'} <Calendar className="w-3.5 h-3.5" />
                             </div>
                           </div>
                         </div>
@@ -274,7 +274,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                           {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-4 h-4", i < (rev.rating || 5) ? "fill-current" : "fill-none")} />)}
                         </div>
                       </div>
-                      <p className="text-base text-muted-foreground leading-relaxed font-medium italic pr-4 border-r-2 border-primary/20">"{rev.text}"</p>
+                      <p className="text-base text-muted-foreground leading-relaxed font-medium italic pl-4 border-l-2 border-primary/20 text-left">"{rev.text}"</p>
                     </div>
                    ))
                  ) : (
