@@ -289,7 +289,40 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             {/* حول المتجر */}
             <TabsContent value="about" className="animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* النبذة والإحصائيات */}
+                {/* معلومات جانبية إضافية - أصبحت في اليمين */}
+                <div className="space-y-10">
+                   <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
+                      <div className="relative z-10 space-y-4">
+                        <Award className="w-12 h-12 text-primary" />
+                        <h4 className="text-2xl font-black">ضمان إيوان المعتمد</h4>
+                        <p className="text-gray-300 font-medium leading-relaxed">
+                          هذا الشريك يخضع لرقابة دورية من قبل منصة إيوان لضمان جودة التصنيع والالتزام بمواعيد التوصيل والتركيب.
+                        </p>
+                      </div>
+                      <Separator className="bg-white/10" />
+                      <div className="flex items-center gap-4 text-primary">
+                        <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <span className="font-black text-lg">شريك استراتيجي معتمد</span>
+                      </div>
+                   </div>
+
+                   <div className="bg-white p-8 rounded-2xl border border-border/50 shadow-sm space-y-6">
+                      <h4 className="font-black text-secondary text-lg border-b pb-4">هل لديك استفسار خاص؟</h4>
+                      <div className="space-y-4">
+                         <Button className="w-full h-14 rounded-xl bg-gray-50 text-secondary border-none hover:bg-gray-100 font-black gap-3">
+                            <Info className="w-5 h-5 text-primary" /> طلب مواصفات مخصصة
+                         </Button>
+                         <Button variant="outline" className="w-full h-14 rounded-xl border-primary text-primary font-black gap-3">
+                            <Calendar className="w-5 h-5" /> حجز موعد زيارة للموقع
+                         </Button>
+                      </div>
+                   </div>
+                </div>
+
+                {/* النبذة والإحصائيات - أصبحت في اليسار */}
                 <div className="lg:col-span-2 space-y-10">
                   <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                     <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
@@ -329,39 +362,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* معلومات جانبية إضافية */}
-                <div className="space-y-10">
-                   <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
-                      <div className="relative z-10 space-y-4">
-                        <Award className="w-12 h-12 text-primary" />
-                        <h4 className="text-2xl font-black">ضمان إيوان المعتمد</h4>
-                        <p className="text-gray-300 font-medium leading-relaxed">
-                          هذا الشريك يخضع لرقابة دورية من قبل منصة إيوان لضمان جودة التصنيع والالتزام بمواعيد التوصيل والتركيب.
-                        </p>
-                      </div>
-                      <Separator className="bg-white/10" />
-                      <div className="flex items-center gap-4 text-primary">
-                        <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6" />
-                        </div>
-                        <span className="font-black text-lg">شريك استراتيجي معتمد</span>
-                      </div>
-                   </div>
-
-                   <div className="bg-white p-8 rounded-2xl border border-border/50 shadow-sm space-y-6">
-                      <h4 className="font-black text-secondary text-lg border-b pb-4">هل لديك استفسار خاص؟</h4>
-                      <div className="space-y-4">
-                         <Button className="w-full h-14 rounded-xl bg-gray-50 text-secondary border-none hover:bg-gray-100 font-black gap-3">
-                            <Info className="w-5 h-5 text-primary" /> طلب مواصفات مخصصة
-                         </Button>
-                         <Button variant="outline" className="w-full h-14 rounded-xl border-primary text-primary font-black gap-3">
-                            <Calendar className="w-5 h-5" /> حجز موعد زيارة للموقع
-                         </Button>
-                      </div>
-                   </div>
                 </div>
               </div>
             </TabsContent>
