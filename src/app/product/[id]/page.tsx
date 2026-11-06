@@ -19,7 +19,8 @@ import {
   MapPin,
   Loader2,
   Calendar,
-  Quote
+  Quote,
+  Layout
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,10 +41,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const [quantity, setQuantity] = useState(1);
   const db = useFirestore();
 
-  // جلب بيانات المنتج
+  // جلب بيانات المنتج الحقيقية
   const { data: productData, loading: productLoading } = useDoc(doc(db, 'products', id));
   
-  // جلب بيانات المتجر (يتم تفعيله بعد جلب المنتج)
+  // جلب بيانات المتجر
   const vendorId = productData?.vendor_id;
   const { data: vendorData, loading: vendorLoading } = useDoc(vendorId ? doc(db, 'vendors', vendorId) : null);
 
@@ -68,6 +69,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     );
   }
 
+  // تنسيق البيانات للعرض مع دعم الأرقام الإنجليزية
   const product = {
     ...productData,
     name: productData.name_ar || 'منتج بدون اسم',
