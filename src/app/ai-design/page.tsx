@@ -43,7 +43,6 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { useCollection, useFirestore, useUser } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
@@ -79,6 +78,7 @@ const compressImage = (base64Str: string, maxWidth = 800): Promise<string> => {
           width = maxWidth;
         }
       } else {
+        const maxHeight = 800;
         if (height > maxHeight) {
           width *= maxHeight / height;
           height = maxHeight;
@@ -604,7 +604,6 @@ export default function AIDesignStudio() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
