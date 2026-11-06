@@ -81,7 +81,6 @@ export default function ProfessionalsPage() {
       const matchesType = activeType === 'all' || prof.business_type === activeType;
       const matchesCity = cityFilter === 'all' || prof.city === cityFilter;
       const matchesSpecialty = specialtyFilter === 'all' || prof.specialty === specialtyFilter;
-      // ميزانية افتراضية للمهنيين لو لم توجد
       return matchesSearch && matchesType && matchesCity && matchesSpecialty;
     });
   }, [firestoreVendors, searchTerm, activeType, cityFilter, specialtyFilter]);
@@ -310,7 +309,7 @@ export default function ProfessionalsPage() {
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                              <MapPin className="w-4 h-4" />
                           </div>
-                          {prof.city}
+                          {prof.service_areas && prof.service_areas.length > 0 ? prof.service_areas[0] : prof.city || 'اليمن'}
                         </div>
                         <Button variant="ghost" size="sm" className="h-11 font-black text-primary hover:bg-primary/5 transition-all rounded-xl gap-2 group/btn">
                           طلب خدمة 
