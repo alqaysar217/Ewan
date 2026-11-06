@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -33,12 +32,14 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCollection, useFirestore } from '@/firebase';
+import { useCart } from '@/context/cart-context';
 import { collection, query, limit, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
   const db = useFirestore();
+  const { addToCart } = useCart();
 
   const productsQuery = useMemo(() => query(
     collection(db, 'products'),
@@ -324,7 +325,16 @@ export default function HomePage() {
                              )}
                           </div>
                         </div>
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black gap-2 h-11 rounded-xl transition-all shadow-sm">
+                        <Button 
+                          onClick={() => addToCart({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.img,
+                            quantity: 1
+                          })}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black gap-2 h-11 rounded-xl transition-all shadow-sm"
+                        >
                           <ShoppingBag className="w-4 h-4" /> إضافة للسلة
                         </Button>
                       </div>

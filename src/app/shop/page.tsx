@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
+import { useCart } from '@/context/cart-context';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { 
   Filter, 
@@ -51,6 +52,7 @@ export default function ShopPage() {
   const [maxPrice, setMaxPrice] = useState([3000000]);
   
   const db = useFirestore();
+  const { addToCart } = useCart();
   
   const productsQuery = useMemo(() => query(collection(db, 'products'), orderBy('created_at', 'desc')), [db]);
   const { data: products, loading: productsLoading } = useCollection(productsQuery);
@@ -305,6 +307,9 @@ export default function ShopPage() {
                 )}>
                   {filteredProducts.map((p: any) => {
                     const vendor = vendors?.find(v => v.id === p.vendor_id);
+                    const productPrice = Number(p.price) || 0;
+                    const productImage = p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`;
+                    
                     return (
                       <div key={p.id} className={cn(
                         "bg-white rounded-[24px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex group border border-border/40",
@@ -315,7 +320,7 @@ export default function ShopPage() {
                           viewType === 'grid' ? "aspect-square" : "aspect-square md:w-64"
                         )}>
                           <Image 
-                            src={p.image_base64 || `https://picsum.photos/seed/${p.id}/600/800`} 
+                            src={productImage} 
                             alt={p.name_ar} 
                             fill 
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -367,13 +372,22 @@ export default function ShopPage() {
                           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between gap-4">
                             <div className="flex flex-col">
                               <span className="text-xl font-black text-secondary">
-                                {(Number(p.price) || 0).toLocaleString('en-US')} <span className="text-[10px] font-bold">ر.ي</span>
+                                {productPrice.toLocaleString('en-US')} <span className="text-[10px] font-bold">ر.ي</span>
                               </span>
                               {Number(p.old_price) > 0 && (
                                 <span className="text-xs text-muted-foreground line-through font-bold opacity-50">{(Number(p.old_price)).toLocaleString('en-US')}</span>
                               )}
                             </div>
-                            <Button className="bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-10 px-6 rounded-xl transition-all shadow-sm">
+                            <Button 
+                              onClick={() => addToCart({
+                                id: p.id,
+                                name: p.name_ar,
+                                price: productPrice,
+                                image: productImage,
+                                quantity: 1
+                              })}
+                              className="bg-secondary hover:bg-secondary/90 text-white font-black gap-2 h-10 px-6 rounded-xl transition-all shadow-sm"
+                            >
                               <ShoppingBag className="w-4 h-4" /> إضافة
                             </Button>
                           </div>

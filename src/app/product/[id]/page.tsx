@@ -30,6 +30,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
 import { useDoc, useFirestore } from '@/firebase';
+import { useCart } from '@/context/cart-context';
 import { doc } from 'firebase/firestore';
 
 type ProductPageProps = {
@@ -40,6 +41,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const { id } = use(params);
   const [quantity, setQuantity] = useState(1);
   const db = useFirestore();
+  const { addToCart } = useCart();
 
   // تثبيت مرجع المنتج
   const productRef = useMemo(() => doc(db, 'products', id), [db, id]);
@@ -90,6 +92,16 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       { label: 'نوع القماش', value: productData.fabric || 'فاخر' },
       { label: 'الضمان', value: productData.warranty || 'ضمان معتمد' }
     ]
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || `https://picsum.photos/seed/${id}/800/800`,
+      quantity: quantity
+    });
   };
 
   return (
@@ -189,10 +201,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                <Button className="h-16 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/30 gap-3">
+                <Button onClick={handleAddToCart} className="h-16 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xl shadow-2xl shadow-primary/30 gap-3">
                   <ShoppingBag className="w-6 h-6" /> إضافة للسلة
                 </Button>
-                <Button variant="secondary" className="h-16 rounded-xl bg-secondary text-white font-black text-xl shadow-2xl shadow-secondary/30 gap-3">
+                <Button onClick={handleAddToCart} variant="secondary" className="h-16 rounded-xl bg-secondary text-white font-black text-xl shadow-2xl shadow-secondary/30 gap-3">
                   <Zap className="w-6 h-6 fill-current" /> شراء فوري
                 </Button>
               </div>

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
+import { useCart } from '@/context/cart-context';
 import { doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -35,6 +36,7 @@ import {
 
 export default function Header() {
   const { user, loading: userLoading } = useUser();
+  const { cartCount } = useCart();
   const db = useFirestore();
   const auth = useAuth();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -121,7 +123,7 @@ export default function Header() {
           
           <Button variant="ghost" size="icon" className="rounded-md hover:bg-accent/10 hover:text-accent relative">
             <ShoppingBag className="w-5 h-5" />
-            <span className="absolute top-1 left-1 w-4 h-4 bg-accent text-white text-[10px] rounded-full flex items-center justify-center font-bold">0</span>
+            <span className="absolute top-1 left-1 w-4 h-4 bg-accent text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount}</span>
           </Button>
 
           {!userLoading && (

@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Cairo } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase';
+import { CartProvider } from '@/context/cart-context';
 import FloatingActions from '@/components/FloatingActions';
 
 const cairo = Cairo({ 
@@ -25,9 +26,11 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className={`${cairo.variable}`}>
       <body className="antialiased font-sans selection:bg-primary/20">
         <FirebaseClientProvider>
-          {children}
-          <FloatingActions />
-          <Toaster />
+          <CartProvider>
+            {children}
+            <FloatingActions />
+            <Toaster />
+          </CartProvider>
         </FirebaseClientProvider>
       </body>
     </html>
