@@ -22,7 +22,8 @@ import {
   Store,
   Images,
   Map,
-  ChevronLeft
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -90,20 +91,20 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/40 to-transparent" />
           
           <div className="container mx-auto px-4 md:px-8 h-full relative z-10 flex flex-col justify-end pb-12 md:pb-16">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 text-center md:text-right">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 text-right">
               <div className="w-32 h-32 md:w-52 md:h-52 bg-white p-1.5 rounded-2xl shadow-2xl relative overflow-hidden shrink-0 border-4 border-white/20 -mb-6 md:-mb-10 z-20">
                 <Image src={vendor.logo_url} alt="Logo" fill className="object-cover" />
               </div>
               
               <div className="flex-1 space-y-3 md:space-y-4 text-white pb-2 md:pb-4">
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <div className="flex flex-wrap items-center justify-start gap-3">
                   <h1 className="text-2xl md:text-5xl font-black tracking-tight drop-shadow-lg">{vendor.business_name}</h1>
                   <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20">
                     <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-8 text-sm md:text-xl font-bold text-gray-200">
+                <div className="flex flex-wrap items-center justify-start gap-4 md:gap-8 text-sm md:text-xl font-bold text-gray-200">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     {vendor.city}
@@ -129,7 +130,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
 
         {/* Content Section */}
         <section className="container mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-24">
-          <Tabs defaultValue="products" className="w-full">
+          <Tabs defaultValue="products" className="w-full" dir="rtl">
             <TabsList className="w-full flex justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
               <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
                 <Package className="w-4 h-4 md:w-5 md:h-5" /> منتجات المتجر
@@ -171,7 +172,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent backdrop-blur-[1px] opacity-70 group-hover:opacity-90 transition-opacity" />
                         
                         <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />
-                        <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+                        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                           {Number(p.discount) > 0 && (
                             <Badge className="bg-secondary text-white font-black rounded-lg px-2 py-1 shadow-sm border-none text-[10px]">
                               %{p.discount.toLocaleString('en-US')} خصم
@@ -245,7 +246,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
                  <div className="text-right space-y-2">
                    <h3 className="text-6xl md:text-7xl font-black text-primary mb-2">{vendor.average_rating.toLocaleString('en-US')}</h3>
-                   <div className="flex gap-2 justify-center md:justify-start text-amber-500 mb-2">
+                   <div className="flex gap-2 justify-start text-amber-500 mb-2">
                      {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={cn("w-8 h-8", i < Math.floor(vendor.average_rating) ? "fill-current" : "fill-none")} />)}
                    </div>
                    <p className="text-muted-foreground font-black text-lg">بناءً على {vendor.reviewsCount.toLocaleString('en-US')} تجربة عملاء موثقة</p>
@@ -289,8 +290,8 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
             {/* حول المتجر */}
             <TabsContent value="about" className="animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* النبذة والإحصائيات */}
-                <div className="lg:col-span-2 space-y-10">
+                {/* النبذة والإحصائيات - المساحة الأكبر على اليمين */}
+                <div className="lg:col-span-2 space-y-10 order-1">
                   <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                     <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
                        <Info className="w-6 h-6 text-primary" /> نبذة عن الشريك
@@ -331,10 +332,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   )}
                 </div>
 
-                {/* معلومات جانبية إضافية */}
-                <div className="space-y-10">
+                {/* معلومات جانبية إضافية - العمود الأصغر على اليسار */}
+                <div className="space-y-10 order-2">
                    <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
-                      <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 -translate-x-16 transition-transform group-hover:scale-125" />
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
                       <div className="relative z-10 space-y-4">
                         <Award className="w-12 h-12 text-primary" />
                         <h4 className="text-2xl font-black">ضمان إيوان المعتمد</h4>
