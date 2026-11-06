@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -67,7 +66,6 @@ export default function StoresPage() {
   displayedStores = displayedStores.filter(store => {
     const matchesSearch = store.business_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCity = cityFilter === 'all' || store.city === cityFilter;
-    // ملاحظة: المتاجر حالياً لا تمتلك حقل تصنيف مباشر، ولكننا نوفر الفلتر لواجهة المستخدم
     return matchesSearch && matchesCity;
   });
 
@@ -115,7 +113,7 @@ export default function StoresPage() {
         <div className="space-y-12">
           
           {/* Horizontal Top Filter Bar */}
-          <div className="bg-white p-6 md:p-8 rounded-[20px] border border-border/50 shadow-sm space-y-6">
+          <div className="bg-white p-6 md:p-8 rounded-[20px] border border-border/50 shadow-sm">
              <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                 
                 {/* Search - Growable */}
@@ -164,14 +162,6 @@ export default function StoresPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-             </div>
-
-             {/* Stats Counter */}
-             <div className="flex items-center gap-4 pt-6 border-t border-gray-50">
-                <div className="flex items-center gap-2 text-sm font-black text-secondary">
-                   <Store className="w-4 h-4 text-primary" />
-                   تم العثور على {displayedStores.length.toLocaleString('en-US')} معرض معتمد
                 </div>
              </div>
           </div>
