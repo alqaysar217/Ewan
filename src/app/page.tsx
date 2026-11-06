@@ -18,7 +18,10 @@ import {
   ChevronRight,
   Sparkles,
   Loader2,
-  HelpCircle
+  HelpCircle,
+  Users,
+  Palette,
+  Award
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
@@ -33,7 +36,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCollection, useFirestore } from '@/firebase';
 import { useCart } from '@/context/cart-context';
-import { collection, query, limit, orderBy } from 'firebase/firestore';
+import { collection, query, limit, orderBy, where, or } from 'firebase/firestore';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
@@ -41,6 +44,7 @@ export default function HomePage() {
   const db = useFirestore();
   const { addToCart } = useCart();
 
+  // جلب المنتجات المميزة
   const productsQuery = useMemo(() => query(
     collection(db, 'products'),
     orderBy('created_at', 'desc'),
@@ -48,11 +52,21 @@ export default function HomePage() {
   ), [db]);
   const { data: productsData, loading: productsLoading } = useCollection(productsQuery);
 
+  // جلب المتاجر فقط (Furniture Stores)
   const storesQuery = useMemo(() => query(
     collection(db, 'vendors'),
+    where('business_type', '==', 'furniture_store'),
     limit(3)
   ), [db]);
   const { data: storesData, loading: storesLoading } = useCollection(storesQuery);
+
+  // جلب المصممين والنجارين فقط (Professionals)
+  const prosQuery = useMemo(() => query(
+    collection(db, 'vendors'),
+    or(where('business_type', '==', 'carpenter'), where('business_type', '==', 'interior_designer')),
+    limit(3)
+  ), [db]);
+  const { data: prosData, loading: prosLoading } = useCollection(prosQuery);
 
   const allVendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
   const { data: allVendors } = useCollection(allVendorsQuery);
@@ -331,7 +345,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Stores Section */}
+        {/* Stores Section - Now ONLY Furniture Stores */}
         <section className="py-24 bg-secondary relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
@@ -461,6 +475,98 @@ export default function HomePage() {
                       fill 
                       className="object-contain" 
                     />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </div>
+        </section>
+
+        {/* Professionals Section - NEW Section after Partners */}
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="container px-4 md:px-8 mx-auto">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInVariants}
+              className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6"
+            >
+              <div className="text-center md:text-right space-y-4">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-lg text-primary font-black text-xs uppercase">
+                    <Award className="w-4 h-4" /> نخبة الحرفيين
+                 </div>
+                 <h2 className="text-3xl md:text-5xl font-black text-secondary">نجارين ومصممين مبدعين</h2>
+                 <p className="text-muted-foreground text-lg max-w-xl">تعاون مع أمهر المحترفين لتنفيذ قطع أثاث مخصصة وفريدة لمساحتك.</p>
+              </div>
+              <Link href="/professionals">
+                 <Button variant="ghost" className="text-accent font-black text-lg p-0 flex gap-2 group hover:bg-transparent">
+                   عرض كافة الخبراء
+                   <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                 </Button>
+              </Link>
+            </motion.div>
+
+            {prosLoading ? (
+               <div className="flex justify-center py-20">
+                 <Loader2 className="w-10 h-10 animate-spin text-accent" />
+               </div>
+            ) : prosData?.length === 0 ? (
+               <div className="py-20 text-center text-muted-foreground font-bold italic">لا يوجد مهنيون مسجلون حالياً.</div>
+            ) : (
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {prosData?.map((pro: any) => (
+                  <motion.div key={pro.id} variants={fadeInVariants}>
+                    <Link 
+                      href={`/vendors/${pro.id}`}
+                      className="group bg-[#F4F6F5]/50 border border-border/40 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col rounded-[24px] h-full"
+                    >
+                      <div className="relative h-56 w-full overflow-hidden">
+                        <Image src={pro.cover_url || `https://picsum.photos/seed/${pro.id}/800/400`} alt={pro.business_name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/20 to-transparent" />
+                        <div className="absolute bottom-4 right-6 left-6 flex items-center gap-4">
+                          <div className="w-16 h-16 bg-white p-1 shadow-2xl relative overflow-hidden rounded-xl shrink-0 border-2 border-white/20">
+                            <Image src={pro.logo_url || `https://picsum.photos/seed/${pro.id}-logo/200/200`} alt="Logo" fill className="object-cover" />
+                          </div>
+                          <div className="text-white space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-black text-xl tracking-tight leading-none">{pro.business_name}</h4>
+                              <CheckCircle2 className="w-5 h-5 text-primary fill-white" />
+                            </div>
+                            <Badge variant="outline" className="bg-white/10 text-[10px] text-white border-white/20 font-bold uppercase py-0 px-2 rounded-md">
+                              {pro.business_type === 'carpenter' ? 'نجار معتمد' : 'مصمم ديكور'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="absolute top-4 left-4">
+                           <Badge className="bg-white/90 backdrop-blur-sm text-secondary font-black border-none px-3 py-1.5 flex items-center gap-1 shadow-xl rounded-lg">
+                             <Star className="w-4 h-4 text-amber-500 fill-current" />
+                             {pro.average_rating ? pro.average_rating.toLocaleString('en-US') : '5.0'}
+                           </Badge>
+                        </div>
+                      </div>
+                      <div className="p-8 flex-1 flex flex-col space-y-6">
+                        <p className="text-[15px] text-muted-foreground leading-relaxed font-medium line-clamp-3">
+                          {pro.description || 'يقدم هذا الخبير خدمات احترافية موثقة لضمان جودة التصنيع والتركيب.'}
+                        </p>
+                        <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-auto">
+                          <div className="flex items-center gap-2 text-secondary font-black text-sm">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            {pro.service_areas && pro.service_areas.length > 0 ? pro.service_areas[0] : pro.city || 'اليمن'}
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-11 font-black text-primary hover:bg-primary/5 transition-all rounded-xl gap-2 group/btn">
+                            طلب خدمة 
+                            <ArrowLeft className="w-4 h-4 transition-transform group-hover/btn:-translate-x-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Link>
                   </motion.div>
                 ))}
               </motion.div>
