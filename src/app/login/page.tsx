@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -13,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, UserPlus, Copy, CheckCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -53,10 +52,9 @@ export default function LoginPage() {
         router.push('/');
       }
     } catch (error: any) {
-      let errorMessage = "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.";
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
-      }
+      console.error("Login error:", error);
+      let errorMessage = "بيانات الاعتماد غير صالحة. يرجى التأكد من البريد وكلمة المرور.";
+      
       toast({
         variant: "destructive",
         title: "خطأ في تسجيل الدخول",
@@ -165,11 +163,9 @@ export default function LoginPage() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
-          <div className="flex flex-col gap-4 w-full">
-            <Link href="/register" className="text-sm font-black text-primary hover:underline flex items-center justify-center gap-2">
-               <UserPlus className="w-4 h-4" /> إنشاء حساب جديد للمعاينة
-            </Link>
-          </div>
+          <p className="text-xs text-muted-foreground text-center font-bold">
+            هذا النظام مخصص للمصرح لهم فقط. يتم مراقبة كافة عمليات الدخول.
+          </p>
         </CardFooter>
       </Card>
     </div>

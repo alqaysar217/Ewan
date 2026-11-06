@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -69,7 +68,6 @@ const compressImage = (base64Str: string, maxWidth = 400): Promise<string> => {
 
 export default function AdminUsers() {
   const db = useFirestore();
-  const mainApp = useFirebaseApp();
   
   const usersQuery = useMemo(() => query(collection(db, 'users'), orderBy('created_at', 'desc')), [db]);
   const { data: users, loading } = useCollection(usersQuery);
@@ -125,11 +123,19 @@ export default function AdminUsers() {
         const secondaryApp = getApps().find(a => a.name === 'secondary') || initializeApp(firebaseConfig, 'secondary');
         const secondaryAuth = getAuth(secondaryApp);
         
-        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, userData.email, userData.password);
-        userId = userCredential.user.uid;
-        
-        // تسجيل الخروج من التطبيق الثانوي فوراً
-        await signOut(secondaryAuth);
+        try {
+          const userCredential = await createUserWithEmailAndPassword(secondaryAuth, userData.email, userData.password);
+          userId = userCredential.user.uid;
+          
+          // تسجيل الخروج من التطبيق الثانوي فوراً لضمان عدم حدوث تداخل
+          await signOut(secondaryAuth);
+        } catch (authError: any) {
+          console.error("Auth creation error:", authError);
+          if (authError.code === 'auth/email-already-in-use') {
+            throw new Error("هذا البريد الإلكتروني مسجل مسبقاً في نظام الحماية.");
+          }
+          throw authError;
+        }
       }
 
       const finalPermissions = userData.role === 'admin' ? {
@@ -149,22 +155,21 @@ export default function AdminUsers() {
         is_active: true
       };
 
-      // حفظ أو تحديث البيانات في Firestore باستخدام الـ UID الحقيقي
+      // حفظ أو تحديث البيانات في Firestore باستخدام الـ UID الحقيقي من Auth
       await setDoc(doc(db, 'users', userId), {
         ...finalData,
         created_at: editingUser ? editingUser.created_at : new Date().toISOString()
       }, { merge: true });
 
-      toast({ title: editingUser ? "تم تحديث البيانات" : "تم تفعيل الحساب بنجاح", description: "يمكن الآن تسجيل الدخول بهذا الحساب." });
+      toast({ 
+        title: editingUser ? "تم تحديث البيانات" : "تم إنشاء الحساب بنجاح", 
+        description: `يمكن لـ ${userData.full_name} تسجيل الدخول الآن باستخدام بياناته.` 
+      });
       setIsDialogOpen(false);
       resetForm();
     } catch (e: any) {
       console.error(e);
-      let msg = "حدث خطأ غير متوقع.";
-      if (e.code === 'auth/email-already-in-use') msg = "هذا البريد الإلكتروني مسجل مسبقاً.";
-      if (e.code === 'auth/weak-password') msg = "كلمة المرور ضعيفة جداً.";
-      
-      toast({ variant: "destructive", title: "فشل في إنشاء الحساب", description: msg });
+      toast({ variant: "destructive", title: "فشل في العملية", description: e.message || "حدث خطأ أثناء محاولة حفظ البيانات." });
     } finally {
       setIsSaving(false);
     }
@@ -187,7 +192,7 @@ export default function AdminUsers() {
     setUserData({
       full_name: user.full_name || '',
       email: user.email || '',
-      password: '', // لا نعرض كلمة المرور القديمة للأمان
+      password: '', 
       avatar_url: user.avatar_url || '',
       role: user.role || 'staff',
       permissions: user.permissions || initialPermissions
