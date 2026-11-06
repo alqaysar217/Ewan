@@ -107,40 +107,34 @@ export default function HomePage() {
     { title: 'ضمان حقيقي', desc: 'ضمان يصل إلى 5 سنوات على جودة الخشب والنجارة.', icon: ShieldCheck }
   ];
 
-  // Animation Variants
+  // هدوء وبساطة في الحركات لتجنب مشاكل الأداء والمساحات الجانبية
+  const fadeInVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.6, ease: "easeOut" } 
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.1,
         delayChildren: 0.1
       }
     }
   };
 
-  const itemFadeUp = {
-    hidden: { y: 60, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
-  };
-
-  const itemFadeRight = {
-    hidden: { x: 100, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { duration: 1, ease: "easeOut" } }
-  };
-
-  const itemFadeLeft = {
-    hidden: { x: -100, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { duration: 1, ease: "easeOut" } }
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-background" dir="rtl">
+    <div className="flex flex-col min-h-screen bg-background overflow-x-hidden" dir="rtl">
       <Header />
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-secondary scroll-mt-20">
+        <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-secondary">
           <div className="absolute inset-0 z-0">
             <Image 
               src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200" 
@@ -157,7 +151,7 @@ export default function HomePage() {
             <motion.div 
               initial="hidden"
               animate="visible"
-              variants={itemFadeRight}
+              variants={fadeInVariants}
               className="max-w-3xl space-y-8 py-16"
             >
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-accent/20 backdrop-blur-xl rounded-[15px] text-accent border-r-4 border-secondary shadow-xl shadow-accent/5 mx-auto lg:mx-0">
@@ -186,13 +180,13 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="pt-32 pb-12 bg-background relative overflow-hidden scroll-mt-20">
+        <section className="pt-32 pb-12 bg-background relative overflow-hidden">
           <div className="container px-4 md:px-8 mx-auto text-center relative z-10">
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemFadeUp}
+              viewport={{ once: true }}
+              variants={fadeInVariants}
               className="mb-20 space-y-5 text-center"
             >
               <div className="flex items-center justify-center gap-3">
@@ -207,23 +201,22 @@ export default function HomePage() {
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true }}
               variants={containerVariants}
               className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10"
             >
               {features.map((feature, i) => (
                 <motion.div 
                   key={i} 
-                  variants={itemFadeUp}
-                  className="group relative p-5 md:p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
+                  variants={fadeInVariants}
+                  className="group relative p-4 md:p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
-                  <div className="w-12 h-12 md:w-20 md:h-20 rounded-xl flex items-center justify-center mb-4 md:mb-8 bg-accent text-white shadow-lg shadow-accent/20 transition-all duration-500 group-hover:scale-110 relative z-10">
-                    <feature.icon className="w-6 h-6 md:w-10 md:h-10" />
+                  <div className="w-10 h-10 md:w-20 md:h-20 rounded-xl flex items-center justify-center mb-3 md:mb-8 bg-accent text-white shadow-lg shadow-accent/20 transition-all duration-500 group-hover:scale-110 relative z-10">
+                    <feature.icon className="w-5 h-5 md:w-10 md:h-10" />
                   </div>
-                  <h3 className="text-sm md:text-2xl font-black text-white mb-2 md:mb-4 relative z-10 tracking-tight">{feature.title}</h3>
+                  <h3 className="text-sm md:text-2xl font-black text-white mb-1 md:mb-4 relative z-10 tracking-tight">{feature.title}</h3>
                   <p className="text-gray-300 font-bold leading-relaxed text-[10px] md:text-sm relative z-10">{feature.desc}</p>
-                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-right" />
                 </motion.div>
               ))}
             </motion.div>
@@ -231,13 +224,13 @@ export default function HomePage() {
         </section>
 
         {/* Featured Products Section */}
-        <section className="py-24 bg-background scroll-mt-20">
+        <section className="py-24 bg-background">
           <div className="container px-4 md:px-8 mx-auto">
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemFadeLeft}
+              viewport={{ once: true }}
+              variants={fadeInVariants}
               className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6 text-center md:text-right"
             >
               <div className="space-y-4">
@@ -267,14 +260,14 @@ export default function HomePage() {
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true }}
                 variants={containerVariants}
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8"
               >
-                {featuredProducts.map((product, idx) => (
+                {featuredProducts.map((product) => (
                   <motion.div 
                     key={product.id} 
-                    variants={itemFadeUp}
+                    variants={fadeInVariants}
                     className="bg-card rounded-[15px] md:rounded-[20px] shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col group border border-border/40"
                   >
                     <div className="relative aspect-square overflow-hidden bg-muted/10">
@@ -284,8 +277,6 @@ export default function HomePage() {
                         fill 
                         className="object-cover group-hover:scale-105 transition-transform duration-700" 
                       />
-                      <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
-                      
                       <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
                       {product.discount > 0 && (
                         <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20">
@@ -342,16 +333,15 @@ export default function HomePage() {
         </section>
 
         {/* Stores Section */}
-        <section className="py-24 bg-secondary relative overflow-hidden scroll-mt-20">
+        <section className="py-24 bg-secondary relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
           
-          <div className="absolute top-0 right-0 w-1/3 h-full bg-accent/5 -skew-x-12 translate-x-1/2" />
           <div className="container relative z-10 px-4 md:px-8 mx-auto">
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemFadeUp}
+              viewport={{ once: true }}
+              variants={fadeInVariants}
               className="text-center mb-16 space-y-4"
             >
               <h2 className="text-4xl md:text-5xl font-black text-white">أبرز المتاجر المعتمدة</h2>
@@ -368,14 +358,14 @@ export default function HomePage() {
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true }}
                 variants={containerVariants}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                {storesData?.map((store: any, i: number) => (
+                {storesData?.map((store: any) => (
                   <motion.div
-                    key={i}
-                    variants={i % 2 === 0 ? itemFadeRight : itemFadeLeft}
+                    key={store.id}
+                    variants={fadeInVariants}
                   >
                     <Link 
                       href={`/vendors/${store.id}`}
@@ -391,7 +381,7 @@ export default function HomePage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent" />
                         
                         <div className="absolute bottom-4 right-4 flex items-center gap-3">
-                          <div className="w-14 h-14 bg-card p-1 shadow-xl relative overflow-hidden rounded-md">
+                          <div className="w-12 h-12 bg-card p-1 shadow-xl relative overflow-hidden rounded-md">
                             <Image 
                               src={store.logo_url || `https://picsum.photos/seed/${store.id}-logo/200/200`}
                               alt="Logo"
@@ -401,20 +391,10 @@ export default function HomePage() {
                           </div>
                           <div className="text-white">
                             <div className="flex items-center gap-1.5">
-                              <h4 className="font-black text-lg">{store.business_name}</h4>
-                              <CheckCircle2 className="w-4 h-4 text-accent fill-white" />
+                              <h4 className="font-black text-base">{store.business_name}</h4>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-accent fill-white" />
                             </div>
-                            <Badge variant="outline" className="bg-white/10 text-white border-white/20 text-[10px] uppercase">
-                              معرض أثاث
-                            </Badge>
                           </div>
-                        </div>
-                        
-                        <div className="absolute top-4 left-4">
-                          <Badge className="bg-white/90 backdrop-blur-sm text-secondary font-black border-none px-2 py-1 flex items-center gap-1 shadow-lg rounded-md">
-                            <Star className="w-3 h-3 text-accent fill-current" />
-                            {(store.average_rating || 5.0).toLocaleString('en-US')}
-                          </Badge>
                         </div>
                       </div>
 
@@ -422,15 +402,13 @@ export default function HomePage() {
                         <p className="text-sm text-muted-foreground leading-relaxed font-medium line-clamp-2 italic">
                           "{store.description || 'شريك معتمد في منصة إيوان للأثاث الفاخر.'}"
                         </p>
-                        
                         <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
                           <div className="flex items-center gap-2 text-muted-foreground text-xs font-bold">
                             <MapPin className="w-3.5 h-3.5 text-accent" />
                             {store.city}
                           </div>
-                          <Button variant="outline" size="sm" className="h-10 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
-                            تصفح المنتجات 
-                            <ArrowLeft className="w-4 h-4 mr-2" />
+                          <Button variant="outline" size="sm" className="h-9 font-bold border-secondary/10 hover:bg-secondary hover:text-white transition-all rounded-md">
+                            تصفح المتجر 
                           </Button>
                         </div>
                       </div>
@@ -439,96 +417,72 @@ export default function HomePage() {
                 ))}
               </motion.div>
             )}
-            
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={itemFadeUp}
-              className="mt-16 text-center"
-            >
-               <Link href="/vendors">
-                 <Button size="lg" className="h-16 px-12 rounded-xl bg-accent hover:bg-accent/90 text-white font-black text-xl shadow-2xl shadow-accent/40 transition-all hover:-translate-y-1">
-                   شاهد كافة المتاجر <ChevronRight className="w-6 h-6 mr-2 rotate-180" />
-                 </Button>
-               </Link>
-            </motion.div>
           </div>
         </section>
 
         {/* Partners Section */}
-        <section className="py-28 bg-background border-y border-border/50 scroll-mt-20">
+        <section className="py-24 bg-background border-y border-border/50">
           <div className="container px-4 md:px-8 mx-auto">
-            <div className="space-y-20">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInVariants}
+              className="text-center space-y-4 max-w-2xl mx-auto mb-16"
+            >
+              <h3 className="text-3xl font-black text-secondary">شركاء النجاح</h3>
+              <p className="text-muted-foreground font-medium">
+                نتعاون مع أفضل الخبرات المحلية والعالمية لتقديم الجودة والابتكار.
+              </p>
+            </motion.div>
+            
+            {partnersLoading ? (
+              <div className="flex justify-center py-10">
+                 <Loader2 className="w-10 h-10 animate-spin text-accent" />
+              </div>
+            ) : partnersData?.length === 0 ? (
+              <div className="text-center text-muted-foreground font-bold">انضم إلينا كشريك نجاح اليوم.</div>
+            ) : (
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={itemFadeUp}
-                className="text-center space-y-4 max-w-2xl mx-auto"
+                viewport={{ once: true }}
+                variants={containerVariants}
+                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-12"
               >
-                <div className="h-1 w-12 bg-accent mx-auto rounded-full mb-4"></div>
-                <h3 className="text-3xl font-black text-secondary">شركاء النجاح</h3>
-                <p className="text-muted-foreground font-medium leading-relaxed">
-                  نتعاون مع أفضل الخبرات المحلية والعالمية لتقديم الجودة والابتكار التي يستحقها عملاؤنا في اليمن.
-                </p>
+                {partnersData?.map((partner: any) => (
+                  <motion.div 
+                    key={partner.id} 
+                    variants={fadeInVariants}
+                    className="relative w-full h-12 flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-500"
+                  >
+                    <Image 
+                      src={partner.logo_url} 
+                      alt={partner.name} 
+                      fill 
+                      className="object-contain" 
+                    />
+                  </motion.div>
+                ))}
               </motion.div>
-              
-              {partnersLoading ? (
-                <div className="flex justify-center py-10">
-                   <Loader2 className="w-10 h-10 animate-spin text-accent" />
-                </div>
-              ) : partnersData?.length === 0 ? (
-                <div className="text-center text-muted-foreground font-bold">انضم إلينا كشريك نجاح اليوم.</div>
-              ) : (
-                <motion.div 
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
-                  variants={containerVariants}
-                  className="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-8 md:gap-24 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700"
-                >
-                  {partnersData?.map((partner: any, i: number) => (
-                    <motion.div 
-                      key={i} 
-                      variants={itemFadeUp}
-                      whileHover={{ scale: 1.1 }}
-                      className="relative w-full h-10 md:w-40 md:h-16 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group"
-                    >
-                      <Image 
-                        src={partner.logo_url} 
-                        alt={partner.name} 
-                        fill 
-                        className="object-contain opacity-70 group-hover:opacity-100 transition-opacity" 
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </div>
+            )}
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-24 bg-secondary text-white relative overflow-hidden scroll-mt-20">
+        <section className="py-24 bg-secondary text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
-          
-          <Quote className="absolute -top-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
-          <Quote className="absolute -bottom-10 -left-10 w-64 h-64 text-white/5 -rotate-12" />
           
           <div className="container px-4 md:px-8 mx-auto relative z-10">
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemFadeUp}
-              className="text-center mb-20 space-y-6"
+              viewport={{ once: true }}
+              variants={fadeInVariants}
+              className="text-center mb-16 space-y-6"
             >
-              <div className="w-20 h-20 bg-accent/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
-                <Quote className="w-10 h-10 text-accent" />
-              </div>
               <h2 className="text-4xl md:text-5xl font-black">ماذا يقول عملاؤنا؟</h2>
-              <p className="text-gray-400 text-lg max-xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">قصص نجاح حقيقية بدأت بلمسة من إيوان وانتهت بمساحات مذهلة.</p>
             </motion.div>
             
             {testimonialsLoading ? (
@@ -541,106 +495,72 @@ export default function HomePage() {
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true }}
                 variants={containerVariants}
                 className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8"
               >
-                {testimonialsData?.map((t: any, i: number) => (
+                {testimonialsData?.map((t: any) => (
                   <motion.div 
-                    key={i} 
-                    variants={itemFadeUp}
-                    className="group relative p-4 md:p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-4 md:space-y-6 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right"
+                    key={t.id} 
+                    variants={fadeInVariants}
+                    className="group relative p-4 md:p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-[15px] space-y-4 hover:bg-white/10 transition-all duration-500 shadow-xl flex flex-col h-full text-right"
                   >
                     <div className="flex gap-0.5 text-accent justify-start">
                       {Array.from({ length: 5 }).map((_, starIdx) => (
                         <Star key={starIdx} className={cn("w-3 h-3 md:w-4 md:h-4", starIdx >= (t.rating || 5) ? "fill-none" : "fill-current")} />
                       ))}
                     </div>
-                    
-                    <div className="relative flex-1">
-                      <Quote className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-6 h-6 md:w-10 md:h-10 text-accent opacity-20" />
-                      <p className="text-xs md:text-lg font-medium leading-relaxed text-right relative z-10 italic line-clamp-4 md:line-clamp-none">
-                        "{t.text}"
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 md:gap-4 pt-4 md:pt-6 border-t border-white/10">
-                      <div className="relative w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl overflow-hidden shadow-lg border-2 border-accent/20 shrink-0 bg-white/10">
-                        {t.avatar_url ? (
-                          <Image src={t.avatar_url} alt={t.name} fill className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center font-black text-accent text-sm md:text-xl">{t.name?.charAt(0)}</div>
-                        )}
+                    <p className="text-xs md:text-base font-medium leading-relaxed italic line-clamp-4 flex-1">
+                      "{t.text}"
+                    </p>
+                    <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+                      <div className="relative w-8 h-8 md:w-12 md:h-12 rounded-lg overflow-hidden shrink-0 bg-white/10 flex items-center justify-center font-black text-accent text-xs">
+                        {t.avatar_url ? <Image src={t.avatar_url} alt={t.name} fill className="object-cover" /> : t.name?.charAt(0)}
                       </div>
                       <div className="text-right min-w-0">
-                        <h4 className="font-black text-white text-[11px] md:text-base truncate">{t.name}</h4>
-                        <p className="text-[9px] md:text-xs text-accent font-bold mt-0.5 truncate">{t.role || 'عميل إيوان'}</p>
+                        <h4 className="font-black text-white text-[10px] md:text-sm truncate">{t.name}</h4>
+                        <p className="text-[8px] md:text-xs text-accent font-bold mt-0.5 truncate">{t.role || 'عميل إيوان'}</p>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </motion.div>
             )}
-
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={itemFadeUp}
-              className="mt-16 text-center"
-            >
-               <Link href="/reviews">
-                 <Button variant="outline" size="lg" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 font-black px-12 h-14 transition-all">
-                   عرض كافة الآراء <ArrowLeft className="w-5 h-5 mr-2" />
-                 </Button>
-               </Link>
-            </motion.div>
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 md:py-24 bg-background scroll-mt-20">
+        <section className="py-24 bg-background">
           <div className="container px-4 md:px-8 max-w-4xl mx-auto">
             <motion.div 
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemFadeRight}
-              className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6 text-center md:text-right"
+              viewport={{ once: true }}
+              variants={fadeInVariants}
+              className="text-center mb-16 space-y-4"
             >
-              <div className="space-y-3 md:space-y-4">
-                <div className="h-6 md:h-8 w-1 bg-accent inline-block align-middle ml-3 md:ml-4 rounded-full"></div>
-                <h2 className="text-2xl md:text-4xl font-black text-secondary inline-block align-middle">الأسئلة الشائعة</h2>
-                <p className="text-muted-foreground text-sm md:text-lg">كل ما تحتاج معرفته حول رحلتك مع إيوان.</p>
-              </div>
-              <Link href="/faq">
-                <Button variant="ghost" className="text-accent font-black text-base md:text-lg p-0 flex gap-2 group hover:bg-transparent">
-                  عرض كل الأسئلة
-                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <h2 className="text-3xl md:text-4xl font-black text-secondary">الأسئلة الشائعة</h2>
+              <p className="text-muted-foreground">كل ما تحتاج معرفته حول رحلتك مع إيوان.</p>
             </motion.div>
 
             {faqsLoading ? (
                <div className="flex justify-center py-10">
                  <Loader2 className="w-10 h-10 animate-spin text-accent" />
                </div>
-            ) : faqsData?.length === 0 ? (
-               <div className="text-center py-10 bg-muted/30 rounded-xl border-2 border-dashed">لا توجد أسئلة مضافة حالياً.</div>
             ) : (
               <motion.div 
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                variants={itemFadeUp}
+                viewport={{ once: true }}
+                variants={fadeInVariants}
               >
-                <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
+                <Accordion type="single" collapsible className="w-full space-y-4">
                   {faqsData?.map((item: any, i: number) => (
-                    <AccordionItem key={i} value={`item-${i}`} className="bg-muted/30 border-none rounded-[15px] px-4 md:px-6 overflow-hidden">
-                      <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-4 md:py-6 text-right leading-snug">
+                    <AccordionItem key={i} value={`item-${i}`} className="bg-muted/30 border-none rounded-[15px] px-6">
+                      <AccordionTrigger className="text-sm md:text-lg font-bold text-secondary hover:no-underline py-5 text-right">
                         {item.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground leading-relaxed text-[13px] md:text-[15px] pb-4 md:pb-6 text-right">
+                      <AccordionContent className="text-muted-foreground leading-relaxed text-sm md:text-base pb-5 text-right">
                         {item.answer}
                       </AccordionContent>
                     </AccordionItem>
