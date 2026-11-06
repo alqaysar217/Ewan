@@ -1,39 +1,32 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
+import { useAuth, useFirestore } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, ArrowRight, ShieldCheck, Loader2, Copy, CheckCircle, Info, AlertTriangle, Key } from 'lucide-react';
+import { Mail, ArrowRight, ShieldCheck, Loader2, Key } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   
   const auth = useAuth();
-  const { user } = useUser();
   const db = useFirestore();
   const router = useRouter();
-
-  // جلب بيانات المستخدم لمعرفة الدور
-  const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
-  const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 1. تسجيل الدخول عبر نظام Authentication (هنا يتم التحقق من كلمة السر)
+      // 1. تسجيل الدخول عبر نظام Authentication
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
       
@@ -43,8 +36,8 @@ export default function LoginPage() {
       if (!userSnap.exists()) {
         toast({
           variant: "destructive",
-          title: "تم الدخول.. ولكن!",
-          description: "كلمة المرور صحيحة، ولكن حسابك يفتقد لبيانات الصلاحيات في Firestore. يرجى اتباع تعليمات الاستعادة بالأسفل.",
+          title: "وصول غير مصرح",
+          description: "حسابك مسجل في النظام ولكن لا يملك صلاحيات وصول إدارية.",
         });
         setLoading(false);
         return;
@@ -68,7 +61,7 @@ export default function LoginPage() {
       let errorMessage = "تأكد من البريد الإلكتروني وكلمة المرور.";
       
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = "خطأ في البريد الإلكتروني أو كلمة المرور (تحقق من نظام Authentication).";
+        errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
       }
 
       toast({
@@ -81,17 +74,9 @@ export default function LoginPage() {
     }
   };
 
-  const copyUid = () => {
-    if (user) {
-      navigator.clipboard.writeText(user.uid);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({ title: "تم نسخ المعرف (UID)", description: "ضعه في حقل Document ID داخل مجموعة users في فايربيس." });
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4 font-cairo" dir="rtl">
+      {/* Subtle Hexagonal Background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23073D49' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
       
       <Card className="w-full max-w-md border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-xl relative z-10">
@@ -114,31 +99,6 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="px-8 pb-8">
-          {/* تنبيه الاستعادة في حال فقدان بيانات فايرستور */}
-          {user && !userData && !docLoading && (
-            <div className="mb-8 p-5 bg-amber-50 border border-amber-200 rounded-2xl space-y-4 shadow-sm animate-in zoom-in duration-300">
-              <div className="flex items-center gap-2 text-amber-600 font-black text-sm">
-                <AlertTriangle className="w-5 h-5" /> تنبيه: حسابك غير مكتمل
-              </div>
-              <p className="text-[12px] font-bold text-amber-700 leading-relaxed text-right">
-                أنت مسجل في نظام الحماية (Authentication) ولكن لا يوجد لك سجل في Firestore. 
-                قم بإنشاء مستند جديد في مجموعة <code className="bg-amber-100 px-1 rounded">users</code> واستخدم هذا المعرف (UID) كاسم للمستند:
-              </p>
-              <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-100 shadow-inner">
-                <div className="flex flex-col overflow-hidden">
-                  <span className="text-[9px] text-gray-400 font-bold uppercase mb-0.5">Your Unique UID</span>
-                  <code className="text-[11px] font-mono text-secondary truncate max-w-[180px]">{user.uid}</code>
-                </div>
-                <Button size="sm" variant="ghost" className="h-10 w-10 p-0 text-primary hover:bg-primary/5 rounded-lg" onClick={copyUid}>
-                  {copied ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
-                </Button>
-              </div>
-              <p className="text-[10px] text-amber-600 font-bold italic">
-                * استخدم البريد وكلمة السر الموجودين في Authentication للدخول دائماً.
-              </p>
-            </div>
-          )}
-
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="email" className="font-black text-secondary mr-1 flex items-center gap-2 text-sm">
@@ -181,7 +141,7 @@ export default function LoginPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  تسجيل الدخول
+                  دخول للنظام
                   <ArrowRight className="w-5 h-5 rotate-180 group-hover:-translate-x-1 transition-transform" />
                 </>
               )}
@@ -189,9 +149,9 @@ export default function LoginPage() {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-6 pb-12 pt-4 px-8 border-t border-gray-50">
+        <CardFooter className="flex flex-col space-y-4 pb-12 pt-4 px-8 border-t border-gray-50">
           <p className="text-xs text-muted-foreground text-center font-bold">
-            كلمة المرور تُدار عبر نظام الحماية المشفر. في حال نسيانها، يرجى مراجعة المسؤول أو نظام Authentication.
+            منصة إيوان للأثاث - نظام الإدارة الموحد
           </p>
         </CardFooter>
       </Card>
