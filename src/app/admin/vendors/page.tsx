@@ -29,7 +29,8 @@ import {
   Package,
   Quote,
   Edit,
-  AlertTriangle
+  X,
+  Calendar
 } from 'lucide-react';
 import {
   Dialog,
@@ -96,6 +97,7 @@ export default function AdminVendors() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingVendor, setEditingVendor] = useState<any>(null);
+  const [newArea, setNewArea] = useState('');
 
   const [vendorData, setVendorData] = useState({
     business_name: '',
@@ -108,7 +110,7 @@ export default function AdminVendors() {
     average_rating: 5,
     experience_years: '5',
     available_products: '0',
-    service_areas: ['صنعاء'],
+    service_areas: [] as string[],
     reviews: [] as any[],
     gallery: [] as string[]
   });
@@ -127,6 +129,17 @@ export default function AdminVendors() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const addArea = () => {
+    if (newArea.trim() && !vendorData.service_areas.includes(newArea.trim())) {
+      setVendorData(prev => ({ ...prev, service_areas: [...prev.service_areas, newArea.trim()] }));
+      setNewArea('');
+    }
+  };
+
+  const removeArea = (area: string) => {
+    setVendorData(prev => ({ ...prev, service_areas: prev.service_areas.filter(a => a !== area) }));
   };
 
   const handleSaveVendor = async () => {
@@ -180,6 +193,8 @@ export default function AdminVendors() {
       ...vendor,
       experience_years: vendor.experience_years?.toString() || '5',
       available_products: vendor.available_products?.toString() || '0',
+      service_areas: vendor.service_areas || [],
+      reviews: vendor.reviews || []
     });
     setIsDialogOpen(true);
   };
@@ -189,7 +204,7 @@ export default function AdminVendors() {
     setVendorData({ 
       business_name: '', business_type: 'furniture_store', city: 'صنعاء', email: '', 
       description: '', logo_url: '', cover_url: '', average_rating: 5, 
-      experience_years: '5', available_products: '0', service_areas: ['صنعاء'], 
+      experience_years: '5', available_products: '0', service_areas: [], 
       reviews: [], gallery: [] 
     });
   };
@@ -259,7 +274,7 @@ export default function AdminVendors() {
                    <div className="text-white">
                       <h4 className="font-black text-lg flex items-center gap-1.5">{vendor.business_name} <CheckCircle2 className="w-4 h-4 text-primary fill-white" /></h4>
                       <p className="text-[10px] font-bold opacity-80 flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {vendor.city}
+                        <MapPin className="w-3 h-3 text-primary" /> {vendor.city}
                       </p>
                    </div>
                 </div>
@@ -295,7 +310,7 @@ export default function AdminVendors() {
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!isSaving) setIsDialogOpen(open); }}>
-        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-2xl border-none shadow-2xl font-cairo" dir="rtl">
+        <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden rounded-2xl border-none shadow-2xl font-cairo" dir="rtl">
           <Tabs defaultValue="branding" className="w-full">
             <div className="bg-secondary p-6 pb-0 text-white">
               <DialogHeader className="mb-4 text-right">
@@ -307,88 +322,183 @@ export default function AdminVendors() {
                   <Store className="w-4 h-4" /> الهوية التجارية
                 </TabsTrigger>
                 <TabsTrigger value="performance" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
-                  <Award className="w-4 h-4" /> الأداء
+                  <Award className="w-4 h-4" /> الأداء والمناطق
                 </TabsTrigger>
                 <TabsTrigger value="reviews" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
-                  <Star className="w-4 h-4" /> الآراء
+                  <Star className="w-4 h-4" /> مراجعات العملاء
                 </TabsTrigger>
                 <TabsTrigger value="gallery" className="rounded-none h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-white font-black text-sm gap-2">
-                  <ImageIcon className="w-4 h-4" /> المعرض
+                  <ImageIcon className="w-4 h-4" /> معرض الأعمال
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <div className="p-6 max-h-[50vh] overflow-y-auto bg-white text-right">
-              <TabsContent value="branding" className="space-y-5 mt-0">
+            <div className="p-6 max-h-[60vh] overflow-y-auto bg-white text-right">
+              <TabsContent value="branding" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                     <label className="text-sm font-black text-secondary flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4 text-primary" /> شعار المتجر الرسمي
+                     </label>
+                     <div className="relative aspect-square w-24 border-2 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center group">
+                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
+                        {vendorData.logo_url ? <Image src={vendorData.logo_url} alt="Logo" fill className="object-cover" /> : <Upload className="w-6 h-6 opacity-30 group-hover:scale-110 transition-transform" />}
+                     </div>
+                  </div>
+                  <div className="space-y-3">
+                     <label className="text-sm font-black text-secondary flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4 text-primary" /> صورة غلاف الملف الشخصي
+                     </label>
+                     <div className="relative aspect-video w-full border-2 border-dashed border-gray-100 rounded-2xl overflow-hidden bg-gray-50 cursor-pointer hover:border-primary/40 transition-all flex items-center justify-center group">
+                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
+                        {vendorData.cover_url ? <Image src={vendorData.cover_url} alt="Cover" fill className="object-cover" /> : <Upload className="w-8 h-8 opacity-30 group-hover:scale-110 transition-transform" />}
+                     </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                     <label className="text-sm font-black text-secondary flex items-center gap-2"><ImageIcon className="w-4 h-4 text-primary" /> شعار المتجر</label>
-                     <div className="relative aspect-square w-20 border-2 border-dashed border-gray-100 rounded-xl overflow-hidden bg-gray-50 cursor-pointer">
-                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('logo', e)} className="absolute inset-0 opacity-0 z-20" />
-                        {vendorData.logo_url ? <Image src={vendorData.logo_url} alt="Logo" fill className="object-cover" /> : <div className="h-full w-full flex items-center justify-center"><Upload className="w-5 h-5 opacity-30" /></div>}
-                     </div>
+                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Store className="w-3 h-3 text-primary" /> الاسم التجاري للمعرض</label>
+                    <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="مثال: عالم الأثاث الفاخر" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
                   </div>
                   <div className="space-y-2">
-                     <label className="text-sm font-black text-secondary flex items-center gap-2"><ImageIcon className="w-4 h-4 text-primary" /> صورة الغلاف</label>
-                     <div className="relative aspect-video w-full border-2 border-dashed border-gray-100 rounded-xl overflow-hidden bg-gray-50 cursor-pointer">
-                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload('cover', e)} className="absolute inset-0 opacity-0 z-20" />
-                        {vendorData.cover_url ? <Image src={vendorData.cover_url} alt="Cover" fill className="object-cover" /> : <div className="h-full w-full flex items-center justify-center"><Upload className="w-6 h-6 opacity-30" /></div>}
-                     </div>
+                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Mail className="w-3 h-3 text-primary" /> البريد الإلكتروني للتواصل</label>
+                    <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="store@ewan.ye" className="rounded-xl h-12 bg-gray-50 border-none shadow-inner" />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input value={vendorData.business_name} onChange={e => setVendorData({...vendorData, business_name: e.target.value})} placeholder="الاسم التجاري" className="rounded-xl h-11 bg-gray-50 border-none" />
-                  <Input value={vendorData.email} onChange={e => setVendorData({...vendorData, email: e.target.value})} placeholder="البريد الإلكتروني" className="rounded-xl h-11 bg-gray-50 border-none" />
+
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-secondary flex items-center gap-2"><Info className="w-3 h-3 text-primary" /> نبذة تعريفية وقصة المتجر</label>
+                  <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="اكتب وصفاً جذاباً لخدماتك ومنتجاتك..." className="rounded-xl min-h-[100px] bg-gray-50 border-none shadow-inner" />
                 </div>
               </TabsContent>
 
-              <TabsContent value="performance" className="space-y-5 mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} placeholder="سنوات الخبرة" className="rounded-xl h-11 bg-gray-50 border-none" />
-                  <Input type="number" value={vendorData.available_products} onChange={e => setVendorData({...vendorData, available_products: e.target.value})} placeholder="المنتجات" className="rounded-xl h-11 bg-gray-50 border-none" />
-                  <Input type="number" max="5" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} placeholder="التقييم" className="rounded-xl h-11 bg-gray-50 border-none" />
+              <TabsContent value="performance" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Clock className="w-3 h-3 text-primary" /> سنوات الخبرة</label>
+                    <Input type="number" value={vendorData.experience_years} onChange={e => setVendorData({...vendorData, experience_years: e.target.value})} placeholder="5" className="rounded-xl h-12 bg-gray-50 border-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Package className="w-3 h-3 text-primary" /> عدد المنتجات</label>
+                    <Input type="number" value={vendorData.available_products} onChange={e => setVendorData({...vendorData, available_products: e.target.value})} placeholder="50" className="rounded-xl h-12 bg-gray-50 border-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-secondary flex items-center gap-2"><Star className="w-3 h-3 text-primary" /> التقييم العام (0-5)</label>
+                    <Input type="number" max="5" value={vendorData.average_rating} onChange={e => setVendorData({...vendorData, average_rating: Number(e.target.value)})} placeholder="4.5" className="rounded-xl h-12 bg-gray-50 border-none" />
+                  </div>
                 </div>
-                <Textarea value={vendorData.description} onChange={e => setVendorData({...vendorData, description: e.target.value})} placeholder="نبذة عن المتجر..." className="rounded-xl min-h-[80px] bg-gray-50 border-none" />
+
+                <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                  <label className="text-sm font-black text-secondary flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> نطاق التغطية ومناطق الخدمة</label>
+                  <div className="flex gap-2">
+                    <Input 
+                      value={newArea} 
+                      onChange={e => setNewArea(e.target.value)} 
+                      placeholder="أدخل اسم المدينة أو المنطقة (مثال: عدن)" 
+                      className="rounded-xl h-12 bg-white border-none shadow-sm flex-1" 
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addArea())}
+                    />
+                    <Button onClick={addArea} type="button" className="h-12 px-6 rounded-xl bg-primary text-white font-black">إضافة</Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {vendorData.service_areas.length > 0 ? vendorData.service_areas.map((area, idx) => (
+                      <Badge key={idx} className="bg-white text-secondary border border-primary/20 px-3 py-1.5 rounded-lg flex items-center gap-2 font-bold shadow-sm">
+                        {area}
+                        <button onClick={() => removeArea(area)} className="text-destructive hover:scale-110 transition-transform"><X className="w-3 h-3" /></button>
+                      </Badge>
+                    )) : (
+                      <p className="text-xs text-muted-foreground italic mr-1">لم يتم تحديد مناطق تغطية بعد.</p>
+                    )}
+                  </div>
+                </div>
               </TabsContent>
 
-              <TabsContent value="reviews" className="space-y-3 mt-0">
-                 <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-black text-secondary">آراء العملاء</h3>
-                    <Button variant="outline" size="sm" onClick={() => setVendorData(prev => ({...prev, reviews: [...prev.reviews, {name: 'عميل جديد', text: '', rating: 5, date: 'الآن'}]}))}>+ إضافة</Button>
+              <TabsContent value="reviews" className="space-y-4 mt-0">
+                 <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-sm font-black text-secondary flex items-center gap-2"><Quote className="w-4 h-4 text-primary" /> مراجعات العملاء المثبتة</h3>
+                    <Button variant="outline" size="sm" onClick={() => setVendorData(prev => ({...prev, reviews: [...prev.reviews, {name: '', text: '', rating: 5, date: 'الآن'}]}))} className="rounded-lg h-9 font-bold">+ إضافة مراجعة</Button>
                  </div>
-                 {vendorData.reviews.map((rev, i) => (
-                    <div key={i} className="p-3 bg-gray-50 rounded-xl border border-gray-100 relative group">
-                       <Input value={rev.name} onChange={e => {
-                          const newRev = [...vendorData.reviews];
-                          newRev[i].name = e.target.value;
-                          setVendorData({...vendorData, reviews: newRev});
-                       }} className="bg-transparent border-none h-8 font-black" />
-                       <button onClick={() => setVendorData(prev => ({...prev, reviews: prev.reviews.filter((_, idx) => idx !== i)}))} className="absolute top-2 left-2 text-destructive opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
-                    </div>
-                 ))}
+                 
+                 <div className="space-y-4">
+                   {vendorData.reviews.length > 0 ? vendorData.reviews.map((rev, i) => (
+                      <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 relative group space-y-4 shadow-inner">
+                         <button onClick={() => setVendorData(prev => ({...prev, reviews: prev.reviews.filter((_, idx) => idx !== i)}))} className="absolute top-4 left-4 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
+                         
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><User className="w-3 h-3" /> اسم العميل</label>
+                               <Input value={rev.name} onChange={e => {
+                                  const newRev = [...vendorData.reviews];
+                                  newRev[i].name = e.target.value;
+                                  setVendorData({...vendorData, reviews: newRev});
+                               }} placeholder="مثال: محمد الريمي" className="bg-white border-none h-10 font-bold rounded-lg" />
+                            </div>
+                            <div className="space-y-1">
+                               <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> تاريخ التقييم</label>
+                               <Input value={rev.date} onChange={e => {
+                                  const newRev = [...vendorData.reviews];
+                                  newRev[i].date = e.target.value;
+                                  setVendorData({...vendorData, reviews: newRev});
+                               }} placeholder="مثال: منذ أسبوعين" className="bg-white border-none h-10 font-bold rounded-lg" />
+                            </div>
+                         </div>
+
+                         <div className="space-y-1">
+                            <label className="text-[10px] font-black text-muted-foreground mr-1 flex items-center gap-1"><Quote className="w-3 h-3" /> نص المراجعة</label>
+                            <Textarea value={rev.text} onChange={e => {
+                               const newRev = [...vendorData.reviews];
+                               newRev[i].text = e.target.value;
+                               setVendorData({...vendorData, reviews: newRev});
+                            }} placeholder="اكتب تجربة العميل بوضوح..." className="bg-white border-none min-h-[60px] font-medium rounded-lg shadow-sm" />
+                         </div>
+
+                         <div className="flex items-center gap-4">
+                            <label className="text-[10px] font-black text-muted-foreground flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-current" /> التقييم:</label>
+                            <select value={rev.rating} onChange={e => {
+                               const newRev = [...vendorData.reviews];
+                               newRev[i].rating = Number(e.target.value);
+                               setVendorData({...vendorData, reviews: newRev});
+                            }} className="bg-white border-none rounded-lg h-8 px-3 font-black text-xs outline-none shadow-sm">
+                               {[5,4,3,2,1].map(v => <option key={v} value={v}>{v} نجوم</option>)}
+                            </select>
+                         </div>
+                      </div>
+                   )) : (
+                     <div className="py-10 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 flex flex-col items-center gap-2 opacity-50">
+                        <MessageSquare className="w-10 h-10" />
+                        <p className="text-xs font-black">لا توجد مراجعات مضافة لهذا المتجر.</p>
+                     </div>
+                   )}
+                 </div>
               </TabsContent>
 
               <TabsContent value="gallery" className="space-y-4 mt-0">
+                 <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-secondary flex items-center gap-2"><ImageIcon className="w-4 h-4 text-primary" /> صور المعرض وبورتفوليو الأعمال</h3>
+                    <Badge variant="outline" className="font-bold text-[10px]">{vendorData.gallery.length} صور مضافة</Badge>
+                 </div>
                  <div className="grid grid-cols-4 gap-3">
                     {vendorData.gallery.map((img, i) => (
                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-md group">
                           <Image src={img} alt="Work" fill className="object-cover" />
-                          <button onClick={() => setVendorData(prev => ({ ...prev, gallery: prev.gallery.filter((_, idx) => idx !== i) }))} className="absolute top-1 left-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100"><Plus className="w-3 h-3 rotate-45" /></button>
+                          <button onClick={() => setVendorData(prev => ({ ...prev, gallery: prev.gallery.filter((_, idx) => idx !== i) }))} className="absolute top-1 left-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"><Trash2 className="w-3 h-3" /></button>
                        </div>
                     ))}
-                    <div className="relative aspect-square border-2 border-dashed border-gray-100 rounded-xl flex items-center justify-center hover:bg-primary/5 cursor-pointer">
-                       <input type="file" accept="image/*" onChange={(e) => handleImageUpload('gallery', e)} className="absolute inset-0 opacity-0" />
-                       <Plus className="w-5 h-5 text-muted-foreground" />
+                    <div className="relative aspect-square border-2 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center hover:bg-primary/5 cursor-pointer transition-all group overflow-hidden">
+                       <input type="file" accept="image/*" onChange={(e) => handleImageUpload('gallery', e)} className="absolute inset-0 opacity-0 z-20 cursor-pointer" />
+                       <Plus className="w-6 h-6 text-muted-foreground group-hover:scale-110 transition-transform" />
+                       <span className="text-[10px] font-black text-muted-foreground mt-1">إضافة صورة</span>
                     </div>
                  </div>
               </TabsContent>
             </div>
 
             <div className="p-6 bg-gray-50 border-t flex flex-row-reverse justify-start gap-4">
-              <Button onClick={handleSaveVendor} disabled={isSaving} className="rounded-xl px-8 h-12 font-black bg-secondary text-white min-w-[150px]">
-                {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : (editingVendor ? 'حفظ التغييرات' : 'تفعيل المعرض')}
+              <Button onClick={handleSaveVendor} disabled={isSaving} className="rounded-xl px-12 h-14 font-black bg-secondary text-white min-w-[180px] shadow-xl shadow-secondary/10">
+                {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (editingVendor ? 'حفظ التغييرات' : 'تفعيل المعرض')}
               </Button>
-              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="rounded-xl px-6 h-12 font-black">إلغاء</Button>
+              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSaving} className="rounded-xl px-8 h-14 font-black">إلغاء</Button>
             </div>
           </Tabs>
         </DialogContent>
