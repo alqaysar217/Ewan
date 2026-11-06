@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Ewan AI Design Assistant Flow.
- * محرك الذكاء الاصطناعي لمنصة إيوان، متخصص في تحليل المساحات وتوليد أوصاف التصميم الداخلي.
+ * محرك الذكاء الاصطناعي لمنصة إيوان، متخصص في تحليل الصور وتوليد توصيات التصميم الداخلي.
  */
 
 import { ai } from '@/ai/genkit';
@@ -10,6 +10,7 @@ import { z } from 'genkit';
 const EwanAiChatInputSchema = z.object({
   message: z.string(),
   history: z.array(z.any()).optional(),
+  imageDataUri: z.string().optional().describe("صورة الغرفة لتحليلها بصرياً"),
   contextData: z.object({
     roomType: z.string().optional(),
     style: z.string().optional(),
@@ -22,7 +23,7 @@ export type EwanAiChatInput = z.infer<typeof EwanAiChatInputSchema>;
 
 const EwanAiChatOutputSchema = z.object({
   text: z.string(),
-  imagePrompt: z.string().optional(), // برومبت مقترح لتوليد صورة في حال كان الطلب تصميم
+  imagePrompt: z.string().optional(),
 });
 export type EwanAiChatOutput = z.infer<typeof EwanAiChatOutputSchema>;
 
@@ -42,7 +43,7 @@ const ewanAiChatFlow = ai.defineFlow(
     outputSchema: EwanAiChatOutputSchema,
   },
   async (input) => {
-    const { message, history, contextData } = input;
+    const { message, history, imageDataUri, contextData } = input;
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
@@ -52,36 +53,45 @@ const ewanAiChatFlow = ai.defineFlow(
     const systemContent = `أنت "إيوان AI"، الخبير الذكي الرائد في التصميم الداخلي وتنسيق الأثاث لمنصة إيوان اليمنية.
 
 هويتك:
-- اسمك "إيوان AI".
-- أنت خبير في دمج الطرازات العالمية (مودرن، كلاسيك) مع اللمسات التراثية اليمنية (صنعاني، حضرمي).
-- هدفك هو مساعدة العملاء على تخيل مساحاتهم واختيار الأثاث الأنسب لميزانياتهم.
+- خبير في دمج الطرازات العالمية (مودرن، كلاسيك) مع اللمسات التراثية اليمنية العريقة.
+- وظيفتك تحليل مساحات العملاء وتقديم نصائح احترافية لتوزيع الأثاث.
 
 قواعد الرد:
-1. إذا طلب العميل تصميم غرفة: قم بتحليل البيانات (المساحة: ${contextData?.area || 'غير محددة'}، النمط: ${contextData?.style || 'غير محدد'}) ثم اقترح توزيعاً احترافياً.
-2. توليد البرومبت (Prompt): إذا كان السياق يتطلب تصميم صورة، قم بإنشاء وصف تفصيلي باللغة الإنجليزية في نهاية ردك بتنسيق: [PROMPT: وصف الصورة بالإنجليزية هنا].
-3. كن ودوداً، مهنياً، واستخدم مصطلحات تعكس الفخامة والجودة.
-4. شجع دائماً على الصناعة الوطنية والنجارين اليمنيين المعتمدين في المنصة.
+1. إذا أرسل العميل صورة: قم بتحليل محتواها (الألوان، المساحة، الأثاث الحالي) وقدم توصيات بناءً عليها.
+2. الهوية اليمنية: شجع دائماً على استخدام قطع الأثاث الوطنية والنجارين المحليين مع لمسات تراثية (صنعاني، حضرمي).
+3. توليد البرومبت (Prompt): قم دائماً بإنشاء وصف تفصيلي باللغة الإنجليزية في نهاية ردك بتنسيق: [PROMPT: وصف الصورة بالإنجليزية هنا]. اجعل الوصف احترافياً لبرامج توليد الصور.
 
-بيانات الغرفة الحالية (إذا توفرت):
+بيانات الغرفة:
 - النوع: ${contextData?.roomType || 'غير محدد'}
 - المساحة: ${contextData?.area || 'غير محدد'} م²
-- الميزانية المتوقعة: ${contextData?.budget || 'غير محدد'} ريال يمني
-- قطع الأثاث المختارة: ${contextData?.products?.join(', ') || 'لا توجد قطع محددة بعد'}`;
+- الميزانية: ${contextData?.budget || 'غير محدد'} ر.ي`;
 
     const apiMessages: any[] = [
       { role: 'system', content: systemContent }
     ];
 
     if (history && Array.isArray(history)) {
-      history.slice(-10).forEach(m => {
+      history.slice(-6).forEach(m => {
         apiMessages.push({ 
           role: m.role === 'user' ? 'user' : 'assistant', 
-          content: typeof m.content === 'string' ? m.content : (m.text || "")
+          content: m.content || m.text || ""
         });
       });
     }
 
-    apiMessages.push({ role: 'user', content: message });
+    // إعداد محتوى الرسالة الحالية (يدعم الصور)
+    const currentUserContent: any[] = [{ type: 'text', text: message }];
+    
+    if (imageDataUri) {
+      currentUserContent.push({
+        type: 'image_url',
+        image_url: {
+          url: imageDataUri
+        }
+      });
+    }
+
+    apiMessages.push({ role: 'user', content: currentUserContent });
 
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -89,21 +99,18 @@ const ewanAiChatFlow = ai.defineFlow(
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://ewan.ye', // اختياري لـ OpenRouter
           'X-Title': 'Ewan Furniture AI',
         },
         body: JSON.stringify({
-          model: 'google/gemma-2-27b-it',
+          model: 'google/gemini-flash-1.5-8b', // نموذج يدعم الصور واقتصادي
           messages: apiMessages,
           temperature: 0.7,
-          max_tokens: 1500
         })
       });
 
       const data = await response.json();
       const fullText = data.choices?.[0]?.message?.content || "";
       
-      // استخراج البرومبت إذا وجد
       let text = fullText;
       let imagePrompt = "";
       const promptMatch = fullText.match(/\[PROMPT: (.*?)\]/i);
