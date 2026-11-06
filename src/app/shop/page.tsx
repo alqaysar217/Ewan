@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
@@ -34,9 +34,11 @@ export default function ShopPage() {
   const [maxPrice, setMaxPrice] = useState([1000000]);
   const db = useFirestore();
   
-  const productsQuery = query(collection(db, 'products'), orderBy('created_at', 'desc'));
+  const productsQuery = useMemo(() => query(collection(db, 'products'), orderBy('created_at', 'desc')), [db]);
   const { data: products, loading: productsLoading } = useCollection(productsQuery);
-  const { data: vendors } = useCollection(collection(db, 'vendors'));
+  
+  const vendorsQuery = useMemo(() => collection(db, 'vendors'), [db]);
+  const { data: vendors } = useCollection(vendorsQuery);
 
   const categories = [
     { id: 'living', name: 'غرف المعيشة' },
@@ -140,7 +142,6 @@ export default function ShopPage() {
                             fill 
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                           />
-                          {/* Blurry layer at bottom */}
                           <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent backdrop-blur-[2px] opacity-40" />
                           
                           <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" />

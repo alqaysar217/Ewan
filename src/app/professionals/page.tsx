@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
@@ -52,42 +52,6 @@ const MOCK_PROFESSIONALS = [
     cover_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=800',
     logo_url: 'https://picsum.photos/seed/p1/200/200',
     approval_status: 'approved'
-  },
-  {
-    id: 'p2',
-    business_name: 'تصاميم رؤية للديكور',
-    business_type: 'interior_designer',
-    description: 'نحول مساحات منزلك إلى لوحات فنية بلمسات عصرية وأسعار تنافسية. متخصصون في الديكورات المودرن.',
-    city: 'عدن',
-    average_rating: 4.8,
-    service_areas: ['عدن', 'لحج', 'أبين'],
-    cover_url: 'https://images.unsplash.com/photo-1554232456-8727aae0cfa4?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/p2/200/200',
-    approval_status: 'approved'
-  },
-  {
-    id: 'p3',
-    business_name: 'نجار اليمن الحديث',
-    business_type: 'carpenter',
-    description: 'خبرة 15 عاماً في تفصيل المطابخ الخشبية والخزائن الحائطية بأحدث التصاميم العالمية.',
-    city: 'تعز',
-    average_rating: 4.6,
-    service_areas: ['تعز', 'إب'],
-    cover_url: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/p3/200/200',
-    approval_status: 'approved'
-  },
-  {
-    id: 'p4',
-    business_name: 'إبداع للتصميم الداخلي',
-    business_type: 'interior_designer',
-    description: 'متخصصون في التصميم ثلاثي الأبعاد وتوزيع الإضاءة والأثاث لخلق بيئة مريحة وجذابة.',
-    city: 'حضرموت',
-    average_rating: 5.0,
-    service_areas: ['المكلا', 'سيئون'],
-    cover_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800',
-    logo_url: 'https://picsum.photos/seed/p4/200/200',
-    approval_status: 'approved'
   }
 ];
 
@@ -96,9 +60,12 @@ export default function ProfessionalsPage() {
   const [activeType, setActiveType] = useState<string>('all');
   const [maxBudget, setMaxBudget] = useState([500000]);
   
-  const vendorsQuery = activeType === 'all' 
-    ? query(collection(db, 'vendors'), or(where('business_type', '==', 'carpenter'), where('business_type', '==', 'interior_designer')))
-    : query(collection(db, 'vendors'), where('business_type', '==', activeType));
+  const vendorsQuery = useMemo(() => {
+    const coll = collection(db, 'vendors');
+    return activeType === 'all' 
+      ? query(coll, or(where('business_type', '==', 'carpenter'), where('business_type', '==', 'interior_designer')))
+      : query(coll, where('business_type', '==', activeType));
+  }, [db, activeType]);
     
   const { data: firestoreVendors, loading } = useCollection(vendorsQuery);
 
@@ -115,11 +82,12 @@ export default function ProfessionalsPage() {
   ];
 
   const cities = [
-    { id: 'sanaa', name: 'صنعاء' },
-    { id: 'aden', name: 'عدن' },
-    { id: 'taiz', name: 'تعز' },
-    { id: 'mukalla', name: 'المكلا' },
-    { id: 'ibb', name: 'إب' }
+    { id: 'all', name: 'جميع المدن' },
+    { id: 'صنعاء', name: 'صنعاء' },
+    { id: 'عدن', name: 'عدن' },
+    { id: 'تعز', name: 'تعز' },
+    { id: 'المكلا', name: 'المكلا' },
+    { id: 'إب', name: 'إب' }
   ];
 
   const styles = [
@@ -134,9 +102,7 @@ export default function ProfessionalsPage() {
       <Header />
 
       <section className="relative py-12 md:py-16 bg-secondary overflow-hidden">
-        {/* Hexagon Pattern Backdrop */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='1' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9l10.99-6.35L25 17.9v12.7L13.99 36.95 3 30.6V17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM28 15l-12.98-7.5V0h2v6.35L28 12.69v2.3zm0 18.5l-12.98 7.5v8h2v-6.85l12.98-7.5v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
-        
         <div className="container relative z-10 px-4 md:px-8 mx-auto text-center">
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 backdrop-blur-xl border-r-4 border-primary text-primary text-[10px] font-black uppercase tracking-[0.2em] mx-auto rounded-sm">
@@ -154,7 +120,6 @@ export default function ProfessionalsPage() {
 
       <main className="container mx-auto py-12 px-4 md:px-8 flex-1">
         <div className="flex flex-col lg:flex-row gap-12">
-          
           <aside className="w-full lg:w-80 space-y-8">
             <div className="bg-white p-8 border border-border/50 shadow-sm space-y-8 rounded-[15px]">
               <div className="space-y-4">
@@ -162,7 +127,6 @@ export default function ProfessionalsPage() {
                   <h3 className="text-lg font-black text-secondary flex items-center gap-2">
                     <Filter className="w-4 h-4 text-primary" /> تصفية الخبراء
                   </h3>
-                  <button className="text-xs font-bold text-primary hover:underline">إعادة تعيين</button>
                 </div>
                 <div className="relative">
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -174,7 +138,6 @@ export default function ProfessionalsPage() {
               </div>
 
               <Accordion type="multiple" defaultValue={["type", "cities", "specialties"]} className="w-full">
-                {/* Expert Type */}
                 <AccordionItem value="type" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="font-bold text-secondary flex items-center gap-2 text-sm">
@@ -199,7 +162,6 @@ export default function ProfessionalsPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Cities */}
                 <AccordionItem value="cities" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="font-bold text-secondary flex items-center gap-2 text-sm">
@@ -220,7 +182,6 @@ export default function ProfessionalsPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Specialties */}
                 <AccordionItem value="specialties" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="font-bold text-secondary flex items-center gap-2 text-sm">
@@ -241,28 +202,6 @@ export default function ProfessionalsPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Styles */}
-                <AccordionItem value="styles" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-3">
-                    <span className="font-bold text-secondary flex items-center gap-2 text-sm">
-                      <Maximize2 className="w-4 h-4 text-primary" /> نمط العمل
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-1">
-                      {styles.map((style) => (
-                        <div key={style.id} className="flex items-center space-x-2 space-x-reverse group cursor-pointer">
-                          <Checkbox id={`style-${style.id}`} className="rounded-sm" />
-                          <label htmlFor={`style-${style.id}`} className="text-xs font-bold text-muted-foreground group-hover:text-primary transition-colors cursor-pointer pr-2">
-                            {style.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Budget */}
                 <AccordionItem value="budget" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="font-bold text-secondary flex items-center gap-2 text-sm">

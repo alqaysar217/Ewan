@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -43,8 +43,10 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
   const { id } = use(params);
   const db = useFirestore();
   
-  const { data: vendorData, loading: vendorLoading } = useDoc(doc(db, 'vendors', id));
-  const productsQuery = query(collection(db, 'products'), where('vendor_id', '==', id));
+  const vendorRef = useMemo(() => doc(db, 'vendors', id), [db, id]);
+  const { data: vendorData, loading: vendorLoading } = useDoc(vendorRef);
+
+  const productsQuery = useMemo(() => query(collection(db, 'products'), where('vendor_id', '==', id)), [db, id]);
   const { data: vendorProducts, loading: productsLoading } = useCollection(productsQuery);
 
   const vendor = {
@@ -79,7 +81,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
       <Header />
 
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="relative h-[45vh] md:h-[55vh] w-full overflow-hidden">
           <Image 
             src={vendor.cover_url} 
@@ -128,7 +129,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
           </div>
         </section>
 
-        {/* Content Section */}
         <section className="container mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-24">
           <Tabs defaultValue="products" className="w-full" dir="rtl">
             <TabsList className="w-full flex justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
@@ -146,7 +146,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               </TabsTrigger>
             </TabsList>
 
-            {/* منتجات المتجر */}
             <TabsContent value="products" className="animate-in fade-in duration-700">
               {productsLoading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -220,7 +219,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
               )}
             </TabsContent>
 
-            {/* معرض الأعمال */}
             <TabsContent value="gallery" className="animate-in fade-in duration-700">
                {vendor.gallery.length > 0 ? (
                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -241,7 +239,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                )}
             </TabsContent>
 
-            {/* آراء العملاء */}
             <TabsContent value="reviews" className="animate-in fade-in duration-700 space-y-10">
                <div className="bg-primary/5 p-10 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-primary/10">
                  <div className="text-right space-y-2">
@@ -287,10 +284,8 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                </div>
             </TabsContent>
 
-            {/* حول المتجر */}
             <TabsContent value="about" className="animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* النبذة والإحصائيات - المساحة الأكبر على اليمين */}
                 <div className="lg:col-span-2 space-y-10 order-1">
                   <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                     <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
@@ -313,7 +308,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                     </div>
                   </div>
 
-                  {/* مناطق الخدمة */}
                   {vendor.service_areas && vendor.service_areas.length > 0 && (
                     <div className="bg-white p-10 rounded-2xl border border-border/50 shadow-sm space-y-6">
                       <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
@@ -332,7 +326,6 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
                   )}
                 </div>
 
-                {/* معلومات جانبية إضافية - العمود الأصغر على اليسار */}
                 <div className="space-y-10 order-2">
                    <div className="bg-secondary text-white p-10 rounded-2xl space-y-8 relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rotate-45 -translate-y-16 translate-x-16 transition-transform group-hover:scale-125" />
