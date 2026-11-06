@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -41,12 +41,16 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const [quantity, setQuantity] = useState(1);
   const db = useFirestore();
 
-  // جلب بيانات المنتج الحقيقية
-  const { data: productData, loading: productLoading } = useDoc(doc(db, 'products', id));
+  // تثبيت مرجع المنتج
+  const productRef = useMemo(() => doc(db, 'products', id), [db, id]);
+  const { data: productData, loading: productLoading } = useDoc(productRef);
   
-  // جلب بيانات المتجر
+  // استخراج معرف المتجر بشكل آمن
   const vendorId = productData?.vendor_id;
-  const { data: vendorData, loading: vendorLoading } = useDoc(vendorId ? doc(db, 'vendors', vendorId) : null);
+  
+  // تثبيت مرجع المتجر وجلب بياناته
+  const vendorRef = useMemo(() => vendorId ? doc(db, 'vendors', vendorId) : null, [db, vendorId]);
+  const { data: vendorData, loading: vendorLoading } = useDoc(vendorRef);
 
   if (productLoading) {
     return (
@@ -69,7 +73,6 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
     );
   }
 
-  // تنسيق البيانات للعرض مع دعم الأرقام الإنجليزية
   const product = {
     ...productData,
     name: productData.name_ar || 'منتج بدون اسم',
@@ -106,7 +109,6 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       <main className="container mx-auto py-8 md:py-16 px-4 md:px-8 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           
-          {/* معرض الصور */}
           <div className="space-y-6">
             <div className="relative aspect-square rounded-[15px] overflow-hidden border border-border/50 shadow-sm bg-gray-50 group">
               <Image 
@@ -135,10 +137,9 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             )}
           </div>
 
-          {/* تفاصيل الشراء */}
           <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
+            <div className="space-y-4 text-right">
+              <div className="flex flex-wrap items-center justify-start gap-3">
                 <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 font-black uppercase px-3 py-1">
                   {product.category}
                 </Badge>
@@ -150,7 +151,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </div>
               <h1 className="text-3xl md:text-5xl font-black text-secondary leading-tight">{product.name}</h1>
               
-              <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-wrap items-center justify-start gap-6">
                 <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50 px-3 py-1 rounded-lg">
                   <Star className="w-5 h-5 fill-current" />
                   <span className="text-secondary font-black text-lg">{product.rating.toLocaleString('en-US')}</span>
@@ -205,7 +206,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4 p-5 bg-white border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                   <item.icon className="w-8 h-8 text-primary shrink-0" />
-                  <div className="space-y-0.5">
+                  <div className="space-y-0.5 text-right">
                     <p className="text-sm font-black text-secondary">{item.title}</p>
                     <p className="text-[10px] text-muted-foreground font-bold">{item.desc}</p>
                   </div>
@@ -215,10 +216,9 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         </div>
 
-        {/* التبويبات التفصيلية */}
         <div className="mt-20 md:mt-32">
           <Tabs defaultValue="specs" className="w-full" dir="rtl">
-            <TabsList className="w-full justify-start h-16 bg-white border-b border-gray-100 rounded-none p-0 gap-10">
+            <TabsList className="w-full flex justify-start items-center h-16 bg-white border-b border-gray-100 rounded-none p-0 gap-10">
               <TabsTrigger value="specs" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">المواصفات الفنية</TabsTrigger>
               <TabsTrigger value="reviews" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">آراء العملاء</TabsTrigger>
               <TabsTrigger value="store" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">عن المتجر</TabsTrigger>

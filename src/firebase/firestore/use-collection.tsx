@@ -18,8 +18,12 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
   useEffect(() => {
     if (!query) {
       setLoading(false);
+      setData([]);
       return;
     }
+
+    // إعادة ضبط الحالة عند تغير الاستعلام
+    setLoading(true);
 
     const unsubscribe = onSnapshot(
       query,

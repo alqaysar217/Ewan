@@ -18,8 +18,12 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
   useEffect(() => {
     if (!ref) {
       setLoading(false);
+      setData(null);
       return;
     }
+
+    // إعادة ضبط الحالة عند تغير المرجع
+    setLoading(true);
 
     const unsubscribe = onSnapshot(
       ref,
@@ -40,7 +44,7 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
     );
 
     return unsubscribe;
-  }, [ref]);
+  }, [ref]); // سيعاد التشغيل فقط عند تغير كائن المرجع
 
   return { data, loading, error };
 }
