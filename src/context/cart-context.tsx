@@ -42,25 +42,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart]);
 
   const addToCart = (newItem: CartItem) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === newItem.id);
-      if (existingItem) {
-        toast({
-          title: "تم تحديث السلة",
-          description: `تمت إضافة قطعة أخرى من "${newItem.name}"`,
-        });
-        return prevCart.map((item) =>
+    const existingItem = cart.find((item) => item.id === newItem.id);
+
+    if (existingItem) {
+      // تحديث الكمية إذا كان المنتج موجوداً مسبقاً
+      setCart((prevCart) =>
+        prevCart.map((item) =>
           item.id === newItem.id
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
-        );
-      }
+        )
+      );
+      
+      // إظهار التنبيه خارج وظيفة تحديث الحالة لتجنب الأخطاء البرمجية
+      toast({
+        title: "تم تحديث السلة",
+        description: `تمت إضافة قطعة أخرى من "${newItem.name}"`,
+      });
+    } else {
+      // إضافة منتج جديد للسلة
+      setCart((prevCart) => [...prevCart, newItem]);
+      
       toast({
         title: "تمت الإضافة للسلة",
         description: `تمت إضافة "${newItem.name}" بنجاح.`,
       });
-      return [...prevCart, newItem];
-    });
+    }
   };
 
   const removeFromCart = (id: string) => {
