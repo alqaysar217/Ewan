@@ -8,6 +8,9 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
+// زيادة مهلة المعالجة لـ Vercel (Next.js 15) لضمان عدم انقطاع الاتصال بالنموذج
+export const maxDuration = 60;
+
 const EwanAiChatInputSchema = z.object({
   message: z.string(),
   history: z.array(z.any()).optional(),
@@ -32,8 +35,9 @@ export async function ewanAiChat(input: EwanAiChatInput): Promise<EwanAiChatOutp
   try {
     return await ewanAiChatFlow(input);
   } catch (error: any) {
-    console.error("Ewan AI Flow Error:", error);
-    return { text: "أعتذر، واجهت مشكلة في معالجة طلبك حالياً. يرجى التحقق من إعدادات المفتاح أو الرصيد." };
+    console.error("Ewan AI Flow Server Error:", error);
+    // إرجاع رسالة خطأ واضحة في حال فشل الـ Flow نفسه لمساعدة المستخدم في Debugging
+    return { text: `⚠️ حدث خطأ في الخادم (Vercel) أثناء المعالجة: ${error.message || 'فشل غير متوقع'}. تأكد من إضافة OPENROUTER_API_KEY في الإعدادات.` };
   }
 }
 
@@ -48,7 +52,7 @@ const ewanAiChatFlow = ai.defineFlow(
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-      return { text: "⚠️ عذراً، مفتاح تشغيل الذكاء الاصطناعي (API Key) غير موجود في إعدادات الخادم (Vercel)." };
+      return { text: "⚠️ عذراً، لم يتم العثور على مفتاح OPENROUTER_API_KEY في إعدادات Vercel. يرجى إضافته في (Environment Variables) ثم الضغط على Redeploy ليعمل النظام." };
     }
 
     const systemContent = `أنت "إيوان AI"، الخبير الذكي الرائد في التصميم الداخلي وتنسيق الأثاث لمنصة إيوان اليمنية.
@@ -87,25 +91,34 @@ const ewanAiChatFlow = ai.defineFlow(
     apiMessages.push({ role: 'user', content: message });
 
     try {
+      // إعداد طلب الـ Fetch مع مهلة زمنية (Abort Controller)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 50000); // 50 ثانية مهلة
+
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
           'X-Title': 'Ewan Furniture AI',
+          'HTTP-Referer': 'https://ewan-furniture.vercel.app', // الرابط المرجعي لـ OpenRouter
         },
         body: JSON.stringify({
           model: 'google/gemma-2-27b-it', 
           messages: apiMessages,
           temperature: 0.7,
           max_tokens: 2000
-        })
+        }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const errData = await response.json();
-        console.error("OpenRouter Error Response:", errData);
-        return { text: `عذراً، حدث خطأ من مزود الخدمة: ${errData.error?.message || response.statusText}` };
+        const errData = await response.json().catch(() => ({}));
+        console.error("OpenRouter API Detailed Error:", errData);
+        const detail = errData.error?.message || response.statusText;
+        return { text: `⚠️ خطأ من مزود الخدمة (OpenRouter): ${detail}. يرجى التأكد من أن الرصيد كافٍ وأن المفتاح فعال.` };
       }
 
       const data = await response.json();
@@ -124,8 +137,11 @@ const ewanAiChatFlow = ai.defineFlow(
 
       return { text: cleanText, imagePrompt };
     } catch (error: any) {
-      console.error("Fetch Exception:", error);
-      return { text: "عذراً، واجهت صعوبة في الاتصال بمركز المعالجة الذكي، يرجى المحاولة لاحقاً." };
+      console.error("AI Fetch Exception:", error);
+      if (error.name === 'AbortError') {
+        return { text: "⚠️ انتهت مهلة الاتصال بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى، قد يكون الضغط عالياً على النموذج حالياً." };
+      }
+      return { text: `⚠️ فشل الاتصال بالنموذج: ${error.message || 'مشكلة في الشبكة'}. يرجى التأكد من استقرار الإنترنت على الخادم.` };
     }
   }
 );
