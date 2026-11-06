@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ReactNode, useEffect, useState, useMemo } from 'react';
@@ -19,7 +20,8 @@ import {
   ChevronLeft,
   Handshake,
   Quote,
-  HelpCircle
+  HelpCircle,
+  ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -57,14 +59,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (userData?.role !== 'admin') {
+  // السماح للمدراء والموظفين بدخول لوحة التحكم
+  if (userData?.role !== 'admin' && userData?.role !== 'staff') {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-background p-6 text-center font-cairo">
         <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-6">
-          <ShieldCheck className="w-10 h-10" />
+          <ShieldAlert className="w-10 h-10" />
         </div>
         <h1 className="text-2xl font-bold text-secondary mb-2">وصول مرفوض</h1>
-        <p className="text-muted-foreground mb-6 max-w-md">هذه المنطقة مخصصة للإدارة فقط.</p>
+        <p className="text-muted-foreground mb-6 max-w-md">عذراً، هذه المنطقة مخصصة لإدارة المنصة فقط.</p>
         <Button onClick={() => router.push('/')} className="rounded-xl px-8">العودة للرئيسية</Button>
       </div>
     );
@@ -72,6 +75,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: '/admin', label: 'ملخص النظام', icon: LayoutDashboard },
+    { href: '/admin/users', label: 'إدارة الصلاحيات', icon: ShieldCheck },
     { href: '/admin/vendors', label: 'إدارة المتاجر', icon: Store },
     { href: '/admin/carpenters', label: 'المصممين والنجارين', icon: Users },
     { href: '/admin/products', label: 'إدارة المنتجات', icon: Package },
@@ -147,7 +151,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               {!isCollapsed && (
                 <div className="flex-1 min-w-0 animate-in fade-in duration-500">
                   <p className="text-sm font-bold truncate">{userData?.full_name}</p>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase">مدير النظام</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase">{userData?.role === 'admin' ? 'مدير النظام' : 'موظف النظام'}</p>
                 </div>
               )}
             </div>

@@ -3,14 +3,23 @@
   "entities": {
     "User": {
       "title": "مستخدم",
-      "description": "بيانات المستخدمين الأساسية",
+      "description": "بيانات المستخدمين الأساسية وصلاحياتهم",
       "type": "object",
       "properties": {
         "full_name": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "phone": { "type": "string" },
         "avatar_url": { "type": "string" },
-        "role": { "type": "string", "enum": ["customer", "vendor", "admin"] },
+        "role": { "type": "string", "enum": ["customer", "vendor", "admin", "staff"] },
+        "permissions": {
+          "type": "object",
+          "properties": {
+            "can_read": { "type": "boolean" },
+            "can_write": { "type": "boolean" },
+            "can_edit": { "type": "boolean" },
+            "can_delete": { "type": "boolean" }
+          }
+        },
         "is_active": { "type": "boolean" },
         "created_at": { "type": "string", "format": "date-time" }
       },
