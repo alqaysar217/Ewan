@@ -125,7 +125,6 @@ export default function HomePage() {
           <div className="container relative z-20 px-4 md:px-8 mx-auto">
             <div className="max-w-3xl space-y-8 animate-in fade-in slide-in-from-right-12 duration-1000 py-16">
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-accent/20 backdrop-blur-xl rounded-[15px] text-accent border-r-4 border-secondary shadow-xl shadow-accent/5 mx-auto lg:mx-0">
-                <Sparkles className="w-4 h-4" />
                 <span className="text-xs font-black tracking-widest uppercase">ابتكار ذكي لمساحتك الخاصة</span>
               </div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.2] tracking-tight text-center lg:text-right">
@@ -150,44 +149,37 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section - Improved Design */}
-        <section className="py-32 bg-muted/20 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
+        {/* Features Section - Inverted Design */}
+        <section className="py-32 bg-background relative overflow-hidden">
           <div className="container px-4 md:px-8 mx-auto text-center relative z-10">
-            <div className="mb-20 space-y-5">
+            <div className="mb-20 space-y-5 text-center">
               <div className="flex items-center justify-center gap-3">
                 <div className="h-1 w-12 bg-accent rounded-full"></div>
                 <span className="text-accent font-black tracking-widest text-xs uppercase">لماذا نحن الأفضل</span>
                 <div className="h-1 w-12 bg-accent rounded-full"></div>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-secondary">لماذا تختار إيوان؟</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-secondary tracking-tight">لماذا تختار إيوان؟</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نجمع بين التكنولوجيا المتطورة وحرفية النجار اليمني لنقدم لك تجربة تأثيث لا تُنسى.</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, i) => (
                 <div 
                   key={i} 
-                  className="group relative p-10 bg-white border border-border/40 rounded-[2.5rem] shadow-sm hover:shadow-[0_40px_80px_-15px_rgba(44,32,14,0.12)] transition-all duration-500 flex flex-col items-center text-center overflow-hidden"
+                  className="group relative p-10 bg-secondary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
                 >
-                  {/* Subtle Background Glow */}
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
+                  {/* Subtle Background Accent */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
                   
-                  <div className={cn(
-                    "w-20 h-20 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-xl shadow-accent/10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 relative z-10", 
-                    "bg-secondary text-accent"
-                  )}>
+                  <div className="w-20 h-20 rounded-xl flex items-center justify-center mb-8 bg-accent text-white shadow-lg shadow-accent/20 transition-all duration-500 group-hover:scale-110 relative z-10">
                     <feature.icon className="w-10 h-10" />
                   </div>
                   
-                  <h3 className="text-2xl font-black text-secondary mb-4 relative z-10 tracking-tight">{feature.title}</h3>
-                  <p className="text-muted-foreground font-bold leading-relaxed text-sm relative z-10">{feature.desc}</p>
+                  <h3 className="text-2xl font-black text-white mb-4 relative z-10 tracking-tight">{feature.title}</h3>
+                  <p className="text-gray-300 font-bold leading-relaxed text-sm relative z-10">{feature.desc}</p>
                   
-                  {/* Decorative corner element */}
-                  <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-accent/10 to-transparent rounded-bl-[2rem] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  
-                  {/* Bottom active indicator */}
-                  <div className="absolute bottom-0 left-0 right-0 h-2 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-right" />
+                  {/* Bottom Indicator */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-right" />
                 </div>
               ))}
             </div>
