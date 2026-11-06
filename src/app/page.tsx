@@ -200,8 +200,8 @@ export default function HomePage() {
                 <span className="text-accent font-black tracking-widest text-xs uppercase">لماذا نحن الأفضل</span>
                 <div className="h-1 w-12 bg-accent rounded-full"></div>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-secondary tracking-tight">لماذا تختار إيوان؟</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">نجمع بين التكنولوجيا المتطورة وحرفية النجار اليمني لنقدم لك تجربة تأثيث لا تُنسى.</p>
+              <h2 className="text-3xl md:text-5xl font-black text-secondary tracking-tight">لماذا تختار إيوان؟</h2>
+              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto font-medium px-4">نجمع بين التكنولوجيا المتطورة وحرفية النجار اليمني لنقدم لك تجربة تأثيث لا تُنسى.</p>
             </motion.div>
             
             <motion.div 
@@ -209,20 +209,20 @@ export default function HomePage() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
               variants={containerVariants}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10"
             >
               {features.map((feature, i) => (
                 <motion.div 
                   key={i} 
                   variants={itemFadeUp}
-                  className="group relative p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
+                  className="group relative p-5 md:p-10 bg-primary border border-white/5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center overflow-hidden transform hover:-translate-y-2"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors" />
-                  <div className="w-20 h-20 rounded-xl flex items-center justify-center mb-8 bg-accent text-white shadow-lg shadow-accent/20 transition-all duration-500 group-hover:scale-110 relative z-10">
-                    <feature.icon className="w-10 h-10" />
+                  <div className="w-12 h-12 md:w-20 md:h-20 rounded-xl flex items-center justify-center mb-4 md:mb-8 bg-accent text-white shadow-lg shadow-accent/20 transition-all duration-500 group-hover:scale-110 relative z-10">
+                    <feature.icon className="w-6 h-6 md:w-10 md:h-10" />
                   </div>
-                  <h3 className="text-2xl font-black text-white mb-4 relative z-10 tracking-tight">{feature.title}</h3>
-                  <p className="text-gray-300 font-bold leading-relaxed text-sm relative z-10">{feature.desc}</p>
+                  <h3 className="text-sm md:text-2xl font-black text-white mb-2 md:mb-4 relative z-10 tracking-tight">{feature.title}</h3>
+                  <p className="text-gray-300 font-bold leading-relaxed text-[10px] md:text-sm relative z-10">{feature.desc}</p>
                   <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-right" />
                 </motion.div>
               ))}
