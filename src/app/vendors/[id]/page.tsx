@@ -130,7 +130,7 @@ export default function VendorDetailPage({ params }: VendorDetailPageProps) {
         {/* Content Section */}
         <section className="container mx-auto px-4 md:px-8 pt-12 md:pt-20 pb-24">
           <Tabs defaultValue="products" className="w-full">
-            <TabsList className="w-full flex justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
+            <TabsList className="w-full flex flex-row-reverse justify-start items-center h-16 bg-white border border-border/50 rounded-xl p-2 gap-2 shadow-sm mb-12 overflow-x-auto no-scrollbar">
               <TabsTrigger value="products" className="h-full rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-black text-sm md:text-lg px-6 md:px-10 transition-all gap-2 shrink-0">
                 <Package className="w-4 h-4 md:w-5 md:h-5" /> منتجات المتجر
               </TabsTrigger>
