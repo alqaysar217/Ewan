@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useUser, useFirestore, useDoc } from '@/firebase';
@@ -34,8 +34,8 @@ export default function AdminDashboard() {
   const db = useFirestore();
   const router = useRouter();
   
-  // جلب وثيقة المستخدم للتحقق من الدور (Role)
-  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  // جلب وثيقة المستخدم للتحقق من الدور (Role) مع تثبيت المرجع
+  const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
   useEffect(() => {

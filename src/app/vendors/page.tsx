@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
@@ -51,10 +51,11 @@ export default function StoresPage() {
   const [cityFilter, setCityFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   
-  const vendorsQuery = query(
+  // تثبيت الاستعلام باستخدام useMemo لمنع حلقات التكرار
+  const vendorsQuery = useMemo(() => query(
     collection(db, 'vendors'), 
     where('business_type', '==', 'furniture_store')
-  );
+  ), [db]);
     
   const { data: firestoreVendors, loading } = useCollection(vendorsQuery);
 

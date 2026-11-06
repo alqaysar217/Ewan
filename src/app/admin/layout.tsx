@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -39,7 +39,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  // تثبيت مرجع وثيقة المستخدم لمنع حلقات التكرار
+  const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
   useEffect(() => {

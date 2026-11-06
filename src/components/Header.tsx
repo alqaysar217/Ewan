@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -39,8 +39,8 @@ export default function Header() {
   const auth = useAuth();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
-  // جلب بيانات المستخدم لمعرفة الدور (Role)
-  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  // جلب بيانات المستخدم لمعرفة الدور (Role) مع تثبيت المرجع
+  const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData, loading: docLoading } = useDoc(userDocRef);
 
   const handleLogout = async () => {

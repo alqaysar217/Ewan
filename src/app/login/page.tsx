@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -25,8 +25,8 @@ export default function LoginPage() {
   const db = useFirestore();
   const router = useRouter();
 
-  // جلب بيانات المستخدم الحالية للتحقق من الصلاحيات
-  const userDocRef = user ? doc(db, 'users', user.uid) : null;
+  // جلب بيانات المستخدم الحالية للتحقق من الصلاحيات مع تثبيت المرجع
+  const userDocRef = useMemo(() => user ? doc(db, 'users', user.uid) : null, [db, user?.uid]);
   const { data: userData } = useDoc(userDocRef);
 
   const handleLogin = async (e: React.FormEvent) => {
