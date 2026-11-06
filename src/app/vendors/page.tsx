@@ -11,15 +11,11 @@ import {
   Star, 
   CheckCircle2, 
   Search,
-  Filter,
-  ArrowLeft,
   Store,
   ChevronLeft,
-  Award,
   Layers,
-  Sparkles,
   Map,
-  Plus
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,30 +43,6 @@ const MOCK_STORES = [
     cover_url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200',
     logo_url: 'https://picsum.photos/seed/s1/200/200',
     approval_status: 'approved'
-  },
-  {
-    id: 's2',
-    business_name: 'أثاث الخليج الحديث',
-    business_type: 'furniture_store',
-    description: 'نقدم حلولاً عصرية للمكاتب والمنازل بأسعار تنافسية. تشكيلة واسعة من المكاتب والكراسي الطبية.',
-    city: 'عدن',
-    average_rating: 4.7,
-    service_areas: ['عدن', 'لحج', 'أبين'],
-    cover_url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1200',
-    logo_url: 'https://picsum.photos/seed/s2/200/200',
-    approval_status: 'approved'
-  },
-  {
-    id: 's3',
-    business_name: 'مفروشات السعيد',
-    business_type: 'furniture_store',
-    description: 'الرائدون في عالم المفروشات منذ عام 1990. نجمع بين الجودة العالية والذوق الرفيع.',
-    city: 'تعز',
-    average_rating: 4.8,
-    service_areas: ['تعز', 'إب'],
-    cover_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1200',
-    logo_url: 'https://picsum.photos/seed/s3/200/200',
-    approval_status: 'approved'
   }
 ];
 
@@ -78,6 +50,7 @@ export default function StoresPage() {
   const db = useFirestore();
   const [searchTerm, setSearchTerm] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   
   const vendorsQuery = query(
     collection(db, 'vendors'), 
@@ -94,16 +67,26 @@ export default function StoresPage() {
   displayedStores = displayedStores.filter(store => {
     const matchesSearch = store.business_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCity = cityFilter === 'all' || store.city === cityFilter;
+    // ملاحظة: المتاجر حالياً لا تمتلك حقل تصنيف مباشر، ولكننا نوفر الفلتر لواجهة المستخدم
     return matchesSearch && matchesCity;
   });
 
   const cities = [
-    { id: 'all', name: 'جميع المدن اليمنية' },
+    { id: 'all', name: 'جميع المدن' },
     { id: 'صنعاء', name: 'صنعاء' },
     { id: 'عدن', name: 'عدن' },
     { id: 'تعز', name: 'تعز' },
     { id: 'المكلا', name: 'المكلا' },
     { id: 'إب', name: 'إب' },
+  ];
+
+  const categories = [
+    { id: 'all', name: 'جميع أنواع الأثاث' },
+    { id: 'living', name: 'غرف المعيشة' },
+    { id: 'bedroom', name: 'غرف النوم' },
+    { id: 'dining', name: 'طاولات الطعام' },
+    { id: 'majlis', name: 'المجالس التراثية' },
+    { id: 'office', name: 'الأثاث المكتبي' },
   ];
 
   return (
@@ -146,14 +129,15 @@ export default function StoresPage() {
                   />
                 </div>
 
-                {/* Filters and Actions */}
+                {/* Filters Row */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-                  <div className="w-full sm:w-56">
+                  {/* City Filter */}
+                  <div className="w-full sm:w-52">
                     <Select value={cityFilter} onValueChange={setCityFilter}>
                       <SelectTrigger className="h-14 rounded-xl border-none bg-gray-50 font-bold px-6 shadow-inner focus:ring-2 focus:ring-primary/20">
                         <div className="flex items-center gap-2">
                            <MapPin className="w-4 h-4 text-primary" />
-                           <SelectValue placeholder="تصفية حسب المدينة" />
+                           <SelectValue placeholder="المدينة" />
                         </div>
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
@@ -164,11 +148,22 @@ export default function StoresPage() {
                     </Select>
                   </div>
 
-                  <Link href="/register" className="w-full sm:w-auto">
-                    <Button className="w-full h-14 px-8 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-base shadow-lg shadow-primary/20 gap-3 transition-transform hover:-translate-y-1">
-                      <Plus className="w-5 h-5" /> سجل معرضك الآن
-                    </Button>
-                  </Link>
+                  {/* Category Filter */}
+                  <div className="w-full sm:w-60">
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="h-14 rounded-xl border-none bg-gray-50 font-bold px-6 shadow-inner focus:ring-2 focus:ring-primary/20">
+                        <div className="flex items-center gap-2">
+                           <Layers className="w-4 h-4 text-primary" />
+                           <SelectValue placeholder="نوع الأثاث" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-none shadow-2xl font-cairo" dir="rtl">
+                        {categories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id} className="font-bold py-3">{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
              </div>
 
@@ -185,7 +180,7 @@ export default function StoresPage() {
           <div className="space-y-8">
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {[1, 2, 3, 4, 5, 6].map(i => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="h-[450px] bg-white rounded-[20px] animate-pulse shadow-sm" />
                 ))}
               </div>
@@ -198,7 +193,7 @@ export default function StoresPage() {
                     <p className="text-2xl font-black text-secondary">لا توجد نتائج تطابق بحثك</p>
                     <p className="text-muted-foreground font-bold">جرب تغيير المدينة أو مسح نص البحث.</p>
                   </div>
-                  <Button variant="outline" onClick={() => { setSearchTerm(''); setCityFilter('all'); }} className="rounded-xl font-black h-12 px-8">إظهار كافة المتاجر</Button>
+                  <Button variant="outline" onClick={() => { setSearchTerm(''); setCityFilter('all'); setCategoryFilter('all'); }} className="rounded-xl font-black h-12 px-8">إظهار كافة المتاجر</Button>
                </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
