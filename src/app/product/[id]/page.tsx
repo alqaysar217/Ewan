@@ -163,15 +163,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </div>
             </div>
 
-            <div className="p-8 md:p-10 bg-gray-50 rounded-2xl space-y-6 border border-gray-100 shadow-inner">
+            <div className="p-8 md:p-10 bg-gray-50 rounded-2xl space-y-6 border border-gray-100 shadow-inner text-right">
               <div className="flex flex-col gap-2">
-                <div className="flex flex-wrap items-baseline gap-4">
+                <div className="flex flex-wrap items-baseline gap-4 justify-start">
                   <span className="text-4xl md:text-5xl font-black text-secondary">{product.price.toLocaleString('en-US')} <span className="text-sm md:text-xl font-bold">ريال يمني</span></span>
                   {product.oldPrice > 0 && (
                     <span className="text-xl md:text-2xl text-muted-foreground line-through font-bold opacity-50">{product.oldPrice.toLocaleString('en-US')} ريال</span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground font-bold flex items-center gap-2">
+                <p className="text-xs text-muted-foreground font-bold flex items-center gap-2 justify-start">
                   <Info className="w-4 h-4" /> شامل كافة الرسوم والضرائب المحلية
                 </p>
               </div>
@@ -179,7 +179,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               <Separator />
 
               <div className="space-y-4 pt-2">
-                <label className="text-sm font-black text-secondary mr-1">تحديد الكمية</label>
+                <label className="text-sm font-black text-secondary block">تحديد الكمية</label>
                 <div className="flex items-center gap-6 bg-white border border-gray-200 rounded-xl p-2 w-fit shadow-sm">
                   <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg hover:bg-gray-50" onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</Button>
                   <span className="w-10 text-center font-black text-xl">{quantity.toLocaleString('en-US')}</span>
@@ -217,22 +217,22 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
         {/* التبويبات التفصيلية */}
         <div className="mt-20 md:mt-32">
-          <Tabs defaultValue="specs" className="w-full">
+          <Tabs defaultValue="specs" className="w-full" dir="rtl">
             <TabsList className="w-full justify-start h-16 bg-white border-b border-gray-100 rounded-none p-0 gap-10">
               <TabsTrigger value="specs" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">المواصفات الفنية</TabsTrigger>
               <TabsTrigger value="reviews" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">آراء العملاء</TabsTrigger>
               <TabsTrigger value="store" className="h-full rounded-none border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary font-black text-lg px-8">عن المتجر</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="specs" className="py-12 animate-in fade-in duration-500">
+            <TabsContent value="specs" className="py-12 animate-in fade-in duration-700">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-                <div className="space-y-6">
+                <div className="space-y-6 text-right">
                   <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
                     <Info className="w-6 h-6 text-primary" /> وصف المنتج
                   </h3>
                   <p className="text-muted-foreground leading-loose font-medium text-lg text-justify">{product.description}</p>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-6 text-right">
                   <h3 className="text-2xl font-black text-secondary flex items-center gap-3">
                     <Layout className="w-6 h-6 text-primary" /> تفاصيل القطعة
                   </h3>
@@ -248,14 +248,14 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value="reviews" className="py-12 animate-in fade-in duration-500">
+            <TabsContent value="reviews" className="py-12 animate-in fade-in duration-700">
                <div className="space-y-12">
                   <div className="flex flex-col md:flex-row justify-between items-center gap-8 p-10 bg-primary/5 rounded-2xl border border-primary/10">
-                    <div className="text-center md:text-right space-y-2">
+                    <div className="text-right space-y-2">
                       <h3 className="text-6xl font-black text-primary">{product.rating.toLocaleString('en-US')}</h3>
-                      <div className="flex gap-1.5 justify-center md:justify-start text-amber-500">
+                      <div className="flex gap-1.5 justify-start text-amber-500">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <Star key={i} className={cn("w-6 h-6 fill-current", i >= Math.floor(product.rating) && "fill-none")} />
+                          <Star key={i} className={cn("w-6 h-6 fill-current", i >= Math.floor(product.rating) ? "fill-none text-gray-200" : "")} />
                         ))}
                       </div>
                       <p className="text-sm font-black text-muted-foreground">بناءً على {product.reviewsCount.toLocaleString('en-US')} مراجعة حقيقية</p>
@@ -266,14 +266,14 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {(productData.reviews || []).length > 0 ? (
                       productData.reviews.map((rev: any, i: number) => (
-                        <div key={i} className="p-8 bg-white border border-gray-100 rounded-2xl space-y-6 shadow-sm relative group">
+                        <div key={i} className="p-8 bg-white border border-gray-100 rounded-2xl space-y-6 shadow-sm relative group text-right">
                           <Quote className="absolute top-6 left-6 w-10 h-10 text-primary/5" />
                           <div className="flex justify-between items-start">
                             <div className="flex items-center gap-4">
                               <div className="w-14 h-14 rounded-xl bg-gray-50 flex items-center justify-center font-black text-secondary text-xl border shadow-inner">
                                 {rev.name?.[0]}
                               </div>
-                              <div className="space-y-1">
+                              <div className="space-y-1 text-right">
                                 <p className="font-black text-secondary text-lg">{rev.name}</p>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground font-bold">
                                   <Calendar className="w-4 h-4" /> {rev.date || 'منذ فترة'}
@@ -282,7 +282,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                             </div>
                             <div className="flex text-amber-500 gap-1">
                               {Array.from({ length: 5 }).map((_, starIdx) => (
-                                <Star key={starIdx} className={cn("w-4 h-4 fill-current", starIdx >= rev.rating && "fill-none text-gray-200")} />
+                                <Star key={starIdx} className={cn("w-4 h-4 fill-current", starIdx >= rev.rating ? "fill-none text-gray-200" : "")} />
                               ))}
                             </div>
                           </div>
@@ -299,26 +299,26 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                </div>
             </TabsContent>
 
-            <TabsContent value="store" className="py-12 animate-in fade-in duration-500">
+            <TabsContent value="store" className="py-12 animate-in fade-in duration-700">
               {vendorLoading ? (
                 <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-primary" /></div>
               ) : vendorData ? (
-                <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center md:items-start">
+                <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-center md:items-start text-right">
                   <div className="relative w-40 h-40 md:w-56 md:h-56 bg-white p-2 rounded-2xl shadow-2xl shrink-0 border-4 border-white/50 overflow-hidden">
                     <Image src={vendorData.logo_url || `https://picsum.photos/seed/${vendorData.id}/400/400`} alt={vendorData.business_name} fill className="object-cover" />
                   </div>
-                  <div className="flex-1 space-y-6 text-center md:text-right">
+                  <div className="flex-1 space-y-6 text-right">
                      <div className="space-y-2">
-                        <div className="flex items-center justify-center md:justify-start gap-3">
+                        <div className="flex items-center justify-start gap-3">
                           <h3 className="text-3xl md:text-4xl font-black text-secondary">{vendorData.business_name}</h3>
                           <CheckCircle2 className="w-6 h-6 text-primary fill-white" />
                         </div>
-                        <p className="text-lg text-muted-foreground font-bold flex items-center justify-center md:justify-start gap-2">
+                        <p className="text-lg text-muted-foreground font-bold flex items-center justify-start gap-2">
                           <MapPin className="w-5 h-5 text-primary" /> {vendorData.city}
                         </p>
                      </div>
-                     <p className="text-xl md:text-2xl leading-relaxed text-muted-foreground font-medium">{vendorData.description || 'شريك معتمد في منصة إيوان للأثاث الفاخر.'}</p>
-                     <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-6">
+                     <p className="text-xl md:text-2xl leading-relaxed text-muted-foreground font-medium text-justify">{vendorData.description || 'شريك معتمد في منصة إيوان للأثاث الفاخر.'}</p>
+                     <div className="flex flex-wrap justify-start gap-4 pt-6">
                        <Link href={`/vendors/${vendorData.id}`}>
                         <Button variant="outline" className="rounded-xl font-black px-10 h-14 border-secondary text-secondary hover:bg-secondary hover:text-white transition-all text-lg">زيارة معرض المتجر</Button>
                        </Link>
